@@ -188,8 +188,20 @@ alias l='ls -CF'                              #
 #
 # alias cd=cd_func
 
+# Cygwin or not
+if [[ $(uname -a) =~ "CYGWIN" ]]; then
+  CYGWIN=1
+else
+  CYGWIN=0
+fi
+
+
 # Kubeconfig Location
 export KUBECONFIG=$HOME/.kube/config
+if [ $CYGWIN = 1 ] ; then
+  # kubectl on windows require windows style path
+  KUBECONFIG=$(cygpath -aw "$KUBECONFIG")
+fi
 
 # Kubeconfig Completiona and alias as k
 source <(kubectl completion bash)
