@@ -195,6 +195,13 @@ else
   CYGWIN=0
 fi
 
+# Kube editor
+# KUBE_EDITOR default to vi on Linux and notepad on Windows
+# https://kubernetes.io/docs/reference/kubectl/generated/kubectl_edit/
+if [ $CYGWIN = 1 ] ; then
+  # kubectl a windows like style path
+   export KUBE_EDITOR='c:/Notepad++/notepad++.exe -notabbar -multiInst -nosession -noPlugin'
+fi
 
 # Kubeconfig Location
 export KUBECONFIG=$HOME/.kube/config
