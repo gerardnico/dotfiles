@@ -221,6 +221,7 @@ eval "$(fnm env --use-on-cd --version-file-strategy recursive)"
 # Git Completion
 # https://git-scm.com/book/en/v2/Appendix-A%3A-Git-in-Other-Environments-Git-in-Bash
 if [[ ! -f ~/git-completion.bash ]]; then
+	echo "Git Completion Not Found. Download"
 	curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o ~/git-completion.bash
 fi
 if [ -f ~/git-completion.bash ]; then  
@@ -229,6 +230,7 @@ fi
 # Git Prompt Customization
 # https://git-scm.com/book/en/v2/Appendix-A%3A-Git-in-Other-Environments-Git-in-Bash
 if [[ ! -f ~/git-prompt.sh ]]; then
+    echo "Git Prompt Not Found. Download"
 	curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh -o ~/git-prompt.sh
 fi
 if [ -f ~/git-prompt.sh ]; then  
