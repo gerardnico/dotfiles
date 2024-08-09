@@ -188,6 +188,9 @@ alias l='ls -CF'                              #
 #
 # alias cd=cd_func
 
+# Add the bin (used by chezmoi)
+export PATH="~/bin:$PATH"
+
 # Cygwin or not
 if [[ $(uname -a) =~ "CYGWIN" ]]; then
   CYGWIN=1
@@ -216,7 +219,12 @@ alias k=kubectl
 complete -o default -F __start_kubectl k
 
 # fnm Eval for the search of node version file on each cd
-eval "$(fnm env --use-on-cd --version-file-strategy recursive)"
+FNM_PATH="~/.local/share/fnm"
+if [ -d "$FNM_PATH" ]; then
+  export PATH="$FNM_PATH:$PATH"
+  eval "`fnm env --use-on-cd --version-file-strategy recursive`"
+fi
+
 
 # Git Completion
 # https://git-scm.com/book/en/v2/Appendix-A%3A-Git-in-Other-Environments-Git-in-Bash
@@ -245,4 +253,11 @@ if [ -f ~/git-prompt.sh ]; then
   # and __git_ps1 " (%s)" calls the function provided by git-prompt.sh with a formatting argument. 
   
   export PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n$(__git_ps1 "(%s)")\$ '
+fi
+
+# fnm
+FNM_PATH="/home/admin/.local/share/fnm"
+if [ -d "$FNM_PATH" ]; then
+  export PATH="$FNM_PATH:$PATH"
+  eval "`fnm env`"
 fi
