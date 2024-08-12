@@ -1,0 +1,5 @@
+[user]
+	name = Nicolas GERARD
+	email = gerardnico@gmail.com
+[core]
+	autocrlf = true

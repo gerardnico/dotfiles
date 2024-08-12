@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Ref:
+# https://stackoverflow.com/questions/10209660/using-notepad-for-git-inside-cygwin
+echo /cygdrive/c/Notepad++/notepad++.exe -multiInst -notabbar \
+  -nosession -noPlugin `cygpath.exe -w "$*"`
+
+/cygdrive/c/Notepad++/notepad++.exe -multiInst -notabbar \
+  -nosession -noPlugin `cygpath.exe -w "$*"`

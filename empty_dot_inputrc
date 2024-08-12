@@ -1,0 +1,9 @@
+# Disable https://cirw.in/blog/bracketed-paste
+# Because it does not work well with Ditto
+# We get # "^[[200~" bracketed-paste
+# To avoid new behaviour of the shell, intended to prevent copy-and-paste injection attacks
+# https://superuser.com/questions/1532688/pasting-required-text-into-terminal-emulator-results-in-200required-text
+# https://github.com/mintty/mintty/issues/1138
+
+set enable-bracketed-paste off
+
