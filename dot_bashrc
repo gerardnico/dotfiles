@@ -1,4 +1,6 @@
 #!/bin/bash
+# set -Eeuo pipefail
+
 # The shebang is for the IDE
 
 # To the extent possible under law, the author(s) have dedicated all
@@ -266,6 +268,12 @@ if [ -f ~/git-prompt.sh ]; then
   
   export PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n$(__git_ps1 "(%s)")\$ '
 fi
+# Alias and function
+alias gs='git status'
+ga(){
+  git add . && git commit -m $1 && git push
+}
+
 
 
 ##############################
@@ -287,84 +295,31 @@ export ANSIBLE_HOME=ansible
 export ANSIBLE_LOCAL_HOME=/mnt/c/code/infra
 
 
-
-
 ##############################
 # SSH
 ##############################
-## We start the SSH agent and add passphrased keys if we find env variables that starts with a special prefix
+# We start the SSH agent and load the kwys
 
-# https://docs.github.com/en/authentication/connecting-to-github-with-ssh/working-with-ssh-key-passphrases#auto-launching-ssh-agent-on-git-for-windows
-# The env file with the SSH_AUTH_SOCK and SSH_AGENT_PID
-# Example:
-# SSH_AUTH_SOCK=/tmp/ssh-XXXXXXVv4IgB/agent.17882; export SSH_AUTH_SOCK;
-# SSH_AGENT_PID=17883; export SSH_AGENT_PID;
-# echo Agent pid 17883;
-env=~/.ssh/agent.env
+# Load the ssh_agent* functions
+source ~/.bashrc.d/ssh_agent_functions.sh
 
-# Start the agent
-# normally it was `eval "$(ssh-agent -s)"`
-agent_start () {
-    echo Starting the ssh-agent
-    (umask 077; ssh-agent >| "$env")
-    . "$env" >| /dev/null ; 
-}
+# The location of the env file
+SSH_ENV=~/.ssh/ssh-agent.env
 
-# Load the env
-agent_load_env () { test -f "$env" && . "$env" >| /dev/null ; }
-agent_load_env
+# Load the env if available
+ssh_agent_load_env $SSH_ENV
 
-# Agent_run_state: 
-# * 0=agent running w/ key; 
-# * 1=agent w/o key; 
-# * 2=agent not running
-agent_run_state=$(ssh-add -l >| /dev/null 2>&1; echo $?)
-
-if [ ! "$SSH_AUTH_SOCK" ] || [ $agent_run_state = 2 ]; then
-    agent_start
-	# add default non-protected keys from ~/.ssh
-    ssh-add
-elif [ "$SSH_AUTH_SOCK" ] && [ $agent_run_state = 1 ]; then
-    ssh-add
+# Get the state
+SSH_AGENT_RUN_STATE=$(ssh_agent_state)
+if [ ! "$SSH_AUTH_SOCK" ] || [ $SSH_AGENT_RUN_STATE = 2 ]; then
+	echo Agent not started
+    ssh_agent_start $SSH_ENV
+	ssh_agent_load_keys
+elif [ "$SSH_AUTH_SOCK" ] && [ $SSH_AGENT_RUN_STATE = 1 ]; then
+	echo Agent not started but empty
+    ssh_agent_load_keys
 fi
 
-unset env
-
-
-# Loop through the ANSIBLE_SSH_KEY_PASSPHRASE environment variables
-# and add the key to the agent
-# Example:
-# With the env `SSH_KEY_PASSPHRASE_MY_KEY` the script below will:
-# * try to find a file at `~/.ssh/my_key`
-# * add it with the value of `ANSIBLE_SSH_KEY_PASSPHRASE_MY_KEY` as passphrase
-#
-SSH_VAR_PREFIX='SSH_KEY_PASSPHRASE_'
-for var in $(printenv | grep -oP "^$SSH_VAR_PREFIX\K[^=]+")
-do
-  filename=$(echo "$var" | tr '[:upper:]' '[:lower:]')
-  fullVariableName="$SSH_VAR_PREFIX$var"
-  filePath=~/.ssh/"$filename"
-  echo "The SSH env variable $fullVariableName was found"
-  if [ -f "$filePath" ]; then
-	echo "Trying to add the key $filename to the SSH agent"
-	# The instruction is in the man page. SSH_ASKPASS needs a path to an executable
-	# that emits the secret to stdout.
-	# See doc: https://man.archlinux.org/man/ssh.1.en#SSH_ASKPASS
-	SSH_ASKPASS="$HOME/.ssh/askpass.sh"
-	echo "  - Creating the executable $SSH_ASKPASS"
-	PASSPHRASE=$(eval "echo \$$SSH_VAR_PREFIX$var")
-	printf "#!/bin/sh\necho %s\n" "$PASSPHRASE" > "$SSH_ASKPASS"
-	chmod +x "$SSH_ASKPASS"
-	TIMEOUT=5
-	echo "  - Executing ssh-add (if the passphrase is incorrect, the execution will freeze for ${TIMEOUT} sec)"
-	# freeze due to SSH_ASKPASS_REQUIRE=force otherwise it will ask it at the terminal
-	BAD_PASSPHRASE_RESULT="Bad passphrase"
-	result=$(timeout $TIMEOUT bash -c "DISPLAY=:0 SSH_ASKPASS_REQUIRE=force SSH_ASKPASS=$SSH_ASKPASS ssh-add $filePath" 2>&1 || echo "$BAD_PASSPHRASE_RESULT")
-	echo "  - $result" # should be `Identity added:xxx`
-	[ "$result" == "$BAD_PASSPHRASE_RESULT" ] && exit 1;
-  else
-	echo "The env variable $fullVariableName designs a key file ($filePath) that does not exist" >&2
-	exit 1;
-  fi
-done
+unset SSH_AGENT_RUN_STATE
+unset SSH_ENV
 
