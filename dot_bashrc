@@ -306,19 +306,20 @@ source ~/.bashrc.d/ssh_agent_functions.sh
 
 # The location of the env file
 export SSH_ENV=~/.ssh/ssh-agent.env
+export SSH_AUTH_SOCK=~/.ssh/agent.sock
 
 # Load the env if available
-ssh_agent_load_env $SSH_ENV
+ssh-agent-load-env $SSH_ENV
 
 # Get the state
-SSH_AGENT_RUN_STATE=$(ssh_agent_state)
+SSH_AGENT_RUN_STATE=$(ssh-agent-state)
 if [ ! "$SSH_AUTH_SOCK" ] || [ $SSH_AGENT_RUN_STATE = 2 ]; then
 	echo Agent not started
-    ssh_agent_start $SSH_ENV
-	ssh_agent_load_keys
+    ssh-agent-start $SSH_ENV $SSH_AUTH_SOCK
+	ssh-add-keys
 elif [ "$SSH_AUTH_SOCK" ] && [ $SSH_AGENT_RUN_STATE = 1 ]; then
 	echo Agent not started but empty
-    ssh_agent_load_keys
+    ssh-add-keys
 fi
 
 unset SSH_AGENT_RUN_STATE

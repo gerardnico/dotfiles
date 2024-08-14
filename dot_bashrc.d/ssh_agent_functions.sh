@@ -12,15 +12,16 @@
 
 # Start the agent and store the env in a file passed as argument
 # normally it was `eval "$(ssh-agent -s)"`
-ssh_agent_start () {
-	local env="${1:-$SSH_ENV}"
-    echo Starting the ssh-agent and storing env at $env
-    (umask 077; ssh-agent >| "$env")
-    . "$env" >| /dev/null ; 
+ssh-agent-start () {
+	local ENV="${1:-$SSH_ENV}"
+	local SOCK="${2:-$SSH_AUTH_SOCK}"
+    echo Starting the ssh-agent with env at $ENV and sock at $SSH_AUTH_SOCK
+    (umask 077; ssh-agent -a $SOCK >| "$ENV")
+    . "$ENV" >| /dev/null ; 
 }
 
 # Load the env
-ssh_agent_load_env () { 
+ssh-agent-load-env () { 
 	local env="${1:-$SSH_ENV}"
 	test -f "$env" && . "$env" >| /dev/null ; 
 }
@@ -30,7 +31,7 @@ ssh_agent_load_env () {
 #  * non-protected keys and 
 #  * protected keys if we find the passphrase in env variables that starts with a special prefix
 #
-ssh_agent_load_keys(){
+ssh-add-keys(){
 
    # add default non-protected keys from ~/.ssh
    ssh-add
@@ -78,9 +79,14 @@ ssh_agent_load_keys(){
 # * 0=agent running with key; 
 # * 1=agent without key; 
 # * 2=agent not running
-ssh_agent_state(){
+ssh-agent-state(){
 
   ssh-add -l >| /dev/null 2>&1;
   echo $?;
   
+}
+
+# Kill a running agent
+ssh-agent-kill(){
+  ssh-agent -k
 }
