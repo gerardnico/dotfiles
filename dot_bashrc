@@ -292,10 +292,14 @@ export ANSIBLE_LOCAL_HOME=/mnt/c/code/infra
 ##############################
 # SSH
 ##############################
-## We start the SSH agent and add keys if we find env variables that starts with a special prefix
+## We start the SSH agent and add passphrased keys if we find env variables that starts with a special prefix
 
 # https://docs.github.com/en/authentication/connecting-to-github-with-ssh/working-with-ssh-key-passphrases#auto-launching-ssh-agent-on-git-for-windows
-# The env file
+# The env file with the SSH_AUTH_SOCK and SSH_AGENT_PID
+# Example:
+# SSH_AUTH_SOCK=/tmp/ssh-XXXXXXVv4IgB/agent.17882; export SSH_AUTH_SOCK;
+# SSH_AGENT_PID=17883; export SSH_AGENT_PID;
+# echo Agent pid 17883;
 env=~/.ssh/agent.env
 
 # Start the agent
@@ -318,6 +322,7 @@ agent_run_state=$(ssh-add -l >| /dev/null 2>&1; echo $?)
 
 if [ ! "$SSH_AUTH_SOCK" ] || [ $agent_run_state = 2 ]; then
     agent_start
+	# add default non-protected keys from ~/.ssh
     ssh-add
 elif [ "$SSH_AUTH_SOCK" ] && [ $agent_run_state = 1 ]; then
     ssh-add
