@@ -31,6 +31,7 @@
 # If not running interactively, don't do anything
 [[ "$-" != *i* ]] && return
 
+
 # Shell Options
 #
 # See man bash for more options...
@@ -304,7 +305,7 @@ export ANSIBLE_LOCAL_HOME=/mnt/c/code/infra
 source ~/.bashrc.d/ssh_agent_functions.sh
 
 # The location of the env file
-SSH_ENV=~/.ssh/ssh-agent.env
+export SSH_ENV=~/.ssh/ssh-agent.env
 
 # Load the env if available
 ssh_agent_load_env $SSH_ENV

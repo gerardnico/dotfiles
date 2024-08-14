@@ -13,13 +13,17 @@
 # Start the agent and store the env in a file passed as argument
 # normally it was `eval "$(ssh-agent -s)"`
 ssh_agent_start () {
-    echo Starting the ssh-agent and storing env at $1
-    (umask 077; ssh-agent >| "$1")
-    . "$1" >| /dev/null ; 
+	local env="${1:-$SSH_ENV}"
+    echo Starting the ssh-agent and storing env at $env
+    (umask 077; ssh-agent >| "$env")
+    . "$env" >| /dev/null ; 
 }
 
 # Load the env
-ssh_agent_load_env () { test -f "$1" && . "$1" >| /dev/null ; }
+ssh_agent_load_env () { 
+	local env="${1:-$SSH_ENV}"
+	test -f "$env" && . "$env" >| /dev/null ; 
+}
 
 # Agent load keys
 # Add:
