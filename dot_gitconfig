@@ -3,3 +3,5 @@
 	email = gerardnico@gmail.com
 [core]
 	autocrlf = true
+[init]
+	defaultBranch = main
