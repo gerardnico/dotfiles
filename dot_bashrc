@@ -195,8 +195,10 @@ alias l='ls -CF'                              #
 export PATH="~/bin:$PATH"
 
 ##############################
-# Secret
+# Secrets
 ##############################
+# On Wsl, create the env on Windows and add it to `WSLENV`
+# example: WSLENV=WT_SESSION:WT_PROFILE_ID:SSH_AUTH_SOCK:HCLOUD_TOKEN
 SECRET_PATH=~/.bashrc-secret
 if [ -f "$SECRET_PATH" ]; then
  source $SECRET_PATH
