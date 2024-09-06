@@ -1,0 +1,23 @@
+#!/bin/bash
+# Auto Push for ChezMoi. Give a commit message
+#
+# Named chezmoy because the name `chezmoi` is protected
+# When trying to add it, you get
+# chezmoi: /home/admin/bin/chezmoi-autopush: cannot add chezmoi file to chezmoi (/home/admin/bin/chezmoi is protected)
+# Source: https://github.com/twpayne/chezmoi/blob/0355a62a8afdb820ffa22291e56e0dafec6f49c0/internal/chezmoi/sourcestate.go#L390
+
+# flag
+# e - Exit if any error
+# u - Treat unset variables as an error when substituting
+# o pipefail - the return value of a pipeline is the status of the last command to exit with a non-zero status or zero if no command exited with a non-zero status
+# E - the ERR trap is inherited by shell functions
+set -Eeuo pipefail
+
+if [ "$1" == "" ]; then
+  echo "Commit message is mandatory"
+  exit 1
+fi
+
+chezmoi git add .
+chezmoi git -- commit -m "$1"
+chezmoi git push -u origin main

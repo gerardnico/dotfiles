@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Dep
+# for the column util
+# sudo apt-get install -y bsdmainutils
+
+
+# flag
+# e - Exit if any error
+# u - Treat unset variables as an error when substituting
+# o pipefail - the return value of a pipeline is the status of the last command to exit with a non-zero status or zero if no command exited with a non-zero status
+# E - the ERR trap is inherited by shell functions
+set -Eeuo pipefail
+
+function show_usage {
+  cat <<EOF
+Usage: $0 [--help] (filename|-)
+
+View a CSV file at the command line.
+
+  --help        Show this help text.
+  filename      CSV file to be viewed
+  -             For Stdin
+
+You can also 
+EOF
+}
+
+descriptor=${1:-}
+if [ "$descriptor" == '' ]; then
+  echo "A filename or - for stdin is expected as first argument"
+  show_usage
+  exit 1
+fi
+
+if [ "$descriptor" == '--help' -o "$descriptor" == '-h' ]; then
+  show_usage
+  exit
+fi
+
+if [ "$descriptor" == '-' ]; then
+  # cat reads from its fd 0 (stdin) and writes to its fd 1
+  cat | column -s, -t | less -#2 -N -S
+else 
+  cat $descriptor | column -s, -t | less -#2 -N -S
+fi
+
+
+

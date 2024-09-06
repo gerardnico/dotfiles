@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Note if you want it pretty printed
+# fs-to-csv | csv-to-pretty
+
+# flag
+# e - Exit if any error
+# u - Treat unset variables as an error when substituting
+# o pipefail - the return value of a pipeline is the status of the last command to exit with a non-zero status or zero if no command exited with a non-zero status
+# E - the ERR trap is inherited by shell functions
+set -Eeuo pipefail
+
+pwd=$(pwd)
+start_dir=${1:-$pwd}  # The directory to start traversing from
+
+
+# Write the CSV header
+echo "File Name,File Path,File Tree Level,File Parent Directory,File’s size in bytes,Disk space in 1 KB blocks,File’s last modification time,File’s last status change time" 
+
+# Because:
+# * we want a relative parent directory 
+# * the %h add the full passed argument directory
+# we need to go into the target directory, pass '.'
+# and come back to original directory
+pushd ${start_dir} > /dev/null
+
+# Print the data
+find . -type f -printf "%f,%P,%d,%h,%s,%k,%TY-%Tm-%TdT%TH:%TM,%CY-%Cm-%CdT%CH:%CM\n"
+
+popd > /dev/null
+
