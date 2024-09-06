@@ -192,14 +192,14 @@ alias l='ls -CF'                              #
 # alias cd=cd_func
 
 # Add the bin (used by chezmoi)
-export PATH="~/bin:$PATH"
+export PATH="$HOME/bin:$PATH"
 
 ##############################
 # Secrets
 ##############################
 # On Wsl, create the env on Windows and add it to `WSLENV`
 # example: WSLENV=WT_SESSION:WT_PROFILE_ID:SSH_AUTH_SOCK:HCLOUD_TOKEN
-SECRET_PATH=~/.bashrc-secret
+SECRET_PATH=$HOME/.bashrc-secret
 if [ -f "$SECRET_PATH" ]; then
  source $SECRET_PATH
 fi
@@ -249,8 +249,8 @@ if [[ ! -f ~/git-completion.bash ]]; then
 	echo "Git Completion Not Found. Download"
 	curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o ~/git-completion.bash
 fi
-if [ -f ~/git-completion.bash ]; then  
-  . ~/git-completion.bash
+if [ -f "$HOME"/git-completion.bash ]; then
+  . "$HOME"/git-completion.bash
 fi
 # Git Prompt Customization
 # https://git-scm.com/book/en/v2/Appendix-A%3A-Git-in-Other-Environments-Git-in-Bash
@@ -259,7 +259,7 @@ if [[ ! -f ~/git-prompt.sh ]]; then
 	curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh -o ~/git-prompt.sh
 fi
 if [ -f ~/git-prompt.sh ]; then  
-  . ~/git-prompt.sh
+  . "$HOME"/git-prompt.sh
   export GIT_PS1_SHOWDIRTYSTATE=1
   # PS1:
   # This is the default PS1 where we have added the __git_ps1 function just before the dollar character
@@ -283,10 +283,10 @@ ga(){
 # Node
 ##############################
 # fnm Eval for the search of node version file on each cd
-FNM_PATH="~/.local/share/fnm"
+FNM_PATH="$HOME/.local/share/fnm"
 if [ -d "$FNM_PATH" ]; then
   export PATH="$FNM_PATH:$PATH"
-  eval "`fnm env --use-on-cd --version-file-strategy recursive`"
+  eval "$(fnm env --use-on-cd --version-file-strategy recursive)"
 fi
 
 ##############################
@@ -304,7 +304,7 @@ export ANSIBLE_LOCAL_HOME=/mnt/c/code/infra
 # We start the SSH agent and load the kwys
 
 # Load the ssh_agent* functions
-source ~/.bashrc.d/ssh_agent_functions.sh
+source "$HOME"/.bashrc.d/ssh_agent_functions.sh
 
 # The location of the env file
 export SSH_ENV=~/.ssh/ssh-agent.env
