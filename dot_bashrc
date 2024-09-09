@@ -286,7 +286,11 @@ ga(){
 FNM_PATH="$HOME/.local/share/fnm"
 if [ -d "$FNM_PATH" ]; then
   export PATH="$FNM_PATH:$PATH"
-  eval "$(fnm env --use-on-cd --version-file-strategy recursive)"
+  # Set default to system to avoid: Can't find an installed Node version matching default
+  fnm default system
+  eval "$(fnm env --use-on-cd --shell bash --version-file-strategy recursive --log-level info --default-if-none)"
+  # https://github.com/Schniz/fnm?tab=readme-ov-file#completions
+  fnm completions --shell bash
 fi
 
 ##############################
