@@ -201,7 +201,8 @@ export PATH="$HOME/bin:$PATH"
 # example: WSLENV=WT_SESSION:WT_PROFILE_ID:SSH_AUTH_SOCK:HCLOUD_TOKEN
 SECRET_PATH=$HOME/.bashrc-secret
 if [ -f "$SECRET_PATH" ]; then
- source $SECRET_PATH
+ # shellcheck disable=SC1090
+ source "$SECRET_PATH"
 fi
 
 
@@ -234,7 +235,8 @@ if [ $CYGWIN = 1 ] ; then
   KUBECONFIG=$(cygpath -aw "$KUBECONFIG")
 fi
 
-# Kubeconfig Completiona and alias as k
+# Kubeconfig Completion and alias as k
+# shellcheck disable=SC1090
 source <(kubectl completion bash)
 alias k=kubectl
 complete -o default -F __start_kubectl k
@@ -290,8 +292,8 @@ if [ -d "$FNM_PATH" ]; then
   fnm default system
   eval "$(fnm env --use-on-cd --shell bash --version-file-strategy recursive --log-level info)" >/dev/null 2>&1
   # https://github.com/Schniz/fnm?tab=readme-ov-file#completions
-  # The below output only the completion file, they should be installed somewhere
-  # fnm completions --shell bash
+  # The below output only the completion script
+  eval "$(fnm completions --shell bash)"
 fi
 
 ##############################
@@ -302,11 +304,21 @@ export ANSIBLE_CONFIG=ansible.cfg
 export ANSIBLE_HOME=ansible
 export ANSIBLE_LOCAL_HOME=/mnt/c/code/infra
 
+###############################
+# Rclone completion
+##############################
+RCLONE_COMPLETION=/etc/bash_completion.d/rclone
+if [ -x "$(command -v rclone)" ] && [ ! -f "$RCLONE_COMPLETION" ]; then
+  sudo rclone genautocomplete bash $RCLONE_COMPLETION
+  # shellcheck disable=SC1090
+  source $RCLONE_COMPLETION
+fi
+
 
 ##############################
 # SSH
 ##############################
-# We start the SSH agent and load the kwys
+# We start the SSH agent and load the keys
 
 # Load the ssh_agent* functions
 source "$HOME"/.bashrc.d/ssh_agent_functions.sh
@@ -320,11 +332,11 @@ ssh-agent-load-env $SSH_ENV
 
 # Get the state
 SSH_AGENT_RUN_STATE=$(ssh-agent-state)
-if [ ! "$SSH_AUTH_SOCK" ] || [ $SSH_AGENT_RUN_STATE = 2 ]; then
+if [ ! "$SSH_AUTH_SOCK" ] || [ "$SSH_AGENT_RUN_STATE" = 2 ]; then
 	echo Agent not started
     ssh-agent-start $SSH_ENV $SSH_AUTH_SOCK
 	ssh-add-keys
-elif [ "$SSH_AUTH_SOCK" ] && [ $SSH_AGENT_RUN_STATE = 1 ]; then
+elif [ "$SSH_AUTH_SOCK" ] && [ "$SSH_AGENT_RUN_STATE" = 1 ]; then
 	echo Agent not started but empty
     ssh-add-keys
 fi
