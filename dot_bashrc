@@ -220,26 +220,30 @@ fi
 ##############################
 # Kube
 ##############################
-# Kube editor
-# KUBE_EDITOR default to vi on Linux and notepad on Windows
-# https://kubernetes.io/docs/reference/kubectl/generated/kubectl_edit/
-if [ $CYGWIN = 1 ] ; then
-  # kubectl a windows like style path
-   export KUBE_EDITOR='c:/Notepad++/notepad++.exe -notabbar -multiInst -nosession -noPlugin'
-fi
+if [ -x "$(command -v kubectl)" ]; then
 
-# Kubeconfig Location
-export KUBECONFIG=$HOME/.kube/config
-if [ $CYGWIN = 1 ] ; then
-  # kubectl on windows require windows style path
-  KUBECONFIG=$(cygpath -aw "$KUBECONFIG")
-fi
+  # Kubeconfig Location
+  export KUBECONFIG=$HOME/.kube/config
+  if [ $CYGWIN = 1 ] ; then
+    # kubectl on windows require windows style path
+    KUBECONFIG=$(cygpath -aw "$KUBECONFIG")
+  fi
 
-# Kubeconfig Completion and alias as k
-# shellcheck disable=SC1090
-source <(kubectl completion bash)
-alias k=kubectl
-complete -o default -F __start_kubectl k
+  # Kube editor
+  # KUBE_EDITOR default to vi on Linux and notepad on Windows
+  # https://kubernetes.io/docs/reference/kubectl/generated/kubectl_edit/
+  if [ $CYGWIN = 1 ] ; then
+    # kubectl a windows like style path
+     export KUBE_EDITOR='c:/Notepad++/notepad++.exe -notabbar -multiInst -nosession -noPlugin'
+  fi
+
+  # Kubeconfig Completion and alias as k
+  # shellcheck disable=SC1090
+  source <(kubectl completion bash)
+  alias k=kubectl
+  complete -o default -F __start_kubectl k
+
+fi
 
 
 ##############################
@@ -321,24 +325,30 @@ fi
 # We start the SSH agent and load the keys
 
 # Load the ssh_agent* functions
+# shellcheck source=./dot_bashrc.d/ssh_agent_functions.sh
 source "$HOME"/.bashrc.d/ssh_agent_functions.sh
 
 # The location of the env file
-export SSH_ENV=~/.ssh/ssh-agent.env
-export SSH_AUTH_SOCK=~/.ssh/agent.sock
+export SSH_ENV="$HOME"/.ssh/ssh-agent.env
+export SSH_AUTH_SOCK="$HOME"/.ssh/agent.sock
 
 # Load the env if available
-ssh-agent-load-env $SSH_ENV
+ssh-agent-load-env "$SSH_ENV"
 
 # Get the state
 SSH_AGENT_RUN_STATE=$(ssh-agent-state)
 if [ ! "$SSH_AUTH_SOCK" ] || [ "$SSH_AGENT_RUN_STATE" = 2 ]; then
-	echo Agent not started
-    ssh-agent-start $SSH_ENV $SSH_AUTH_SOCK
+	echo "Agent not started"
+	if [ -f "$SSH_AUTH_SOCK" ]; then
+	  echo "Deleting Sock file $SSH_AUTH_SOCK"
+	  rm "$SSH_AUTH_SOCK"
+	fi
+	echo "Staring Agent"
+  ssh-agent-start "$SSH_ENV" "$SSH_AUTH_SOCK"
 	ssh-add-keys
 elif [ "$SSH_AUTH_SOCK" ] && [ "$SSH_AGENT_RUN_STATE" = 1 ]; then
 	echo Agent not started but empty
-    ssh-add-keys
+  ssh-add-keys
 fi
 
 unset SSH_AGENT_RUN_STATE

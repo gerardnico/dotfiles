@@ -7,9 +7,47 @@
 # E - the ERR trap is inherited by shell functions
 set -Eeuo pipefail
 
+COMMAND=""
+HELP_ASKED="false"
+for arg in "$@"; do
+  case "$arg" in
+  --help)
+      HELP_ASKED="true";
+      ;;
+  --*|-*)
+    # argument
+    ;;
+  *)
+    # Command or arg
+    if [ "$COMMAND" = "" ]; then
+        COMMAND=$1
+      else
+        if [ "$COMMAND" = "backup" ]; then
+          DIRECTORY="$arg"
+        fi
+    fi
+    ;;
+  esac
+done
+
+OPTION=""
+if [ "$COMMAND" = "backup" ] && [ "$HELP_ASKED" == "false" ]; then
+  if [ ! -d "$DIRECTORY" ]; then
+    echo "The $DIRECTORY was not found. Did you mount GDrive?"
+    exit 1
+  fi
+  FILE_COUNT=$(rclone lsf "$DIRECTORY" | wc -l)
+  if [ "$FILE_COUNT" = 0 ]; then
+    echo "No files to backup into $DIRECTORY. Did you mount GDrive?"
+    exit 1
+  fi
+  # --ignore-ctime because the docs are exported
+  OPTION="--host gdrive"
+fi
+
 
 RESTIC_PASSWORD=$RESTIC_PASSWORD \
  RESTIC_REPOSITORY=$RESTIC_REPOSITORY/gdrive \
  AWS_SECRET_ACCESS_KEY=$RESTIC_AWS_SECRET_ACCESS_KEY \
  AWS_ACCESS_KEY_ID=$RESTIC_AWS_ACCESS_KEY_ID \
- /usr/bin/restic "$@"
+ /usr/bin/restic "$@" $OPTION
