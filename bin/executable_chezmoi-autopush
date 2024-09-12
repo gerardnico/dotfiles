@@ -1,8 +1,8 @@
 #!/bin/bash
 # Auto Push for ChezMoi. Give a commit message
 #
-# Named chezmoy because the name `chezmoi` is protected
-# When trying to add it, you get
+# Don't install chezmoi in the bin directory because the path to the `chezmoi` executable is protected
+# When trying to add this executable, you would get
 # chezmoi: /home/admin/bin/chezmoi-autopush: cannot add chezmoi file to chezmoi (/home/admin/bin/chezmoi is protected)
 # Source: https://github.com/twpayne/chezmoi/blob/0355a62a8afdb820ffa22291e56e0dafec6f49c0/internal/chezmoi/sourcestate.go#L390
 
@@ -20,4 +20,4 @@ fi
 
 chezmoi git add .
 chezmoi git -- commit -m "$1"
-chezmoi git push -u origin main
+chezmoi git push
