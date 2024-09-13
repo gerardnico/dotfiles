@@ -13,19 +13,28 @@ WEBSITE_URL=$1
 
 # Download the website and log details
 wget \
-  --mirror `#shortcut for -N -r -l inf --no-remove-listing` \
-  --continue `#resume getting a partially-downloaded file` \
+  --mirror \
+  --continue \
   --level=inf \
   --no-parent \
   --quiet \
-  --progress=TYPE `#select progress gauge type` \
-  --show-progress `#display the progress bar in any verbosity mode` \
-  --timeout=2 `#set all timeout values to SECONDS` \
-  --waitretry=3 `#wait SECONDS between retries of a retrieval` \
+  --progress=bar:force  \
+  --show-progress \
+  --timeout=2 \
+  --waitretry=3 \
   --output-file=wget-output.txt \
   --append-output=wget-append.txt \
-  --output-document=wget-document.txt
   "$WEBSITE_URL"
+# where
+# quiet    - turn of wget output
+# mirror   - shortcut for -N -r -l inf --no-remove-listing
+# continue - resume getting a partially-downloaded file
+# show-progress - display the progress bar in any verbosity mode
+# progress=type - select the progress bar type
+# timeout   - set all timeout values to SECONDS
+# waitretry - wait SECONDS between retries of a retrieval
+# output-document - will save the document (ie body response)
+
 
 # Count the number of requests made (lines starting with "HTTP" in the log)
 TOTAL_REQUESTS=$(grep -c "HTTP/" wget-log.txt)

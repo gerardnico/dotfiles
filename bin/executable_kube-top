@@ -15,11 +15,22 @@ list_pods (){
   PODS=$(kubectl get pods --namespace="$NAMESPACE" -o jsonpath='{.items[*].metadata.name}' --field-selector=status.phase=Running)
   for POD in $PODS; do
     read -r  CPU MEM <<< "$(kubectl top pod "$POD" --namespace="$NAMESPACE" | awk '{ if(NR>1) print $2, $3 }')"
-    printf "Pod: %s\n * CPU: %s\n * MEM: %s\n\nSleeping %s sec" "$POD" "$CPU" "$MEM" "$SLEEPING"
+    # PS=$(kubectl exec -it "$POD" --namespace="$NAMESPACE" -- ps auxww --sort -command)
+    # https://www.gnu.org/software/gawk/manual/html_node/Printf.html
+    PS=$(kubectl exec -it "$POD" --namespace="$NAMESPACE" -- ps auxww --sort -command | awk '
+    BEGIN { print "PID          CPU     MEM (MB)  COMMAND"
+            print "----      ------     --------  ----------------" }
+          { if(NR>1) printf "%-10s %5s %12.2f  %s %s %s %s\n", $2, $3, $6/1024, $11, $12, $13, $14}
+          ')
+    # Trying to print in MB
+    # RSS is the amount of memory in Bytes (1024)
+    #PS=$(kubectl exec -it "$POD" --namespace="$NAMESPACE" -- ps auxww --sort -command | awk 'NR=1 {printf "%-10s %-10s %-10s\n", $2, $3, $6 } NR>1 {printf "%-10s %-10s %-10s\n", $2, $3, $6/1024 " MB"}')
+    printf "Pod: %s\n * CPU: %s\n * MEM: %s\n%s\n\nSleeping %s sec" "$POD" "$CPU" "$MEM" "$PS" "$SLEEPING"
   done
 }
 
 while sleep $SLEEPING; do
   printf '%s\n' "$(clear; list_pods)"
 done
+
 
