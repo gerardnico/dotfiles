@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# flag
+# e - Exit if any error
+# u - Treat unset variables as an error when substituting
+# o pipefail - the return value of a pipeline is the status of the last command to exit with a non-zero status or zero if no command exited with a non-zero status
+# E - the ERR trap is inherited by shell functions
+set -Eeuo pipefail
+
+# Check if container is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <container>"
+    exit 1
+fi
+
+sleep=1
+while :; do
+
+  output=$(docker top "$1" aux | awk '{ if(NR>1) print $6/1024 " MB", $11, $12, $13, $14}' | sort -k2 -nr)
+  # docker top "site-com-combostrap" aux |  awk '{ for(i=1;i<=NF;i++) {if ( i >= 11 || i == 2 ) printf $i" "}; printf "\n" }'
+  total=$(docker stats "$1" --no-stream --format "{{.MemUsage}}" | awk '{print $1}')
+  clear
+  printf "%s\nTotal: %s\nSleeping %s" "$output" "$total" "$sleep"
+  sleep 1
+
+done

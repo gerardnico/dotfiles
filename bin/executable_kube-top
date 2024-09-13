@@ -1,0 +1,25 @@
+#!/bin/bash
+# Shows the process inside a Pod
+
+# Check if the namespace is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <namespace>"
+    exit 1
+fi
+
+NAMESPACE=$1
+SLEEPING=1
+
+list_pods (){
+  # Fetch all running pods in the given namespace
+  PODS=$(kubectl get pods --namespace="$NAMESPACE" -o jsonpath='{.items[*].metadata.name}' --field-selector=status.phase=Running)
+  for POD in $PODS; do
+    read -r  CPU MEM <<< "$(kubectl top pod "$POD" --namespace="$NAMESPACE" | awk '{ if(NR>1) print $2, $3 }')"
+    printf "Pod: %s\n * CPU: %s\n * MEM: %s\n\nSleeping %s sec" "$POD" "$CPU" "$MEM" "$SLEEPING"
+  done
+}
+
+while sleep $SLEEPING; do
+  printf '%s\n' "$(clear; list_pods)"
+done
+
