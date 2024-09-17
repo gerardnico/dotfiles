@@ -1,3 +1,4 @@
 #!/bin/bash
+# Return the CIDR of pods
 
 kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.podCIDR}{"\n"}{end}'

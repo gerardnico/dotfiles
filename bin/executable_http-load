@@ -1,6 +1,12 @@
 #!/bin/bash
-
 # Download a whole website
+
+# flag
+# e - Exit if any error
+# u - Treat unset variables as an error when substituting
+# o pipefail - the return value of a pipeline is the status of the last command to exit with a non-zero status or zero if no command exited with a non-zero status
+# E - the ERR trap is inherited by shell functions
+set -Eeuo pipefail
 
 # Check if URL is provided
 if [ -z "$1" ]; then
@@ -10,6 +16,10 @@ fi
 
 # Define the website URL
 WEBSITE_URL=$1
+
+LOAD_DIR=/tmp/http-load
+mkdir -p $LOAD_DIR
+pushd $LOAD_DIR || exit
 
 # Download the website and log details
 wget \
@@ -32,9 +42,11 @@ wget \
 # show-progress - display the progress bar in any verbosity mode
 # progress=type - select the progress bar type
 # timeout   - set all timeout values to SECONDS
+# no-parent - ensures it does not traverse to parent directories
 # waitretry - wait SECONDS between retries of a retrieval
 # output-document - will save the document (ie body response)
 
+popd
 
 # Count the number of requests made (lines starting with "HTTP" in the log)
 TOTAL_REQUESTS=$(grep -c "HTTP/" wget-log.txt)

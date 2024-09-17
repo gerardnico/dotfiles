@@ -1,0 +1,27 @@
+#!/bin/bash
+# Download a whole website
+
+# flag
+# e - Exit if any error
+# u - Treat unset variables as an error when substituting
+# o pipefail - the return value of a pipeline is the status of the last command to exit with a non-zero status or zero if no command exited with a non-zero status
+# E - the ERR trap is inherited by shell functions
+set -Eeuo pipefail
+
+# Check if URL is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <website_url>"
+    exit 1
+fi
+
+URL="$1"  # Replace with your desired URL
+INTERVAL=1  # Time in seconds between each request
+
+while true; do
+  STATUS=$(curl -o /dev/null -s -w "%{http_code}" "$URL")
+  echo "HTTP Status for $URL: $STATUS"
+  if [ "$INTERVAL" != "0" ]; then
+    sleep $INTERVAL
+  fi
+done
+
