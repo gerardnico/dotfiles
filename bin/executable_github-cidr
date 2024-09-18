@@ -1,0 +1,8 @@
+#!/bin/bash
+# Get the CIDR of Github
+
+
+# Get the hooks CIDR line by line
+curl -s https://api.github.com/meta | jq --raw-output '.hooks | join("\n")'
+
+

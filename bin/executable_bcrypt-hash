@@ -1,0 +1,27 @@
+#!/bin/bash
+# Hash a password with bcrypt
+
+# flag
+# e - Exit if any error
+# u - Treat unset variables as an error when substituting
+# o pipefail - the return value of a pipeline is the status of the last command to exit with a non-zero status or zero if no command exited with a non-zero status
+# E - the ERR trap is inherited by shell functions
+set -Eeuo pipefail
+
+if [ ! -x "$(command -v htpasswd)" ]; then
+  echo "htpasswd is not installed"
+  echo "Install htpasswd with: sudo apt install apache2-utils"
+  exit 1
+fi
+
+# Hash a password with bcrypt algorithm though htpasswd
+USER=""
+PASSWORD=$1
+htpasswd -bnBC 10 "$USER" "$PASSWORD" | tr -d ':\n'
+# where
+# B force to use bcrypt,
+# C set the computing time used for the bcrypt algorithm
+# b Use the password from the command line rather than prompting for it.
+# n Don't update file; display results on stdout.
+
+
