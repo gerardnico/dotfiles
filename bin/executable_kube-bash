@@ -31,7 +31,6 @@ if [ "$APP_NAME" == "busybox" ]; then
 fi
 
 echo Getting Pod Name and Namespace for app "$APP_NAME"
-# shellcheck disable=SC2089
 APP_LABEL="app.kubernetes.io/name=$APP_NAME"
 # the name label as seen here: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/
 # label app.kubernetes.io/name=prometheus
