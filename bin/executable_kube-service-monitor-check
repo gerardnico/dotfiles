@@ -31,6 +31,7 @@ read -r SERVICE_MONITOR_NAME SERVICE_MONITOR_NAMESPACE <<< "$(kubectl get servic
 
 if [ -z "$SERVICE_MONITOR_NAME" ]; then
     echo "Error: No service monitor found for app label: $APP_LABEL"
+    echo "  Is the app name correct?: $APP_NAME"
     exit 1
 fi
 echo "Service monitor found: $SERVICE_MONITOR_NAMESPACE/$SERVICE_MONITOR_NAME"
@@ -80,6 +81,9 @@ fi
 echo "Service Monitor $SERVICE_MONITOR_NAME found in the Prometheus Config file"
 
 echo "Service Monitor should work."
+echo ""
+echo " If not check the logs for any configuration/scrape problem"
+echo "   kube-logs $PROMETHEUS_OBJECT_NAME"
 
 
 
