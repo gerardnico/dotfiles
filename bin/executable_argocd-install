@@ -23,5 +23,8 @@ argocd version --client
 
 echo "Done"
 echo ""
-echo "Login with:"
-echo "argocd login argocd.i.eraldy.com --grpc-web"
+echo "Next Steps"
+echo "  * Login with           :   argocd login argocd.i.eraldy.com --grpc-web"
+echo "  * Change the namespace :   kube-ns-current argocd"
+echo "  * List apps            :   argocd app list"
+
