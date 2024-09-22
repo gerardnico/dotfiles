@@ -1,0 +1,27 @@
+#!/bin/bash
+# ArgoCd client installation
+
+
+# ARGOCD_VERSION=$(curl --silent "https://api.github.com/repos/argoproj/argo-cd/releases/latest" | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
+
+ARGOCD_VERSION=v2.11.7
+DESTINATION_BINARY=/tmp/argocd-${ARGOCD_VERSION}
+
+if [ ! -f $DESTINATION_BINARY ]; then
+  echo "Downloading ArgoCd $ARGOCD_VERSION to $DESTINATION_BINARY"
+  curl -sSL -o $DESTINATION_BINARY https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64
+else
+  echo "ArgoCd available at $DESTINATION_BINARY"
+fi
+
+echo "Set Permissions and installations"
+chmod +x $DESTINATION_BINARY
+sudo mv $DESTINATION_BINARY /usr/local/bin/argocd
+
+echo "Test Client version"
+argocd version --client
+
+echo "Done"
+echo ""
+echo "Login with:"
+echo "argocd login argocd.i.eraldy.com --grpc-web"

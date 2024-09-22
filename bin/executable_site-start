@@ -1,0 +1,38 @@
+#!/bin/bash
+# Start Combostrap
+
+
+# flag
+# e - Exit if any error
+# u - Treat unset variables as an error when substituting
+# o pipefail - the return value of a pipeline is the status of the last command to exit with a non-zero status or zero if no command exited with a non-zero status
+# E - the ERR trap is inherited by shell functions
+set -Eeuo pipefail
+
+# Check if the app name is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <site name>"
+    exit 1
+fi
+
+
+PORT=8081
+
+pushd  ~/code/site-com-combostrap/ &>/dev/null
+
+docker run \
+  --name site-com-combostrap \
+  --rm \
+  -d \
+  -p $PORT:80 \
+  --user 1000:1000 \
+  -e DOKU_DOCKER_ENV=dev \
+  -e DOKU_DOCKER_ACL_POLICY='public' \
+  -e DOKU_DOCKER_ADMIN_NAME='admin' \
+  -e DOKU_DOCKER_ADMIN_PASSWORD='welcome' \
+  -v "$PWD":/var/www/html \
+  ghcr.io/combostrap/dokuwiki:php8.3-latest
+
+echo "Combostrap should be available at http://localhost:$PORT"
+
+popd &>/dev/null
