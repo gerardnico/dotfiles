@@ -1,5 +1,5 @@
 #!/bin/bash
-# Start Combostrap
+# Start a site
 
 
 # flag
@@ -15,24 +15,73 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
+SITE_NAME=$1
 
-PORT=8081
+case "$SITE_NAME" in
+  "combostrap")
+    SITE_QUALIFIED_NAME="site-com-$SITE_NAME"
+    PORT=8081 ;;
+  "datacadamia")
+    SITE_QUALIFIED_NAME="site-com-$SITE_NAME"
+    PORT=8082 ;;
+  "tabulify")
+    SITE_QUALIFIED_NAME="site-com-$SITE_NAME"
+    PORT=8083 ;;
+  "dd")
+    SITE_QUALIFIED_NAME="dokuwiki-docker"
+    PORT=8084 ;;
+  *)
+    SITE_QUALIFIED_NAME="site-com-$SITE_NAME"
+    PORT=8080
+    echo "Unknown site: $SITE_NAME, port given $PORT"
+  ;;
+esac
 
-pushd  ~/code/site-com-combostrap/ &>/dev/null
 
-docker run \
-  --name site-com-combostrap \
-  --rm \
-  -d \
-  -p $PORT:80 \
-  --user 1000:1000 \
-  -e DOKU_DOCKER_ENV=dev \
-  -e DOKU_DOCKER_ACL_POLICY='public' \
-  -e DOKU_DOCKER_ADMIN_NAME='admin' \
-  -e DOKU_DOCKER_ADMIN_PASSWORD='welcome' \
-  -v "$PWD":/var/www/html \
-  ghcr.io/combostrap/dokuwiki:php8.3-latest
+SITE_PATH="$HOME/code/$SITE_QUALIFIED_NAME"
 
-echo "Combostrap should be available at http://localhost:$PORT"
+if [ ! -d "$SITE_PATH" ]; then
+  echo "The path ($SITE_PATH) was not found. We were unable to find the site directory."
+  exit 1
+fi
+
+pushd  "$SITE_PATH" &>/dev/null
+
+if [ "$SITE_NAME" == "dd" ]; then
+  docker run \
+    --name "$SITE_NAME" \
+    --rm \
+    -d \
+    -p $PORT:80 \
+    --user 1000:1000 \
+    -e DOKU_DOCKER_STRICT=true \
+    -e DOKU_DOCKER_ENV=dev \
+    -e DOKU_DOCKER_STARTER_SITE=false \
+    -e DOKU_DOCKER_ACL_POLICY='public' \
+    -e DOKU_DOCKER_ADMIN_NAME='admin' \
+    -e DOKU_DOCKER_ADMIN_PASSWORD='welcome' \
+    -v "$PWD"/resources/dokuwiki-docker:/opt/dokuwiki-docker \
+    -v "$PWD"/resources/dokuwiki-installer:/opt/dokuwiki-installer \
+    -v "$PWD"/resources/comboctl:/opt/comboctl \
+    -v "$PWD"/resources/phpctl:/opt/phpctl \
+    -v "$PWD"/resources/conf/bash/bash.bashrc:/etc/bash.bashrc \
+    -v "$PWD"/resources/conf/caddy/Caddyfile:/etc/caddy/Caddyfile \
+    ghcr.io/combostrap/dokuwiki:php8.3-latest
+else
+  docker run \
+    --name "$SITE_NAME" \
+    --rm \
+    -d \
+    -p $PORT:80 \
+    --user 1000:1000 \
+    -e DOKU_DOCKER_ENV=dev \
+    -e DOKU_DOCKER_ACL_POLICY='public' \
+    -e DOKU_DOCKER_ADMIN_NAME='admin' \
+    -e DOKU_DOCKER_ADMIN_PASSWORD='welcome' \
+    -v "$PWD":/var/www/html \
+    ghcr.io/combostrap/dokuwiki:php8.3-latest
+fi
+echo "$SITE_NAME should be available at http://localhost:$PORT"
 
 popd &>/dev/null
+

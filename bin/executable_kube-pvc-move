@@ -2,7 +2,9 @@
 # Move a local-path pv
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # Not finished, you should apply the command one by one manually for now
-# Prerequisites: You should have the ssh private key on the source host
+# Prerequisites:
+#   * You should have the ssh private key on the source host
+#   * Rsync on both nodes
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!
 # Original Idea: # https://stackoverflow.com/questions/71708673/how-to-move-pv-from-one-kubernetes-node-to-another
 

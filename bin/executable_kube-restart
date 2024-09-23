@@ -1,0 +1,95 @@
+#!/bin/bash
+
+######################
+# Standard Library and conf
+######################
+
+# flag
+# e - Exit if any error
+# u - Treat unset variables as an error when substituting
+# o pipefail - the return value of a pipeline is the status of the last command to exit with a non-zero status or zero if no command exited with a non-zero status
+# E - the ERR trap is inherited by shell functions
+set -Eeuo pipefail
+
+## A trap on ERR, if set, is executed before the shell exits.
+# Because we show the $LINENO, we can;t create a function otherwise the line number would be not correct
+trap 'echo_err ""; echo_err "Command error on line ($0:$LINENO)"; exit 1' ERR
+
+CLI_NAME=$(basename "$0") # Name of the cli
+
+# Echo a message
+function echo_log() {
+
+  echo -e "$CLI_NAME: ${1:-}"
+
+}
+
+# Print the error message $1
+function echo_err() {
+  RED='\033[0;31m'
+  NC='\033[0m' # No Color
+  #(>&2 echo -e "${RED}$1${NC}")
+  echo_log "${RED}$1${NC}"
+}
+
+
+######################
+# Main
+######################
+
+# Check if app is provided
+if [ -z "$1" ]; then
+    echo "Please provide a name."
+    echo "Usage: $0 <app name>"
+    exit 1
+fi
+
+APP_NAME=$1
+APP_LABEL=app.kubernetes.io/name="$APP_NAME"
+
+# Function to search for a resource type across all namespaces
+search_resource() {
+    local RESOURCE_TYPE=$1
+    kubectl get "$RESOURCE_TYPE" --all-namespaces -l "$APP_LABEL" -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{"\n"}{end}' 2>/dev/null
+}
+
+# Search for deployments
+DEPLOYMENTS=$(search_resource deployment)
+DEPLOYMENT_COUNT=$(echo "$DEPLOYMENTS" | sed '/^\s*$/d' | wc -l )
+if [ "$DEPLOYMENT_COUNT" -gt 1 ]; then
+    echo "Error: Multiple deployments found with label app.kubernetes.io/name=$APP_NAME:"
+    echo "$DEPLOYMENTS"
+    exit 1
+fi;
+
+if [ "$DEPLOYMENT_COUNT" -eq 1 ]; then
+    read -r NAMESPACE DEPLOYMENT_NAME <<< "$DEPLOYMENTS"
+    echo "Deployment found: $DEPLOYMENT_NAME in namespace: $NAMESPACE"
+    echo "Restarting"
+    kubectl rollout restart deployment/"$DEPLOYMENT_NAME" -n "$NAMESPACE"
+    exit 0
+fi
+
+echo "No Deployment found. Searching a Statefulset"
+STATEFULSETS=$(search_resource statefulset)
+STATEFULSET_COUNT=$(echo "$STATEFULSETS" | sed '/^\s*$/d' | wc -l )
+
+if [ "$STATEFULSET_COUNT" -gt 1 ]; then
+    echo "Error: Multiple statefulset found with label app.kubernetes.io/name=$APP_NAME:"
+    echo "$STATEFULSETS"
+    exit 1
+fi;
+
+if [ "$STATEFULSET_COUNT" -eq 1 ]; then
+    read -r NAMESPACE STATEFULSET_NAME <<< $STATEFULSETS
+    echo "StatefulSet found: $STATEFULSET_NAME in namespace: $NAMESPACE"
+    echo "Restarting"
+    kubectl rollout restart statefulset/"$STATEFULSET_NAME" -n "$NAMESPACE"
+    exit 0
+fi
+
+echo_err "No deployment or statefulset found for the app $APP_NAME (with the label $APP_LABEL)"
+exit 1
+
+
+

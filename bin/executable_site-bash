@@ -1,5 +1,6 @@
 #!/bin/bash
-# Set the current kubernetes namespace
+# Start bash in a site container
+
 
 # flag
 # e - Exit if any error
@@ -8,11 +9,15 @@
 # E - the ERR trap is inherited by shell functions
 set -Eeuo pipefail
 
-NS_CURRENT=${1:-}
-if [ "$NS_CURRENT" != "" ]; then
-  kubectl config set-context --current --namespace="$NS_CURRENT"
-else
-  # --minify: Displays only the current context's information
-  kubectl config view --minify --output 'jsonpath={..namespace}'
+# Check if the app name is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <site name>"
+    exit 1
 fi
 
+SITE_NAME=$1
+
+
+SITE_QUALIFIED_NAME="site-com-$SITE_NAME"
+
+docker exec -ti "$SITE_QUALIFIED_NAME" bash

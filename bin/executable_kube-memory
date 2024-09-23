@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Show all pods cpu and memory
+kubectl top pods -A
+
+
+argocd app delete git-backup --cascade=false
