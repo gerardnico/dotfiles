@@ -6,6 +6,7 @@
     # No CRLF at all o
     # This feature means that it will push with LF and check out with CRLF
     # We don't want that on WSL
+    # Idea gives a warning, ignore itB
 	autocrlf = false
 [init]
 	defaultBranch = main

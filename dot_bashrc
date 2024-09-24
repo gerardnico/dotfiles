@@ -306,7 +306,10 @@ fi
 # https://github.com/gerardnico/ansible
 export ANSIBLE_CONFIG=ansible.cfg
 export ANSIBLE_HOME=ansible
-export ANSIBLE_LOCAL_HOME=/mnt/c/code/infra
+ANSIBLE_GIT_REPO=$HOME/code/ansible
+if [ -d "$ANSIBLE_GIT_REPO" ]; then
+  export PATH="$ANSIBLE_GIT_REPO:$PATH"
+fi
 
 ###############################
 # Rclone completion
