@@ -2,6 +2,8 @@
 	name = Nicolas GERARD
 	email = gerardnico@gmail.com
 [core]
-	autocrlf = true
+    # https://git-scm.com/docs/gitattributes#_end_of_line_conversion
+    # No CRLF on WSL please
+	autocrlf = false
 [init]
 	defaultBranch = main
