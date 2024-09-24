@@ -3,7 +3,9 @@
 	email = gerardnico@gmail.com
 [core]
     # https://git-scm.com/docs/gitattributes#_end_of_line_conversion
-    # No CRLF on WSL please
+    # No CRLF at all o
+    # This feature means that it will push with LF and check out with CRLF
+    # We don't want that on WSL
 	autocrlf = false
 [init]
 	defaultBranch = main
