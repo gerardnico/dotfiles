@@ -1,4 +1,6 @@
 #!/bin/bash
+# Bashrc: Bash runtime configuration
+
 # set -Eeuo pipefail
 
 # The shebang is for the IDE
@@ -43,17 +45,18 @@
 # set -o ignoreeof
 #
 # Use case-insensitive filename globbing
-# shopt -s nocaseglob
+shopt -s nocaseglob
+
 #
 # Make bash append rather than overwrite the history on disk
 # shopt -s histappend
 #
 # When changing directory small typos can be ignored by bash
 # for example, cd /vr/lgo/apaache would find /var/log/apache
-# shopt -s cdspell
+shopt -s cdspell
 
 # Programmable completion enhancements are enabled via
-# /etc/profile.d/bash_completion.sh when the package bash_completetion
+# /etc/profile.d/bash_completion.sh when the package bash_completion
 # is installed.  Any completions you add in ~/.bash_completion are
 # sourced last.
 
@@ -119,77 +122,11 @@ alias l='ls -CF'                              #
 # Functions
 #
 # Some people use a different file for functions
-# if [ -f "${HOME}/.bash_functions" ]; then
-#   source "${HOME}/.bash_functions"
-# fi
+if [ -f "${HOME}/.bash_functions" ]; then
+   source "${HOME}/.bash_functions"
+fi
 #
-# Some example functions:
-#
-# a) function settitle
-# settitle ()
-# {
-#   echo -ne "\e]2;$@\a\e]1;$@\a";
-# }
-#
-# b) function cd_func
-# This function defines a 'cd' replacement function capable of keeping,
-# displaying and accessing history of visited directories, up to 10 entries.
-# To use it, uncomment it, source this file and try 'cd --'.
-# acd_func 1.0.5, 10-nov-2004
-# Petar Marinov, http:/geocities.com/h2428, this is public domain
-# cd_func ()
-# {
-#   local x2 the_new_dir adir index
-#   local -i cnt
-#
-#   if [[ $1 ==  "--" ]]; then
-#     dirs -v
-#     return 0
-#   fi
-#
-#   the_new_dir=$1
-#   [[ -z $1 ]] && the_new_dir=$HOME
-#
-#   if [[ ${the_new_dir:0:1} == '-' ]]; then
-#     #
-#     # Extract dir N from dirs
-#     index=${the_new_dir:1}
-#     [[ -z $index ]] && index=1
-#     adir=$(dirs +$index)
-#     [[ -z $adir ]] && return 1
-#     the_new_dir=$adir
-#   fi
-#
-#   #
-#   # '~' has to be substituted by ${HOME}
-#   [[ ${the_new_dir:0:1} == '~' ]] && the_new_dir="${HOME}${the_new_dir:1}"
-#
-#   #
-#   # Now change to the new dir and add to the top of the stack
-#   pushd "${the_new_dir}" > /dev/null
-#   [[ $? -ne 0 ]] && return 1
-#   the_new_dir=$(pwd)
-#
-#   #
-#   # Trim down everything beyond 11th entry
-#   popd -n +11 2>/dev/null 1>/dev/null
-#
-#   #
-#   # Remove any other occurence of this dir, skipping the top of the stack
-#   for ((cnt=1; cnt <= 10; cnt++)); do
-#     x2=$(dirs +${cnt} 2>/dev/null)
-#     [[ $? -ne 0 ]] && return 0
-#     [[ ${x2:0:1} == '~' ]] && x2="${HOME}${x2:1}"
-#     if [[ "${x2}" == "${the_new_dir}" ]]; then
-#       popd -n +$cnt 2>/dev/null 1>/dev/null
-#       cnt=cnt-1
-#     fi
-#   done
-#
-#   return 0
-# }
-#
-# alias cd=cd_func
+
 
 # Add the bin (used by chezmoi)
 export PATH="$HOME/bin:$PATH"
@@ -306,9 +243,13 @@ fi
 # https://github.com/gerardnico/ansible
 export ANSIBLE_CONFIG=ansible.cfg
 export ANSIBLE_HOME=ansible
-ANSIBLE_GIT_REPO=$HOME/code/ansible
-if [ -d "$ANSIBLE_GIT_REPO" ]; then
-  export PATH="$ANSIBLE_GIT_REPO:$PATH"
+ANSIBLE_SCRIPTS=$HOME/code/ansible
+if [ -d "$ANSIBLE_SCRIPTS" ]; then
+  export PATH="$ANSIBLE_SCRIPTS:$PATH"
+fi
+ANSIBLE_LOCAL_HOME=$HOME/code/infra
+if [ -d "$ANSIBLE_SCRIPTS" ]; then
+  export ANSIBLE_LOCAL_HOME
 fi
 
 ###############################
@@ -329,7 +270,7 @@ fi
 
 # Load the ssh_agent* functions
 # shellcheck source=./dot_bashrc.d/ssh_agent_functions.sh
-source "$HOME"/.bashrc.d/ssh_agent_functions.sh
+source "$HOME"/.bashrc.d/ssh_agent_functions
 
 # The location of the env file
 export SSH_ENV="$HOME"/.ssh/ssh-agent.env
@@ -357,3 +298,22 @@ fi
 unset SSH_AGENT_RUN_STATE
 unset SSH_ENV
 
+#######################
+# cd hook
+#######################
+source "$HOME"/.bashrc.d/my_cd
+
+##############################
+# Env by directories
+##############################
+# https://direnv.net/docs/installation.html
+# Make sure it appears even after rvm, git-prompt and other shell extensions that manipulate the prompt.
+if [ -x "$(command -v rclone)" ]; then
+  eval "$(direnv hook bash)"
+else
+  echo_err "You should install direnv"
+fi
+
+
+#There is $PROMPT_COMMAND, which is executed before showing a prompt
+trap 'echo -ne "\e]0;$BASH_COMMAND\007"' DEBUG

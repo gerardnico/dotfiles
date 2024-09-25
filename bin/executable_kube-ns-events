@@ -1,12 +1,16 @@
 #!/bin/bash
 # Shows the pods ip (node name can be given for a smaller subset)
 
-# flag
-# e - Exit if any error
-# u - Treat unset variables as an error when substituting
-# o pipefail - the return value of a pipeline is the status of the last command to exit with a non-zero status or zero if no command exited with a non-zero status
-# E - the ERR trap is inherited by shell functions
+######################
+# Standard Library and conf
+######################
+# The log and error handling
+# We still need to use the set command
+# because shellcheck does not see them and want use to add
+# exit check everywhere
 set -Eeuo pipefail
+# shellcheck source=bash-library/base
+source "$HOME"/bin/bash-library/base
 
 # Check if the app name is provided
 if [ -z "$1" ]; then

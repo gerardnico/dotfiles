@@ -1,5 +1,13 @@
 #!/bin/bash
+
 # Shows the process inside a Pod
+# The log and error handling
+# We still need to use the set command
+# because shellcheck does not see them and want use to add
+# exit check everywhere
+set -Eeuo pipefail
+# shellcheck source=bash-library/base
+source "$HOME"/bin/bash-library/base
 
 # Check if the app is provided
 if [ -z "$1" ]; then

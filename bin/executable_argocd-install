@@ -1,7 +1,21 @@
 #!/bin/bash
 # ArgoCd client installation
 
+######################
+# Standard Library and conf
+######################
+# The log and error handling
+# We still need to use the set command
+# because shellcheck does not see them and want use to add
+# exit check everywhere
+set -Eeuo pipefail
+# shellcheck source=bash-library/base
+source "$HOME"/bin/bash-library/base
 
+
+######################
+# Main
+######################
 # ARGOCD_VERSION=$(curl --silent "https://api.github.com/repos/argoproj/argo-cd/releases/latest" | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
 
 ARGOCD_VERSION=v2.11.7

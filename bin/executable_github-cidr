@@ -1,7 +1,21 @@
 #!/bin/bash
 # Get the CIDR of Github
 
+######################
+# Standard Library and conf
+######################
+# The log and error handling
+# We still need to use the set command
+# because shellcheck does not see them and want use to add
+# exit check everywhere
+set -Eeuo pipefail
+# shellcheck source=bash-library/base
+source "$HOME"/bin/bash-library/base
 
+
+######################
+# Main
+######################
 # Get the hooks CIDR line by line
 curl -s https://api.github.com/meta | jq --raw-output '.hooks | join("\n")'
 

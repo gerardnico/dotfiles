@@ -6,12 +6,21 @@
 # chezmoi: /home/admin/bin/chezmoi-autopush: cannot add chezmoi file to chezmoi (/home/admin/bin/chezmoi is protected)
 # Source: https://github.com/twpayne/chezmoi/blob/0355a62a8afdb820ffa22291e56e0dafec6f49c0/internal/chezmoi/sourcestate.go#L390
 
-# flag
-# e - Exit if any error
-# u - Treat unset variables as an error when substituting
-# o pipefail - the return value of a pipeline is the status of the last command to exit with a non-zero status or zero if no command exited with a non-zero status
-# E - the ERR trap is inherited by shell functions
+######################
+# Standard Library and conf
+######################
+# The log and error handling
+# We still need to use the set command
+# because shellcheck does not see them and want use to add
+# exit check everywhere
 set -Eeuo pipefail
+# shellcheck source=bash-library/base
+source "$HOME"/bin/bash-library/base
+
+
+######################
+# Main
+######################
 
 if [ "$1" == "" ]; then
   echo "Commit message is mandatory"
