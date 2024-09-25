@@ -20,17 +20,26 @@ source "$HOME"/bin/bash-library/base
 
 # Check if the app name is provided
 if [ -z "$1" ]; then
-    echo "Usage: $0 <app name>"
+    echo "Usage: $0 <app name> <app namespace>"
     exit 1
 fi
 
 export KUBE_APP_NAME=$1
+export KUBE_APP_NAMESPACE=${2:-$KUBE_APP_NAME}
+
 KUBECONFIG=$HOME/.kube/config-$KUBE_APP_NAME
 
 if [ ! -f "$KUBECONFIG" ]; then
   echo_err "The KUBECONFIG file $KUBECONFIG for the app $KUBE_APP_NAME does not exist"
   echo_err "You will not be able to connect to the cluster"
   exit 1
+fi
+
+# Check namespace
+KUBECONFIG_NAMESPACE=$(kubectl config view --kubeconfig "$KUBECONFIG" --minify --output 'jsonpath={..namespace}')
+if [ "$KUBECONFIG_NAMESPACE" != "$KUBE_APP_NAMESPACE" ]; then
+  echo_err "The current context of the KUBECONFIG file $KUBECONFIG does not have the good app namespace (Found $KUBECONFIG_NAMESPACE in place of $KUBE_APP_NAMESPACE)"
+  exit;
 fi
 
 export KUBECONFIG
@@ -41,5 +50,9 @@ fi
 
 echo ""
 echo "The following kube app env were set:"
-echo "KUBECONFIG    : $KUBECONFIG"
-echo "KUBE_APP_NAME : $KUBE_APP_NAME"
+echo "KUBECONFIG               : $KUBECONFIG"
+echo "KUBE_APP_NAME            : $KUBE_APP_NAME"
+echo "KUBE_APP_NAMESPACE       : $KUBE_APP_NAMESPACE"
+
+
+
