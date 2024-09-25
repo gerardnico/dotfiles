@@ -1,0 +1,9 @@
+# https://direnv.net/man/direnv.toml.1.html
+
+[global]
+strict_env = true
+warn_timeout = "1s"
+
+# Trusted directories
+[whitelist]
+prefix = [ "~/code" ]

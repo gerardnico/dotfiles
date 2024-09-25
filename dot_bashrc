@@ -159,13 +159,6 @@ fi
 ##############################
 if [ -x "$(command -v kubectl)" ]; then
 
-  # Kubeconfig Location
-  export KUBECONFIG=$HOME/.kube/config
-  if [ $CYGWIN = 1 ] ; then
-    # kubectl on windows require windows style path
-    KUBECONFIG=$(cygpath -aw "$KUBECONFIG")
-  fi
-
   # Kube editor
   # KUBE_EDITOR default to vi on Linux and notepad on Windows
   # https://kubernetes.io/docs/reference/kubectl/generated/kubectl_edit/
@@ -287,7 +280,7 @@ if [ ! "$SSH_AUTH_SOCK" ] || [ "$SSH_AGENT_RUN_STATE" = 2 ]; then
 	  echo "Deleting Sock file $SSH_AUTH_SOCK"
 	  rm "$SSH_AUTH_SOCK"
 	fi
-	echo "Staring Agent"
+	echo "Starting Agent"
   ssh-agent-start "$SSH_ENV" "$SSH_AUTH_SOCK"
 	ssh-add-keys
 elif [ "$SSH_AUTH_SOCK" ] && [ "$SSH_AGENT_RUN_STATE" = 1 ]; then
@@ -306,12 +299,13 @@ source "$HOME"/.bashrc.d/my_cd
 ##############################
 # Env by directories
 ##############################
+# https://github.com/direnv/direnv
 # https://direnv.net/docs/installation.html
 # Make sure it appears even after rvm, git-prompt and other shell extensions that manipulate the prompt.
 if [ -x "$(command -v rclone)" ]; then
   eval "$(direnv hook bash)"
 else
-  echo_err "You should install direnv"
+  echo "You should install direnv"
 fi
 
 
