@@ -1,7 +1,8 @@
 #!/bin/bash
-# Set the environment for the actual app
+# Print the environment for the app
 # such as kubeconfig and app name
 # used with direnv
+# Usage: `eval "$(kube-app-env app-name)"`
 
 ######################
 # Standard Library and conf
@@ -11,8 +12,7 @@
 # because shellcheck does not see them and want use to add
 # exit check everywhere
 set -Eeuo pipefail
-# shellcheck source=bash-library/base
-source "$HOME"/bin/bash-library/base
+# echo and error_handling should be in your bashrc.d directory
 
 ######################
 # Main
@@ -24,8 +24,9 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-export KUBE_APP_NAME=$1
-export KUBE_APP_NAMESPACE=${2:-$KUBE_APP_NAME}
+export NICO=nico
+KUBE_APP_NAME=$1
+KUBE_APP_NAMESPACE=${2:-$KUBE_APP_NAME}
 
 KUBECONFIG=$HOME/.kube/config-$KUBE_APP_NAME
 
@@ -42,17 +43,23 @@ if [ "$KUBECONFIG_NAMESPACE" != "$KUBE_APP_NAMESPACE" ]; then
   exit;
 fi
 
-export KUBECONFIG
+
 if [[ $(uname -a) =~ "CYGWIN" ]];  then
   # kubectl on windows require windows style path
   KUBECONFIG=$(cygpath -aw "$KUBECONFIG")
 fi
 
-echo ""
-echo "The following kube app env were set:"
-echo "KUBECONFIG               : $KUBECONFIG"
-echo "KUBE_APP_NAME            : $KUBE_APP_NAME"
-echo "KUBE_APP_NAMESPACE       : $KUBE_APP_NAMESPACE"
+KUBE_APP_DIRECTORY=$HOME/code/kube-argocd/$KUBE_APP_NAME
+if [ ! -d "$KUBE_APP_DIRECTORY" ]; then
+  echo_err "The app directory $KUBE_APP_DIRECTORY does not exist"
+  exit 1
+fi
+
+
+echo "export KUBECONFIG=$KUBECONFIG"
+echo "export KUBE_APP_NAME=$KUBE_APP_NAME"
+echo "export KUBE_APP_NAMESPACE=$KUBE_APP_NAMESPACE"
+echo "export KUBE_APP_DIRECTORY=$KUBE_APP_DIRECTORY"
 
 
 

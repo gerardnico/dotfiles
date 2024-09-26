@@ -7,8 +7,7 @@
 # because shellcheck does not see them and want use to add
 # exit check everywhere
 set -Eeuo pipefail
-# shellcheck source=bash-library/base
-source "$HOME"/bin/bash-library/base
+# echo and error_handling should be in your bashrc.d directory
 
 
 # Check if URL is provided

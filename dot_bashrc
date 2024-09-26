@@ -103,13 +103,7 @@ alias du='du -h'
 # alias egrep='egrep --color=auto'              # show differences in colour
 # alias fgrep='fgrep --color=auto'              # show differences in colour
 #
-# Some shortcuts for different directory listings
-alias ls='ls -hF --color=tty'                 # classify files in colour
-alias dir='ls --color=auto --format=vertical'
-# alias vdir='ls --color=auto --format=long'
-alias ll='ls -l'                              # long list
-alias la='ls -A'                              # all but . and ..
-alias l='ls -CF'                              #
+
 
 # Umask
 #
@@ -119,16 +113,8 @@ alias l='ls -CF'                              #
 # Paranoid: neither group nor others have any perms:
 # umask 077
 
-# Functions
-#
-# Some people use a different file for functions
-if [ -f "${HOME}/.bash_functions" ]; then
-   source "${HOME}/.bash_functions"
-fi
-#
 
-
-# Add the bin (used by chezmoi)
+# Add the bin
 export PATH="$HOME/bin:$PATH"
 
 ##############################
@@ -147,91 +133,25 @@ fi
 # Cygwin
 ##############################
 # Cygwin or not
+export CYGWIN=0
 if [[ $(uname -a) =~ "CYGWIN" ]]; then
   CYGWIN=1
-else
-  CYGWIN=0
+fi
+
+##############################
+# Load sub bashrc script
+##############################
+if [ -d ~/.bashrc.d ]; then
+  for file in ~/.bashrc.d/*; do
+    # shellcheck disable=SC1090
+    [ -r "$file" ] && source "$file"
+  done
+  unset file
 fi
 
 
 ##############################
-# Kube
-##############################
-if [ -x "$(command -v kubectl)" ]; then
-
-  # Kube editor
-  # KUBE_EDITOR default to vi on Linux and notepad on Windows
-  # https://kubernetes.io/docs/reference/kubectl/generated/kubectl_edit/
-  if [ $CYGWIN = 1 ] ; then
-    # kubectl a windows like style path
-     export KUBE_EDITOR='c:/Notepad++/notepad++.exe -notabbar -multiInst -nosession -noPlugin'
-  fi
-
-  # Kubeconfig Completion and alias as k
-  # shellcheck disable=SC1090
-  source <(kubectl completion bash)
-  alias k=kubectl
-  complete -o default -F __start_kubectl k
-
-fi
-
-
-##############################
-# Git
-##############################
-# Git Completion
-# https://git-scm.com/book/en/v2/Appendix-A%3A-Git-in-Other-Environments-Git-in-Bash
-if [[ ! -f ~/git-completion.bash ]]; then
-	echo "Git Completion Not Found. Download"
-	curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o ~/git-completion.bash
-fi
-if [ -f "$HOME"/git-completion.bash ]; then
-  . "$HOME"/git-completion.bash
-fi
-# Git Prompt Customization
-# https://git-scm.com/book/en/v2/Appendix-A%3A-Git-in-Other-Environments-Git-in-Bash
-if [[ ! -f ~/git-prompt.sh ]]; then
-    echo "Git Prompt Not Found. Download"
-	curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh -o ~/git-prompt.sh
-fi
-if [ -f ~/git-prompt.sh ]; then  
-  . "$HOME"/git-prompt.sh
-  export GIT_PS1_SHOWDIRTYSTATE=1
-  # PS1:
-  # This is the default PS1 where we have added the __git_ps1 function just before the dollar character
-  # Explanation:
-  # The \w means print the current working directory, 
-  # the \$ prints the $ part of the prompt, 
-  # \[exxx] are color formatting syntax
-  # and __git_ps1 " (%s)" calls the function provided by git-prompt.sh with a formatting argument. 
-  
-  export PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n$(__git_ps1 "(%s)")\$ '
-fi
-# Alias and function
-alias gs='git status'
-ga(){
-  git add . && git commit -m $1 && git push
-}
-
-
-
-##############################
-# Node
-##############################
-# fnm Eval for the search of node version file on each cd
-FNM_PATH="$HOME/.local/share/fnm"
-if [ -d "$FNM_PATH" ]; then
-  export PATH="$FNM_PATH:$PATH"
-  # Set default to system to avoid: Can't find an installed Node version matching default
-  fnm default system
-  eval "$(fnm env --use-on-cd --shell bash --version-file-strategy recursive --log-level info)" >/dev/null 2>&1
-  # https://github.com/Schniz/fnm?tab=readme-ov-file#completions
-  # The below output only the completion script
-  eval "$(fnm completions --shell bash)"
-fi
-
-##############################
-# Ansible
+# Ansible Docker Env
 ##############################
 # https://github.com/gerardnico/ansible
 export ANSIBLE_CONFIG=ansible.cfg
@@ -245,25 +165,13 @@ if [ -d "$ANSIBLE_SCRIPTS" ]; then
   export ANSIBLE_LOCAL_HOME
 fi
 
-###############################
-# Rclone completion
-##############################
-RCLONE_COMPLETION=/etc/bash_completion.d/rclone
-if [ -x "$(command -v rclone)" ] && [ ! -f "$RCLONE_COMPLETION" ]; then
-  sudo rclone genautocomplete bash $RCLONE_COMPLETION
-  # shellcheck disable=SC1090
-  source $RCLONE_COMPLETION
-fi
 
 
 ##############################
-# SSH
+# SSH Env
 ##############################
+# Warning: ssh_agent file should be in the bashrc.d direcrory
 # We start the SSH agent and load the keys
-
-# Load the ssh_agent* functions
-# shellcheck source=./dot_bashrc.d/ssh_agent_functions.sh
-source "$HOME"/.bashrc.d/ssh_agent_functions
 
 # The location of the env file
 export SSH_ENV="$HOME"/.ssh/ssh-agent.env
@@ -291,23 +199,20 @@ fi
 unset SSH_AGENT_RUN_STATE
 unset SSH_ENV
 
-#######################
-# cd hook
-#######################
-source "$HOME"/.bashrc.d/my_cd
 
 ##############################
-# Env by directories
+# DirEnv hook
 ##############################
 # https://github.com/direnv/direnv
 # https://direnv.net/docs/installation.html
-# Make sure it appears even after rvm, git-prompt and other shell extensions that manipulate the prompt.
-if [ -x "$(command -v rclone)" ]; then
+# We put it here to make sure it appears even after git-prompt and other shell extensions that manipulate the prompt.
+if [ -x "$(command -v direnv)" ]; then
   eval "$(direnv hook bash)"
 else
   echo "You should install direnv"
 fi
 
-
-#There is $PROMPT_COMMAND, which is executed before showing a prompt
+#############################
+# Set the window title
+#############################
 trap 'echo -ne "\e]0;$BASH_COMMAND\007"' DEBUG

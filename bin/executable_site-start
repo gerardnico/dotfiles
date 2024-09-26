@@ -6,12 +6,11 @@
 # because shellcheck does not see them and want use to add
 # exit check everywhere
 set -Eeuo pipefail
-# shellcheck source=bash-library/base
-source "$HOME"/bin/bash-library/base
+# echo and error_handling should be in your bashrc.d directory
 
 # Check if the app name is provided
 if [ -z "$1" ]; then
-    echo_log "Usage: $0 <site name>"
+    echo_info "Usage: $0 <site name>"
     exit 1
 fi
 
@@ -33,7 +32,7 @@ case "$SITE_NAME" in
   *)
     SITE_QUALIFIED_NAME="site-com-$SITE_NAME"
     PORT=8080
-    echo_log "Unknown site: $SITE_NAME, port given $PORT"
+    echo_info "Unknown site: $SITE_NAME, port given $PORT"
   ;;
 esac
 
@@ -41,7 +40,7 @@ esac
 SITE_PATH="$HOME/code/$SITE_QUALIFIED_NAME"
 
 if [ ! -d "$SITE_PATH" ]; then
-  echo_log "The path ($SITE_PATH) was not found. We were unable to find the site directory."
+  echo_info "The path ($SITE_PATH) was not found. We were unable to find the site directory."
   exit 1
 fi
 
@@ -81,7 +80,7 @@ else
     -v "$PWD":/var/www/html \
     ghcr.io/combostrap/dokuwiki:php8.3-latest
 fi
-echo_log "$SITE_NAME should be available at http://localhost:$PORT"
+echo_info "$SITE_NAME should be available at http://localhost:$PORT"
 
 popd &>/dev/null
 

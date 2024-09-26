@@ -1,6 +1,5 @@
 #!/bin/bash
-# Return the CIDR of pods
-
+# Apply the kustomize app
 ######################
 # Standard Library and conf
 ######################
@@ -11,8 +10,28 @@
 set -Eeuo pipefail
 # echo and error_handling should be in your bashrc.d directory
 
-
 ######################
 # Main
 ######################
-kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.podCIDR}{"\n"}{end}'
+
+if [ -z "$1" ]; then
+    echo "Usage: $0 <app name>"
+    exit 1
+fi
+
+APP_NAME=$1
+APP_DIRECTORY=$HOME/code/kube-argocd/$APP_NAME
+
+
+if [ ! -d "$APP_DIRECTORY" ]; then
+  echo_err "The app directory $APP_DIRECTORY does not exist"
+  exit 1
+fi
+
+pushd "$APP_DIRECTORY"
+
+kubectl apply -k .
+
+popd
+
+echo "Done"

@@ -9,8 +9,12 @@
 # because shellcheck does not see them and want use to add
 # exit check everywhere
 set -Eeuo pipefail
-# shellcheck source=bash-library/base
-source "$HOME"/bin/bash-library/base
+
+# Dependencies
+# shellcheck source=../dot_bashrc.d/echo
+# source "$HOME"/.bashrc.d/echo
+# shellcheck source=../dot_bashrc.d/error_handling
+# source "$HOME"/.bashrc.d/error_handling
 
 
 ######################

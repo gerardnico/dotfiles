@@ -10,8 +10,7 @@
 # because shellcheck does not see them and want use to add
 # exit check everywhere
 set -Eeuo pipefail
-# shellcheck source=bash-library/base
-source "$HOME"/bin/bash-library/base
+# echo and error_handling should be in your bashrc.d directory
 
 
 ######################
@@ -20,16 +19,16 @@ source "$HOME"/bin/bash-library/base
 
 # Check if URL is provided
 if [ -z "$1" ]; then
-    echo "Usage: $0 <website_url>"
+    echo "Usage: $0 <website_url> <destination directory"
     exit 1
 fi
 
 # Define the website URL
 WEBSITE_URL=$1
+DESTINATION_DIR=${2:-/tmp/http-load}
 
-LOAD_DIR=/tmp/http-load
-mkdir -p $LOAD_DIR
-pushd $LOAD_DIR || exit
+mkdir -p "$DESTINATION_DIR"
+pushd "$DESTINATION_DIR"
 
 # Download the website and log details
 wget \
