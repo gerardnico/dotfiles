@@ -167,7 +167,9 @@ fi
 # Load sub bashrc script
 ##############################
 if [ -d ~/.bashrc.d ]; then
-  for file in ~/.bashrc.d/*; do
+  # All file loaded in a directory should have a sh extension
+  # This is how /etc/profile also work
+  for file in ~/.bashrc.d/*.sh; do
     # shellcheck disable=SC1090
     [ -r "$file" ] && source "$file"
   done
@@ -209,12 +211,14 @@ ssh-agent-load-env "$SSH_ENV"
 SSH_AGENT_RUN_STATE=$(ssh-agent-state)
 if [ ! "$SSH_AUTH_SOCK" ] || [ "$SSH_AGENT_RUN_STATE" = 2 ]; then
 	echo "Agent not started"
-	if [ -f "$SSH_AUTH_SOCK" ]; then
+	# The sock may be a symlink, so -e check that
+	# -f check only if it's a regular file
+	if [ -e "$SSH_AUTH_SOCK" ]; then
 	  echo "Deleting Sock file $SSH_AUTH_SOCK"
 	  rm "$SSH_AUTH_SOCK"
 	fi
 	echo "Starting Agent"
-  ssh-agent-start "$SSH_ENV" "$SSH_AUTH_SOCK"
+  ssh_agent_start "$SSH_ENV" "$SSH_AUTH_SOCK"
 	ssh-add-keys
 elif [ "$SSH_AUTH_SOCK" ] && [ "$SSH_AGENT_RUN_STATE" = 1 ]; then
 	echo Agent not started but empty
@@ -242,4 +246,3 @@ fi
 #############################
 trap 'echo -ne "\e]0;$BASH_COMMAND\007"' DEBUG
 
-print_stack

@@ -14,11 +14,11 @@
 
 # Start the agent and store the env in a file passed as argument
 # normally it was `eval "$(ssh-agent -s)"`
-ssh-agent-start () {
+ssh_agent_start () {
 	local ENV="${1:-$SSH_ENV}"
 	local SOCK="${2:-$SSH_AUTH_SOCK}"
-    echo Starting the ssh-agent with env at $ENV and sock at $SSH_AUTH_SOCK
-    (umask 077; ssh-agent -a $SOCK >| "$ENV")
+    echo Starting the ssh-agent with env at $ENV and sock at "$SSH_AUTH_SOCK"
+    (umask 077; ssh-agent -a "$SOCK" >| "$ENV")
     . "$ENV" >| /dev/null ; 
 }
 
@@ -91,4 +91,15 @@ ssh-agent-state(){
 # Kill a running agent
 ssh-agent-kill(){
   ssh-agent -k
+}
+
+
+ssh_known_hosts_update() {
+
+  ## Known Host
+  curl --silent https://api.github.com/meta \
+    | jq --raw-output '"github.com "+.ssh_keys[]' >> ~/.ssh/known_hosts
+
+  echo_info "Known Hosts file created"
+
 }

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source "$HOME"/.bashrc.d/color
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+source "$SCRIPT_DIR"/color
 
 # Example of a more complex helper function
 confirm() {
