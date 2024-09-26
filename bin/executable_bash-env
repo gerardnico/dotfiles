@@ -1,0 +1,6 @@
+#!/bin/bash
+# Print information about the current shell environment.
+
+
+echo "Is the shell run interactively ? $( [[ "$-" != *i* ]] && echo "true" || echo "false" )"
+echo "Is a login shell ? $( shopt -q login_shell && echo "true" || echo "false" )"

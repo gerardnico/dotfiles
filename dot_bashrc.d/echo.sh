@@ -6,10 +6,11 @@ source "$SCRIPT_DIR"/color
 
 
 function cli_name(){
-  CLI_NAME="bash"
-  if [ "$0" != "-bash" ]; then
-    CLI_NAME=$(basename "$0") # Name of the cli
-  fi
+  # caller return the line, the function and the script
+  # example: 10 main /opt/dokuwiki-docker/bin/dokuwiki-docker-entrypoint
+  CALLING_SCRIPT=$(caller 1 | awk '{print $3}')
+  # Name of the calling script
+  CLI_NAME=$(basename "$CALLING_SCRIPT")
   echo "$CLI_NAME"
 }
 

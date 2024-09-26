@@ -1,10 +1,11 @@
 #!/bin/bash
 # Bashrc: Bash runtime configuration
+#
 # Run when the shell is interactive
 # ie when `bash` is executed in the terminal without the `c` option
 #
 # We hooked it up in `./profile` that runs when the terminal is starting (ie non-interactive)
-#
+# On Windows, the terminal is started with: `wsl.exe --distribution Debian`
 
 # set -Eeuo pipefail
 
