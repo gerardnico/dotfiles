@@ -2,7 +2,19 @@
 # Wrapper script around git to perform
 # action on multiple repository
 
+######################
+# Standard Library and conf
+######################
+# The log and error handling
+# We still need to use the set command
+# because shellcheck does not see them and want use to add
+# exit check everywhere
+set -Eeuo pipefail
+# echo and error_handling should be in your bashrc.d directory
 
+######################
+# Main
+######################
 
 # Integrate the changes
 # AutoPull to stay in the same fashion than AutoCommit
@@ -136,45 +148,35 @@ function gitStatusByFileType() {
   fi
 }
 
-# Directory to checkout may be in a config file
-# shellcheck disable=SC2070
-if [ -n "$GITCS_CONF" ]; then
-  echo "Environment GITCS_CONF found with the value $GITCS_CONF"
-  if [ -f "$GITCS_CONF" ]; then
-    IFS=$'\n' read -r -a REPO_DIRS -d $'\c0' <"$GITCS_CONF"
-    echo "${#REPO_DIRS[*]} directory found in $GITCS_CONF"
-  else
-    echo_err "$GITCS_CONF is not a file"
-    exit 1
-  fi
-else
-  echo "Environment GITCS_CONF not found"
+# Git Directory to checkout may be in a config file
+GITALL_CONF_FILE=${GITALL_CONF_FILE:-}
+if [ "$GITALL_CONF_FILE" != "" ] && [ -f "$GITALL_CONF_FILE" ]; then
+  IFS=$'\n' read -r -a REPO_DIRS -d $'\c0' <"$GITALL_CONF_FILE"
+  echo_info "${#REPO_DIRS[*]} directory found in $GITALL_CONF_FILE"
 fi
+
 
 # The root directory where all repository may be the children
-if [[ -n ${GITCS_HOME+x} ]]; then
-  for childPath in "$GITCS_HOME"/*; do
-    if [ -d "$childPath" ]; then
-      REPO_DIRS+=("$childPath")
-    fi
-  done
-else
-  echo "GITCS_HOME environment not found"
-fi
+GITALL_CODE_HOME=${GITALL_CODE_HOME:-$HOME/code}
+for childPath in "$GITALL_CODE_HOME"/*; do
+  if [ -d "$childPath" ]; then
+    REPO_DIRS+=("$childPath")
+  fi
+done
 
 if [ ${#REPO_DIRS[*]} == 0 ]; then
-  echo_err 'No Git repository directory found'
+  echo_err 'No Git repository found'
   exit 1
 fi
 
-COMMAND=$1
-shift
+COMMAND=${1:-}
 
-if [ -z "$COMMAND" ]; then
+
+if [ "$COMMAND" == "" ]; then
   echo 'No command was given, status chosen.'
   COMMAND=status
 fi
-
+CLI_NAME=$(basename "$0")
 echo
 echo "${CLI_NAME^} ${COMMAND^}"
 echo "-------------------------------------------"

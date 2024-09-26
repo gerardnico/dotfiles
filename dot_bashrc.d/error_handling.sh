@@ -31,9 +31,18 @@ error_handler() {
     local err=$?
     local line=$1
     local command="$2"
-    echo_err "Error on ${BASH_SOURCE[1]} line $line"
     echo_err ""
     echo_err "Command '$command' exited with status $err."
+    echo_err ""
+    SCRIPT=${BASH_SOURCE[1]}
+    if [ "$SCRIPT" == "" ]; then
+      # Line is completely off in this case
+      echo_err "Error on the main script."
+      echo_err "It seems to be a bash builtin-command (shift, ...) as no location was given for the error by Bash."
+      return
+    fi
+    echo_err "Error on $SCRIPT line $line"
+
     echo_err ""
     print_stack
 
