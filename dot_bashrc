@@ -1,5 +1,10 @@
 #!/bin/bash
 # Bashrc: Bash runtime configuration
+# Run when the shell is interactive
+# ie when `bash` is executed in the terminal without the `c` option
+#
+# We hooked it up in `./profile` that runs when the terminal is starting (ie non-interactive)
+#
 
 # set -Eeuo pipefail
 
@@ -113,9 +118,29 @@ alias du='du -h'
 # Paranoid: neither group nor others have any perms:
 # umask 077
 
-
-# Add the bin
+#####################
+# Executable: Add the bin
+#####################
 export PATH="$HOME/bin:$PATH"
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/bin" ] ; then
+    export PATH="$HOME/bin:$PATH"
+fi
+
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/.local/bin" ] ; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
+
+#####################
+# Go Environment Variables"
+#####################
+if [ -d "/usr/local/go" ]; then
+	export GOROOT=/usr/local/go
+	export GOPATH=$HOME/go
+	export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+fi
 
 ##############################
 # Secrets
@@ -216,3 +241,5 @@ fi
 # Set the window title
 #############################
 trap 'echo -ne "\e]0;$BASH_COMMAND\007"' DEBUG
+
+print_stack
