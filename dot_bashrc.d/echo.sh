@@ -18,7 +18,10 @@ function cli_name(){
 # Echo an info message
 function echo_info() {
 
-  echo -e "$(cli_name): ${1:-}"
+  # We send all echo to the error stream
+  # so that any redirection will not get them
+  # this is the standard behaviour of git
+  echo -e "$(cli_name): ${1:-}" >&2
 
 }
 
