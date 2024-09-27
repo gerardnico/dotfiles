@@ -1,0 +1,7 @@
+#!/bin/bash
+
+## Reload bashrc
+# To Avoid: -bash: /home/admin/.bashrc: Permission denied
+# if I forgot the `source`
+
+chezmoi apply && source ~/.bashrc

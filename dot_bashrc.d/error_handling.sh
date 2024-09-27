@@ -38,7 +38,10 @@ error_handler() {
     if [ "$SCRIPT" == "" ]; then
       # Line is completely off in this case
       echo_err "Error on the main script."
-      echo_err "It seems to be a bash builtin-command (shift, ...) as no location was given for the error by Bash."
+      echo_err "Possible causes: (as no location was given for the error by Bash)"
+      echo_err "   The command was not found"
+      echo_err "   The command is a bash builtin-command (shift, ...)"
+      echo_err '   The `source` key word was forgotten '
       return
     fi
     echo_err "Error on $SCRIPT line $line"

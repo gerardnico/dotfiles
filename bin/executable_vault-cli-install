@@ -1,0 +1,19 @@
+#!/bin/bash
+# Vault Cli Installation
+# https://developer.hashicorp.com/vault/install#linux
+
+# The log and error handling
+# We still need to use the set command
+# because shellcheck does not see them and want use to add
+# exit check everywhere
+set -Eeuo pipefail
+# echo and error_handling should be in your bashrc.d directory
+
+wget --quiet -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+if [ ! -x "$(command -v lsb_release)" ]; then
+  sudo apt install -y lsb-release
+fi
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+sudo apt update && sudo apt install -y vault
