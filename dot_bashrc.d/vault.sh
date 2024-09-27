@@ -1,6 +1,6 @@
 # Hashicorp Vault
 
-if [ ! -x "$(command -v vault)" ]; then
+if [ -x "$(command -v vault)" ]; then
 
   export VAULT_ADDR=https://vault.i.eraldy.com
   # https://developer.hashicorp.com/vault/docs/commands/login
@@ -8,6 +8,7 @@ if [ ! -x "$(command -v vault)" ]; then
 
   # https://developer.hashicorp.com/vault/docs/commands#autocompletion
   # need to restart the shell
-  vault -autocomplete-install
+  # `vault -autocomplete-install` add the below line to bashrc
+  complete -C /usr/bin/vault vault
 
 fi

@@ -5,7 +5,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 source "$SCRIPT_DIR"/color
 
 
-function cli_name(){
+function calling_script(){
   # caller return the line, the function and the script
   # example: 10 main /opt/dokuwiki-docker/bin/dokuwiki-docker-entrypoint
   CALLING_SCRIPT=$(caller 1 | awk '{print $3}')
@@ -21,7 +21,7 @@ function echo_info() {
   # We send all echo to the error stream
   # so that any redirection will not get them
   # this is the standard behaviour of git
-  echo -e "$(cli_name): ${1:-}" >&2
+  echo -e "$(calling_script): ${1:-}" >&2
 
 }
 
@@ -44,3 +44,4 @@ echo_warning() {
 export -f echo_err
 export -f echo_info
 export -f echo_warning
+export -f calling_script
