@@ -3,6 +3,7 @@
 [global]
 strict_env = true
 warn_timeout = "1s"
+load_dotenv = true # load .env files if envrc is not present
 
 # Trusted directories
 [whitelist]
