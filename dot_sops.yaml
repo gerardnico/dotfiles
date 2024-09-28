@@ -1,0 +1,9 @@
+# Sops configuration file
+# https://github.com/getsops/sops
+creation_rules:
+  # prod files that ends with .prod.yaml
+  - path_regex: \.prod\.yaml$
+    hc_vault_transit_uri: "https://vault.i.eraldy.com/v1/sops/keys/thirdkey"
+  # other files
+  # The absence of a path_regex means it will match everything
+  - hc_vault_transit_uri: "https://vault.i.eraldy.com/v1/sops/keys/default-key"

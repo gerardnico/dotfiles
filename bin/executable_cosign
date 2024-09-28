@@ -14,8 +14,8 @@ IMAGE=gcr.io/projectsigstore/cosign:v2.4.0
 
 # The workdir is the home (ie /home/noname)
 # We can't mount there because cosign would not be able to create its config
-# You get: 
-# $(docker inspect --format='{{.Config.WorkingDir}}' $IMAGE)
+# You get: `mkdir /home/nonroot/.sigstore permission denied`
+
 
 docker run \
   -v $PWD:/tmp \
