@@ -1,0 +1,71 @@
+#!/bin/bash
+
+######################
+# Standard Library and conf
+######################
+# The log and error handling
+# We still need to use the set command
+# because shellcheck does not see them and want use to add
+# exit check everywhere
+set -Eeuo pipefail
+# echo and error_handling should be in your bashrc.d directory
+
+######################
+# Sops does not have any image
+# Installation can be seen on every release documentation
+# this is what we are doing here
+######################
+
+VERSION=${1:-v3.9.0}
+echo_info "Installing sops version $VERSION"
+
+INSTALL_DIR=/tmp/sops-install-$VERSION
+echo_info "Create and cd to install directory $INSTALL_DIR"
+mkdir -p /tmp/sops-install-$VERSION
+pushd $INSTALL_DIR
+
+BINARY=sops-$VERSION.linux.amd64
+if [ ! -f $INSTALL_DIR/$BINARY ]; then
+  echo_info "Download the binary $BINARY"
+  curl -LO "https://github.com/getsops/sops/releases/download/$VERSION/$BINARY"
+else
+  echo_info "Binary $BINARY found"
+fi;
+
+echo_info "Move the binary in to your PATH"
+sudo mv $BINARY /usr/local/bin/sops
+
+echo_info "Make the binary executable"
+chmod +x /usr/local/bin/sops
+
+echo_info "Download the checksums file, certificate and signature"
+TXT_CHECKSUM="sops-$VERSION.checksums.txt"
+if [ ! -f $INSTALL_DIR/$TXT_CHECKSUM ]; then
+  curl -LO "https://github.com/getsops/sops/releases/download/$VERSION/$TXT_CHECKSUM"
+fi
+PEM_CHECKSUM="sops-$VERSION.checksums.pem"
+if [ ! -f $INSTALL_DIR/$PEM_CHECKSUM ]; then
+  curl -LO "https://github.com/getsops/sops/releases/download/$VERSION/$PEM_CHECKSUM"
+fi
+SIG_CHECKSUM="sops-$VERSION.checksums.sig"
+if [ ! -f $INSTALL_DIR/$SIG_CHECKSUM ]; then
+  curl -LO "https://github.com/getsops/sops/releases/download/$VERSION/$SIG_CHECKSUM"
+fi
+
+if [ ! -x "$(command -v cosign)" ]; then
+  echo_err "You should install cosign"
+  exit 1
+fi
+
+# Verify the checksums file
+cosign verify-blob sops-$VERSION.checksums.txt \
+  --certificate sops-$VERSION.checksums.pem \
+  --signature sops-$VERSION.checksums.sig \
+  --certificate-identity-regexp=https://github.com/getsops \
+  --certificate-oidc-issuer=https://token.actions.githubusercontent.com
+
+echo_info "Go back to current directory"
+popd
+
+echo_info "Clean install directory"
+rm -rf $INSTALL_DIR

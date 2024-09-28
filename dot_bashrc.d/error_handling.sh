@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# set -Eeuo pipefail on each script at the top
+# where the flag are:
+# e - Exit if any error
+# u - Treat unset variables as an error when substituting
+# o pipefail - the return value of a pipeline is the status of the last command to exit with a non-zero status or zero if no command exited with a non-zero status
+# E - the ERR trap is inherited by shell functions
+
 
 print_stack(){
   # CallStack with FUNCNAME

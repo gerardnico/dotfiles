@@ -16,7 +16,7 @@ set -Eeuo pipefail
 ######################
 
 # Check if container is provided
-if [ -z "$1" ]; then
+if [ "$1" == "" ]; then
     echo "Usage: $0 <container>"
     exit 1
 fi
