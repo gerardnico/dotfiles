@@ -21,11 +21,11 @@ echo_info "Installing sops version $VERSION"
 
 INSTALL_DIR=/tmp/sops-install-$VERSION
 echo_info "Create and cd to install directory $INSTALL_DIR"
-mkdir -p /tmp/sops-install-$VERSION
-pushd $INSTALL_DIR
+mkdir -p "$INSTALL_DIR"
+pushd "$INSTALL_DIR"
 
 BINARY=sops-$VERSION.linux.amd64
-if [ ! -f $INSTALL_DIR/$BINARY ]; then
+if [ ! -f "$INSTALL_DIR"/"$BINARY" ]; then
   echo_info "Download the binary $BINARY"
   curl -LO "https://github.com/getsops/sops/releases/download/$VERSION/$BINARY"
 else
@@ -33,22 +33,22 @@ else
 fi;
 
 echo_info "Move the binary in to your PATH"
-sudo mv $BINARY /usr/local/bin/sops
+sudo mv "$BINARY" /usr/local/bin/sops
 
 echo_info "Make the binary executable"
 chmod +x /usr/local/bin/sops
 
 echo_info "Download the checksums file, certificate and signature"
 TXT_CHECKSUM="sops-$VERSION.checksums.txt"
-if [ ! -f $INSTALL_DIR/$TXT_CHECKSUM ]; then
+if [ ! -f "$INSTALL_DIR"/"$TXT_CHECKSUM" ]; then
   curl -LO "https://github.com/getsops/sops/releases/download/$VERSION/$TXT_CHECKSUM"
 fi
 PEM_CHECKSUM="sops-$VERSION.checksums.pem"
-if [ ! -f $INSTALL_DIR/$PEM_CHECKSUM ]; then
+if [ ! -f "$INSTALL_DIR"/"$PEM_CHECKSUM" ]; then
   curl -LO "https://github.com/getsops/sops/releases/download/$VERSION/$PEM_CHECKSUM"
 fi
 SIG_CHECKSUM="sops-$VERSION.checksums.sig"
-if [ ! -f $INSTALL_DIR/$SIG_CHECKSUM ]; then
+if [ ! -f "$INSTALL_DIR"/"$SIG_CHECKSUM" ]; then
   curl -LO "https://github.com/getsops/sops/releases/download/$VERSION/$SIG_CHECKSUM"
 fi
 
