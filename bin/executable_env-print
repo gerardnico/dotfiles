@@ -2,8 +2,9 @@
 # This script will take an env file
 # * print it in a export format
 # * retrieve value from a vault if the value has the form: vault:$ENGINE/path/to/secret/field
+
 #
-# This script was entirely written by Claude 3.5 Sonnet
+# This script was originally entirely written by Claude 3.5 Sonnet
 # Prompt:
 # Can you write a bash script that:
 # * will get a env file as first argument called the `input` variable
@@ -18,21 +19,6 @@
 # * add to the `output` variable the line  `export $key=$value`
 # * once the loop has finished, echo the whole `output` variable
 
-# Check if an input file is provided
-if [ $# -eq 0 ]; then
-    echo "Please provide an input file as an argument."
-    exit 1
-fi
-
-# Assign the first argument to the INPUT variable
-INPUT="$1"
-
-# Initialize the OUTPUT variable
-OUTPUT=""
-
-# Set the VAULT_PREFIX variable
-VAULT_PREFIX="vault:"
-
 # Function to trim leading and trailing whitespace
 trim() {
     local VAR="$*"
@@ -43,13 +29,81 @@ trim() {
     printf '%s' "$VAR"
 }
 
+# Declare an associative array to store the field values
+declare -A SECRETS_MAP
+
+
+# Given a vault path in the form: vault:$ENGINE/path/to/secret/field,
+# it will return the value of the field
+# If the value has already been retrieved, it will be retrieved from the associative array
+vault_get() {
+
+  SECRET_FIELD_PATH=${1}
+  export SECRETS_MAP
+
+  # Check if we have already the value
+  VALUE=${SECRETS_MAP["$SECRET_FIELD_PATH"]}
+  if [ "$VALUE" != "" ]; then
+    echo "$VALUE";
+    return
+  fi
+
+  # Extract the FIELD (last part of the remaining path)
+  IFS='/' read -ra PATH_PARTS <<< "$SECRET_FIELD_PATH"
+  FIELD=${PATH_PARTS[-1]}
+
+  # Remove the FIELD from the SECRET_PATH
+  SECRET_PATH=${SECRET_FIELD_PATH%/$FIELD}
+
+  # Make a Vault call to get the actual value using the extracted MOUNT
+  if ! SECRET_KV_JSON=$(vault kv get -format=json "$SECRET_PATH"); then
+    echo_err "Error: Failed to retrieve secret from Vault for mount: $MOUNT, path: $SECRET_PATH" >&2
+    exit 1
+  fi
+
+  # Extract the data portion of the secret
+  SECRET_FIELDS=$(echo "$SECRET_KV_JSON" | jq -r '.data.data')
+
+  # Iterate through each field in the secret and store in the associative array
+  while IFS="=" read -r key value; do
+      map_key="${SECRET_PATH}/${key}"
+      SECRETS_MAP["$map_key"]="$value"
+  done < <(echo "$SECRET_FIELDS" | jq -r 'to_entries[] | "\(.key)=\(.value)"')
+
+  # Do we got the field
+  VALUE=${SECRETS_MAP["$SECRET_FIELD_PATH"]}
+  if [ "$VALUE" == "" ]; then
+    exit 1
+  fi
+
+  # Return the value
+  echo "$VALUE";
+
+}
+
+
+# Assign the first argument to the INPUT variable
+INPUT="${1:-.env}"
+
+if [ ! -f "$INPUT" ]; then
+  echo_err "Env File  ($INPUT) was not found"
+  exit 1;
+fi
+
+
+# Initialize the OUTPUT variable
+OUTPUT=""
+
+# Set the VAULT_PREFIX variable
+VAULT_PREFIX="vault:"
+
 # Process each line in the INPUT file
 while IFS= read -r LINE; do
+
     # Skip comments (lines starting with #)
     if [[ $LINE =~ ^[[:space:]]*#.*$ ]]; then
         continue
     fi
-
     # Separate KEY and VALUE
     if [[ $LINE =~ ^([^=]+)=(.*)$ ]]; then
         KEY=$(trim "${BASH_REMATCH[1]}")
@@ -58,31 +112,37 @@ while IFS= read -r LINE; do
 
         # Check if VALUE starts with VAULT_PREFIX
         if [[ $VALUE == $VAULT_PREFIX* ]]; then
-            # Extract the SECRET_PATH
-            SECRET_PATH=${VALUE#$VAULT_PREFIX}
-            SECRET_PATH=$(trim "$SECRET_PATH")
 
-            # Extract the MOUNT (first part of the path)
-            IFS='/' read -r MOUNT REST <<< "$SECRET_PATH"
+            # Extract the FULL QUALIFIED SECRET_PATH
+            SECRET_FIELD_PATH=${VALUE#$VAULT_PREFIX}
+            SECRET_FIELD_PATH=$(trim "$SECRET_FIELD_PATH")
 
-            # Extract the FIELD (last part of the remaining path)
-            IFS='/' read -ra PATH_PARTS <<< "$REST"
-            FIELD=${PATH_PARTS[-1]}
-
-            # Remove the FIELD from the SECRET_PATH
-            SECRET_PATH=${REST%/$FIELD}
-
-            # Make a Vault call to get the actual value using the extracted MOUNT
-            if ! VALUE=$(vault kv get -mount="$MOUNT" -field="$FIELD" "$SECRET_PATH"); then
-                echo "Error: Failed to retrieve secret from Vault for mount: $MOUNT, path: $SECRET_PATH, field: $FIELD" >&2
-                exit 1
+            # Get the value from the vault
+            if ! VALUE=$(vault_get "$SECRET_FIELD_PATH"); then
+              echo $VALUE
+              echo_err "Value not found for $SECRET_FIELD_PATH"
+              exit 1;
             fi
+
         fi
 
         # Add the processed line to the OUTPUT
         OUTPUT+="export $KEY=$VALUE"$'\n'
     fi
-done < "$INPUT"
+done <<< "$(
+                cat "$INPUT";
+                # If there is no new line at the end,
+                # the line is not processed by read
+                # https://stackoverflow.com/questions/20010741/why-does-unix-while-read-not-read-last-line
+                echo;
+           )"
+
+if [ "$OUTPUT" == "" ]; then
+    echo_err "No env variables found in $INPUT. Did you forget a new line at the end"
+    exit 1
+fi
 
 # Echo the entire OUTPUT
-echo "$OUTPUT"
+echo "${OUTPUT}"
+
+
