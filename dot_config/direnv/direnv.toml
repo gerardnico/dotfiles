@@ -2,7 +2,9 @@
 
 [global]
 strict_env = true
-warn_timeout = "1s"
+# to avoid: direnv is taking a while to execute
+# a call to the external http vault may take a long time
+warn_timeout = "3s"
 load_dotenv = true # load .env files if envrc is not present
 
 # Trusted directories

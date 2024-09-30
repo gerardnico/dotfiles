@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script will take an env file
+# This script will take all env file (.env and .env.*)
 # * print it in a export format
 # * retrieve value from a vault if the value has the form: vault:$ENGINE/path/to/secret/field
 
@@ -19,6 +19,15 @@
 # * add to the `output` variable the line  `export $key=$value`
 # * once the loop has finished, echo the whole `output` variable
 
+######################
+# Standard Library and conf
+######################
+# The log and error handling
+# We still need to use the set command
+# because shellcheck does not see them and want use to add
+# exit check everywhere
+set -Eeuo pipefail
+
 # Function to trim leading and trailing whitespace
 trim() {
     local VAR="$*"
@@ -31,7 +40,7 @@ trim() {
 
 # Declare an associative array to store the field values
 declare -A SECRETS_MAP
-
+SECRETS_MAP=()
 
 # Given a vault path in the form: vault:$ENGINE/path/to/secret/field,
 # it will return the value of the field
@@ -42,7 +51,7 @@ vault_get() {
   export SECRETS_MAP
 
   # Check if we have already the value
-  VALUE=${SECRETS_MAP["$SECRET_FIELD_PATH"]}
+  VALUE=${SECRETS_MAP["$SECRET_FIELD_PATH"]:-}
   if [ "$VALUE" != "" ]; then
     echo "$VALUE";
     return
@@ -57,7 +66,7 @@ vault_get() {
 
   # Make a Vault call to get the actual value using the extracted MOUNT
   if ! SECRET_KV_JSON=$(vault kv get -format=json "$SECRET_PATH"); then
-    echo_err "Error: Failed to retrieve secret from Vault for mount: $MOUNT, path: $SECRET_PATH" >&2
+    echo "Error: Failed to retrieve secret from Vault for mount: $MOUNT, path: $SECRET_PATH" >&2
     exit 1
   fi
 
@@ -71,7 +80,7 @@ vault_get() {
   done < <(echo "$SECRET_FIELDS" | jq -r 'to_entries[] | "\(.key)=\(.value)"')
 
   # Do we got the field
-  VALUE=${SECRETS_MAP["$SECRET_FIELD_PATH"]}
+  VALUE=${SECRETS_MAP["$SECRET_FIELD_PATH"]:-}
   if [ "$VALUE" == "" ]; then
     exit 1
   fi
@@ -82,12 +91,17 @@ vault_get() {
 }
 
 
-# Assign the first argument to the INPUT variable
-INPUT="${1:-.env}"
+# Assign the first argument to the ENV_FILE_PATTERN variable
+ENV_FILE_PATTERN="${1:-.env.*}"
+ENV_FILES=$(find . -maxdepth 1 -type f -name $ENV_FILE_PATTERN 2> /dev/null)
+ENV_FILE_BASE='.env'
+if [ -f "$ENV_FILE_BASE" ]; then
+  ENV_FILES="$ENV_FILE_BASE $ENV_FILES"
+fi
 
-if [ ! -f "$INPUT" ]; then
-  echo_err "Env File  ($INPUT) was not found"
-  exit 1;
+if [ "$ENV_FILES" == "" ]; then
+  echo_err $ENV_FILES
+  exit;
 fi
 
 
@@ -97,48 +111,55 @@ OUTPUT=""
 # Set the VAULT_PREFIX variable
 VAULT_PREFIX="vault:"
 
-# Process each line in the INPUT file
-while IFS= read -r LINE; do
+# Processing the env files
+for ENV_FILE in $ENV_FILES; do
 
-    # Skip comments (lines starting with #)
-    if [[ $LINE =~ ^[[:space:]]*#.*$ ]]; then
-        continue
-    fi
-    # Separate KEY and VALUE
-    if [[ $LINE =~ ^([^=]+)=(.*)$ ]]; then
-        KEY=$(trim "${BASH_REMATCH[1]}")
-        KEY=${KEY^^} # Convert KEY to uppercase
-        VALUE=$(trim "${BASH_REMATCH[2]}")
+  # Process each line in the ENV_FILE_PATTERN file
+  while IFS= read -r LINE; do
 
-        # Check if VALUE starts with VAULT_PREFIX
-        if [[ $VALUE == $VAULT_PREFIX* ]]; then
+      # Skip comments (lines starting with #)
+      if [[ $LINE =~ ^[[:space:]]*#.*$ ]]; then
+          continue
+      fi
+      # Separate KEY and VALUE
+      if [[ $LINE =~ ^([^=]+)=(.*)$ ]]; then
+          KEY=$(trim "${BASH_REMATCH[1]}")
+          KEY=${KEY^^} # Convert KEY to uppercase
+          VALUE=$(trim "${BASH_REMATCH[2]}")
 
-            # Extract the FULL QUALIFIED SECRET_PATH
-            SECRET_FIELD_PATH=${VALUE#$VAULT_PREFIX}
-            SECRET_FIELD_PATH=$(trim "$SECRET_FIELD_PATH")
+          # Check if VALUE starts with VAULT_PREFIX
+          if [[ $VALUE == $VAULT_PREFIX* ]]; then
 
-            # Get the value from the vault
-            if ! VALUE=$(vault_get "$SECRET_FIELD_PATH"); then
-              echo $VALUE
-              echo_err "Value not found for $SECRET_FIELD_PATH"
-              exit 1;
-            fi
+              # Extract the FULL QUALIFIED SECRET_PATH
+              SECRET_FIELD_PATH=${VALUE#$VAULT_PREFIX}
+              SECRET_FIELD_PATH=$(trim "$SECRET_FIELD_PATH")
 
-        fi
+              # Get the value from the vault
+              if ! VALUE=$(vault_get "$SECRET_FIELD_PATH"); then
+                echo_err "Value not found for $SECRET_FIELD_PATH"
+                if [[ $VALUE != "" ]]; then
+                  echo_err "Error: $VALUE"
+                fi
+                exit 1;
+              fi
 
-        # Add the processed line to the OUTPUT
-        OUTPUT+="export $KEY=$VALUE"$'\n'
-    fi
-done <<< "$(
-                cat "$INPUT";
-                # If there is no new line at the end,
-                # the line is not processed by read
-                # https://stackoverflow.com/questions/20010741/why-does-unix-while-read-not-read-last-line
-                echo;
-           )"
+          fi
+
+          # Add the processed line to the OUTPUT
+          OUTPUT+="export $KEY=$VALUE"$'\n'
+      fi
+  done <<< "$(
+                  cat "$ENV_FILE";
+                  # If there is no new line at the end,
+                  # the line is not processed by read
+                  # https://stackoverflow.com/questions/20010741/why-does-unix-while-read-not-read-last-line
+                  echo;
+             )"
+
+done
 
 if [ "$OUTPUT" == "" ]; then
-    echo_err "No env variables found in $INPUT. Did you forget a new line at the end"
+    echo_err "No env variables found in $ENV_FILES. Did you forget a new line at the end"
     exit 1
 fi
 
