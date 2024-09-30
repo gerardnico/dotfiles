@@ -2,6 +2,8 @@
 # This script will take all env file (.env and .env.*)
 # * print it in a export format
 # * retrieve value from a vault if the value has the form: vault:$ENGINE/path/to/secret/field
+# * export the keys in the DIRENV_EXPORTED_KEYS variable
+#    Why? DIRENV_EXPORTED_KEYS may be used to recreate a list of env for docker in the form `-e KEY=VALUE`
 
 #
 # This script was originally entirely written by Claude 3.5 Sonnet
@@ -100,13 +102,13 @@ if [ -f "$ENV_FILE_BASE" ]; then
 fi
 
 if [ "$ENV_FILES" == "" ]; then
-  echo_err $ENV_FILES
+  echo_err "$ENV_FILES"
   exit;
 fi
 
 
-# Initialize the OUTPUT variable
-OUTPUT=""
+# Initialize the OUTPUT_KEY_VALUES variable
+declare -A OUTPUT_KEY_VALUES=()
 
 # Set the VAULT_PREFIX variable
 VAULT_PREFIX="vault:"
@@ -145,8 +147,9 @@ for ENV_FILE in $ENV_FILES; do
 
           fi
 
-          # Add the processed line to the OUTPUT
-          OUTPUT+="export $KEY=$VALUE"$'\n'
+          # Add the key to the OUTPUT_KEY_VALUES
+          OUTPUT_KEY_VALUES["$KEY"]=$VALUE
+
       fi
   done <<< "$(
                   cat "$ENV_FILE";
@@ -158,12 +161,21 @@ for ENV_FILE in $ENV_FILES; do
 
 done
 
-if [ "$OUTPUT" == "" ]; then
+if [ ${#OUTPUT_KEY_VALUES[@]} -eq 0 ]; then
     echo_err "No env variables found in $ENV_FILES. Did you forget a new line at the end"
     exit 1
 fi
 
-# Echo the entire OUTPUT
-echo "${OUTPUT}"
+# Create the bash export statement
+EXPORTED_STATEMENT=""
+declare -a EXPORTED_KEYS=()
+for KEY in "${!OUTPUT_KEY_VALUES[@]}"; do
+  VALUE=${OUTPUT_KEY_VALUES[$KEY]}
+  EXPORTED_STATEMENT+="export $KEY=$VALUE"$'\n'
+  EXPORTED_KEYS+=("$KEY")
+done
+
+echo "${EXPORTED_STATEMENT}"
+echo "export DIRENV_EXPORTED_KEYS=$(IFS=, ; echo "${EXPORTED_KEYS[*]}")"
 
 

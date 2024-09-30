@@ -9,7 +9,7 @@ set -Eeuo pipefail
 
 # Arg
 WALG_VERSION=v3.0.3
-OSNAME=ubuntu-20.04-amd64
+WALG_OSNAME=ubuntu-20.04-amd64
 
 
 ## Walg Install
@@ -19,7 +19,7 @@ mkdir -p "$INSTALL_DIR"
 pushd "$INSTALL_DIR"
 
 # Derived Arg
-WALG_FILE_NAME=wal-g-pg-$OSNAME
+WALG_FILE_NAME=wal-g-pg-$WALG_OSNAME
 WALG_TAR_GZ_FILE_NAME=$WALG_FILE_NAME.tar.gz
 
 if [[ ! -f $WALG_TAR_GZ_FILE_NAME ]]; then
