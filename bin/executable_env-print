@@ -175,7 +175,6 @@ for KEY in "${!OUTPUT_KEY_VALUES[@]}"; do
   EXPORTED_KEYS+=("$KEY")
 done
 
-echo "${EXPORTED_STATEMENT}"
-echo "export DIRENV_EXPORTED_KEYS=$(IFS=, ; echo "${EXPORTED_KEYS[*]}")"
+echo "${EXPORTED_STATEMENT}export DIRENV_EXPORTED_KEYS=$(IFS=, ; echo "${EXPORTED_KEYS[*]}")"
 
 

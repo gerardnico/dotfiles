@@ -4,6 +4,9 @@
 # Adaptation from the [doc](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-using-native-package-management)
 # for debian
 
+# See also how to package it with Fpm
+# https://fpm.readthedocs.io/en/latest/packages/dir.html#sample-usage
+
 # The log and error handling
 # We still need to use the set command
 # because shellcheck does not see them and want use to add
