@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Get the directory of the current script
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-source "$SCRIPT_DIR"/color
-
 
 function calling_script(){
   # caller return the line, the function and the script
