@@ -1,5 +1,5 @@
 #!/bin/bash
-# Add all repo/bin directory into the PATH
+# Add all code/repo/bin directory into the PATH
 
 # Find all bin directories in the second level of the code directory
 add_bin_dirs_from_code_repo() {
