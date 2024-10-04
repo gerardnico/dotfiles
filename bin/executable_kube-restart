@@ -10,6 +10,8 @@
 set -Eeuo pipefail
 # echo and error_handling should be in your bashrc.d directory
 
+# Load echo package
+source $(libpath echo.sh)
 
 ######################
 # Main
@@ -66,7 +68,7 @@ if [ "$STATEFULSET_COUNT" -eq 1 ]; then
     exit 0
 fi
 
-echo_err "No deployment or statefulset found for the app $APP_NAME (with the label $APP_LABEL)"
+echo::err"No deployment or statefulset found for the app $APP_NAME (with the label $APP_LABEL)"
 exit 1
 
 

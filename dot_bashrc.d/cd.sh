@@ -41,28 +41,24 @@ cd_func ()
 
    #
    # Now change to the new dir and add to the top of the stack
-   pushd "${the_new_dir}" > /dev/null
-   [[ $? -ne 0 ]] && return 1
+   pushd "${the_new_dir}" > /dev/null || return 1
    the_new_dir=$(pwd)
 
    # Trim down everything beyond 11th entry
    popd -n +11 2>/dev/null 1>/dev/null
 
    #
-   # Remove any other occurence of this dir, skipping the top of the stack
+   # Remove any other occurrence of this dir, skipping the top of the stack
    for ((cnt=1; cnt <= 10; cnt++)); do
-     x2=$(dirs +${cnt} 2>/dev/null)
-     [[ $? -ne 0 ]] && return 0
+     x2=$(dirs +${cnt} 2>/dev/null) || return 0
      [[ ${x2:0:1} == '~' ]] && x2="${HOME}${x2:1}"
      if [[ "${x2}" == "${the_new_dir}" ]]; then
        popd -n +$cnt 2>/dev/null 1>/dev/null
-       cnt=cnt-1
+       cnt=$((cnt-1))
      fi
    done
 
    return 0
  }
-
-export -f cd_func
 
 alias cd=cd_func

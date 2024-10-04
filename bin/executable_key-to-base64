@@ -12,6 +12,8 @@
 set -Eeuo pipefail
 # echo and error_handling should be in your bashrc.d directory
 
+# Load echo package
+source $(libpath echo.sh)
 
 # Function to display usage information
 usage() {
@@ -29,7 +31,7 @@ PEM_FILE=$1
 
 # Check if the PEM file exists
 if [ ! -f "$PEM_FILE" ]; then
-    echo "Error: PEM file does not exist: $PEM_FILE"
+    echo::err "PEM file does not exist: $PEM_FILE"
     exit 1
 fi
 
@@ -47,11 +49,11 @@ extract_and_encode() {
 
 # Detect key type and extract
 if grep -q "PRIVATE KEY" "$PEM_FILE"; then
-    echo_info "Detected private key. Extracting and encoding:"
+    echo::info "Detected private key. Extracting and encoding:"
 elif grep -q "PUBLIC KEY" "$PEM_FILE"; then
-    echo_info "Detected public key. Extracting and encoding:"
+    echo::info "Detected public key. Extracting and encoding:"
 else
-    echo_err "Error: Unable to determine key type. Ensure the file contains a valid PEM-encoded key."
+    echo::err "Error: Unable to determine key type. Ensure the file contains a valid PEM-encoded key."
     exit 1
 fi
 

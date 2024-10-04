@@ -10,6 +10,9 @@
 set -Eeuo pipefail
 # echo and error_handling should be in your bashrc.d directory
 
+# Load echo package
+source $(libpath echo.sh)
+
 ######################
 # Sops does not have any image
 # Installation can be seen on every release documentation
@@ -17,28 +20,28 @@ set -Eeuo pipefail
 ######################
 
 VERSION=${1:-v3.9.0}
-echo_info "Installing sops version $VERSION"
+echo::info"Installing sops version $VERSION"
 
 INSTALL_DIR=/tmp/sops-install-$VERSION
-echo_info "Create and cd to install directory $INSTALL_DIR"
+echo::info"Create and cd to install directory $INSTALL_DIR"
 mkdir -p "$INSTALL_DIR"
 pushd "$INSTALL_DIR"
 
 BINARY=sops-$VERSION.linux.amd64
 if [ ! -f "$INSTALL_DIR"/"$BINARY" ]; then
-  echo_info "Download the binary $BINARY"
+  echo::info"Download the binary $BINARY"
   curl -LO "https://github.com/getsops/sops/releases/download/$VERSION/$BINARY"
 else
-  echo_info "Binary $BINARY found"
+  echo::info"Binary $BINARY found"
 fi;
 
-echo_info "Move the binary in to your PATH"
+echo::info"Move the binary in to your PATH"
 sudo mv "$BINARY" /usr/local/bin/sops
 
-echo_info "Make the binary executable"
+echo::info"Make the binary executable"
 chmod +x /usr/local/bin/sops
 
-echo_info "Download the checksums file, certificate and signature"
+echo::info"Download the checksums file, certificate and signature"
 TXT_CHECKSUM="sops-$VERSION.checksums.txt"
 if [ ! -f "$INSTALL_DIR"/"$TXT_CHECKSUM" ]; then
   curl -LO "https://github.com/getsops/sops/releases/download/$VERSION/$TXT_CHECKSUM"
@@ -53,7 +56,7 @@ if [ ! -f "$INSTALL_DIR"/"$SIG_CHECKSUM" ]; then
 fi
 
 if [ ! -x "$(command -v cosign)" ]; then
-  echo_err "You should install cosign"
+  echo::err"You should install cosign"
   exit 1
 fi
 
@@ -64,8 +67,8 @@ cosign verify-blob sops-$VERSION.checksums.txt \
   --certificate-identity-regexp=https://github.com/getsops \
   --certificate-oidc-issuer=https://token.actions.githubusercontent.com
 
-echo_info "Go back to current directory"
+echo::info"Go back to current directory"
 popd
 
-echo_info "Clean install directory"
+echo::info"Clean install directory"
 rm -rf $INSTALL_DIR

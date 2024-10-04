@@ -8,7 +8,9 @@
 # because shellcheck does not see them and want use to add
 # exit check everywhere
 set -Eeuo pipefail
-# echo and error_handling should be in your bashrc.d directory
+
+# Load echo package
+source $(libpath echo.sh)
 
 ######################
 # Main
@@ -24,7 +26,7 @@ APP_DIRECTORY=$HOME/code/kube-argocd/$APP_NAME
 
 
 if [ ! -d "$APP_DIRECTORY" ]; then
-  echo_err "The app directory $APP_DIRECTORY does not exist"
+  echo::err "The app directory $APP_DIRECTORY does not exist"
   exit 1
 fi
 

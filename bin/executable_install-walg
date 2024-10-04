@@ -7,6 +7,9 @@
 set -Eeuo pipefail
 # echo and error_handling should be in your bashrc.d directory
 
+# Load echo package
+source $(libpath echo.sh)
+
 # Arg
 WALG_VERSION=v3.0.3
 WALG_OSNAME=ubuntu-20.04-amd64
@@ -14,7 +17,7 @@ WALG_OSNAME=ubuntu-20.04-amd64
 
 ## Walg Install
 INSTALL_DIR=/tmp/walg-install-$WALG_VERSION
-echo_info "Create and cd to install directory $INSTALL_DIR"
+echo::info"Create and cd to install directory $INSTALL_DIR"
 mkdir -p "$INSTALL_DIR"
 pushd "$INSTALL_DIR"
 
@@ -23,20 +26,20 @@ WALG_FILE_NAME=wal-g-pg-$WALG_OSNAME
 WALG_TAR_GZ_FILE_NAME=$WALG_FILE_NAME.tar.gz
 
 if [[ ! -f $WALG_TAR_GZ_FILE_NAME ]]; then
-  echo_info "Download $WALG_TAR_GZ_FILE_NAME"
+  echo::info"Download $WALG_TAR_GZ_FILE_NAME"
   curl -sSL -o $WALG_TAR_GZ_FILE_NAME https://github.com/wal-g/wal-g/releases/download/$WALG_VERSION/$WALG_TAR_GZ_FILE_NAME
 fi
 
 if [[ ! -f $WALG_FILE_NAME ]]; then
-  echo_info "Un tar $WALG_TAR_GZ_FILE_NAME"
+  echo::info"Un tar $WALG_TAR_GZ_FILE_NAME"
   tar -zxvf $WALG_TAR_GZ_FILE_NAME
 fi
 
-echo_info "Move to bin directory"
+echo::info"Move to bin directory"
 sudo mv $WALG_FILE_NAME /usr/local/bin/wal-g
 sudo chmod +x /usr/local/bin/wal-g
 
-echo_info "Cleaning up"
+echo::info"Cleaning up"
 rm -rf "$INSTALL_DIR"
 
 popd

@@ -12,6 +12,10 @@
 set -Eeuo pipefail
 # echo and error_handling should be in your bashrc.d directory
 
+# Load echo package
+source $(libpath echo.sh)
+
+
 ######################
 # Main
 ######################
@@ -83,7 +87,7 @@ function gitResetAndClean() {
 function gitAutoCommit() {
 
   if [[ -z $1 ]]; then
-    echo_err "A message is mandatory for a commit"
+    echo::err"A message is mandatory for a commit"
     exit 1
   fi
   commitString="GIT_COMMITTER_NAME='beau.bytle.net' GIT_COMMITTER_EMAIL='support@combostrap.com' git commit --author 'Nico <nico@${FQDN}>' -m '$1'"
@@ -152,7 +156,7 @@ function gitStatusByFileType() {
 GITALL_CONF_FILE=${GITALL_CONF_FILE:-}
 if [ "$GITALL_CONF_FILE" != "" ] && [ -f "$GITALL_CONF_FILE" ]; then
   IFS=$'\n' read -r -a REPO_DIRS -d $'\c0' <"$GITALL_CONF_FILE"
-  echo_info "${#REPO_DIRS[*]} directory found in $GITALL_CONF_FILE"
+  echo::info"${#REPO_DIRS[*]} directory found in $GITALL_CONF_FILE"
 fi
 
 
@@ -165,7 +169,7 @@ for childPath in "$GITALL_CODE_HOME"/*; do
 done
 
 if [ ${#REPO_DIRS[*]} == 0 ]; then
-  echo_err 'No Git repository found'
+  echo::err'No Git repository found'
   exit 1
 fi
 
@@ -218,7 +222,7 @@ for REPO_DIR in "${REPO_DIRS[@]}"; do
   CURRENT_BRANCH_UPSTREAM=$(git rev-parse --abbrev-ref "@{u}")
   echo "  * Upstream: $CURRENT_BRANCH_UPSTREAM"
   if ! (eval "${COMMAND_STRING}" "$@"); then
-    echo_err "The command ${COMMAND_STRING} has error"
+    echo::err"The command ${COMMAND_STRING} has error"
   fi
   echo ""
   popd >/dev/null || checkStatus

@@ -4,4 +4,5 @@
 # To Avoid: -bash: /home/admin/.bashrc: Permission denied
 # if I forgot the `source`
 
+# shellcheck disable=SC1090
 chezmoi apply && source ~/.bashrc

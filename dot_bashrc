@@ -120,6 +120,17 @@ alias du='du -h'
 # umask 077
 
 #####################
+# Add Bash Library Loader
+#####################
+export BASH_LIB_DIR=$HOME/code/bash-lib/lib
+export PATH=$HOME/code/bash-lib/bin:$PATH
+if [ ! -x "$(command -v libpath)" ]; then
+  echo "########################"
+  echo "The libpath utility could not be found"
+  echo "########################"
+fi
+
+#####################
 # Executable: Add the bin
 #####################
 export PATH="$HOME/bin:$PATH"
@@ -194,40 +205,6 @@ if [ -d "$ANSIBLE_SCRIPTS" ]; then
 fi
 
 
-
-##############################
-# SSH Env
-##############################
-# Warning: ssh_agent file should be in the bashrc.d direcrory
-# We start the SSH agent and load the keys
-
-# The location of the env file
-export SSH_ENV="$HOME"/.ssh/ssh-agent.env
-export SSH_AUTH_SOCK="$HOME"/.ssh/agent.sock
-
-# Load the env if available
-ssh-agent-load-env "$SSH_ENV"
-
-# Get the state
-SSH_AGENT_RUN_STATE=$(ssh-agent-state)
-if [ ! "$SSH_AUTH_SOCK" ] || [ "$SSH_AGENT_RUN_STATE" = 2 ]; then
-	echo "Agent not started"
-	# The sock may be a symlink, so -e check that
-	# -f check only if it's a regular file
-	if [ -e "$SSH_AUTH_SOCK" ]; then
-	  echo "Deleting Sock file $SSH_AUTH_SOCK"
-	  rm "$SSH_AUTH_SOCK"
-	fi
-	echo "Starting Agent"
-  ssh_agent_start "$SSH_ENV" "$SSH_AUTH_SOCK"
-	ssh-add-keys
-elif [ "$SSH_AUTH_SOCK" ] && [ "$SSH_AGENT_RUN_STATE" = 1 ]; then
-	echo Agent not started but empty
-  ssh-add-keys
-fi
-
-unset SSH_AGENT_RUN_STATE
-unset SSH_ENV
 
 
 ##############################

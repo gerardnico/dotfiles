@@ -12,7 +12,9 @@
 # because shellcheck does not see them and want use to add
 # exit check everywhere
 set -Eeuo pipefail
-# echo and error_handling should be in your bashrc.d directory
+
+# Load echo package
+source $(libpath echo.sh)
 
 ######################
 # Main
@@ -31,15 +33,15 @@ KUBE_APP_NAMESPACE=${2:-$KUBE_APP_NAME}
 KUBECONFIG=$HOME/.kube/config-$KUBE_APP_NAME
 
 if [ ! -f "$KUBECONFIG" ]; then
-  echo_err "The KUBECONFIG file $KUBECONFIG for the app $KUBE_APP_NAME does not exist"
-  echo_err "You will not be able to connect to the cluster"
+  echo::err"The KUBECONFIG file $KUBECONFIG for the app $KUBE_APP_NAME does not exist"
+  echo::err"You will not be able to connect to the cluster"
   exit 1
 fi
 
 # Check namespace
 KUBECONFIG_NAMESPACE=$(kubectl config view --kubeconfig "$KUBECONFIG" --minify --output 'jsonpath={..namespace}')
 if [ "$KUBECONFIG_NAMESPACE" != "$KUBE_APP_NAMESPACE" ]; then
-  echo_err "The current context of the KUBECONFIG file $KUBECONFIG does not have the good app namespace (Found $KUBECONFIG_NAMESPACE in place of $KUBE_APP_NAMESPACE)"
+  echo::err"The current context of the KUBECONFIG file $KUBECONFIG does not have the good app namespace (Found $KUBECONFIG_NAMESPACE in place of $KUBE_APP_NAMESPACE)"
   exit;
 fi
 
@@ -51,7 +53,7 @@ fi
 
 KUBE_APP_DIRECTORY=$HOME/code/kube-argocd/$KUBE_APP_NAME
 if [ ! -d "$KUBE_APP_DIRECTORY" ]; then
-  echo_err "The app directory $KUBE_APP_DIRECTORY does not exist"
+  echo::err"The app directory $KUBE_APP_DIRECTORY does not exist"
   exit 1
 fi
 
