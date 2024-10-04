@@ -11,7 +11,8 @@ set -Eeuo pipefail
 # echo and error_handling should be in your bashrc.d directory
 
 # Load echo package
-source $(libpath echo.sh)
+# shellcheck disable=SC1090
+source "$(libpath echo.sh)"
 
 ######################
 # Sops does not have any image

@@ -1,0 +1,24 @@
+#!/bin/bash
+# https://aider.chat/docs/install/pipx.html
+
+set -Eeuo pipefail
+
+# Load echo package
+# shellcheck disable=SC1090
+source "$(libpath echo.sh)"
+
+if [ -x "$(command -v aider)" ]; then
+  echo::err "Aider already installed"
+fi
+
+
+if [ ! -x "$(command -v pipx)" ]; then
+  sudo apt update && sudo apt install -y pipx
+  pipx ensurepath
+fi
+
+
+# pipx install globally on your system within its own python environment.
+pipx install aider-chat
+
+

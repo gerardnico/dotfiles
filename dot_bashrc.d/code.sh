@@ -18,5 +18,8 @@ add_bin_dirs_from_code_repo() {
 
 }
 
+export CODE_HOME
+CODE_HOME="$HOME"/code
+
 # Execute the function
-add_bin_dirs_from_code_repo "$HOME"/code
+add_bin_dirs_from_code_repo "$CODE_HOME"
