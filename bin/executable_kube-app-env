@@ -14,7 +14,7 @@
 set -Eeuo pipefail
 
 # Load echo package
-source $(libpath echo.sh)
+source bashlib-echo.sh
 
 ######################
 # Main

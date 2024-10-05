@@ -8,7 +8,7 @@
 set -Eeuo pipefail
 
 # Load echo package
-source $(libpath echo.sh)
+source bashlib-echo.sh
 
 
 # Check if the app name is provided
