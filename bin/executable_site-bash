@@ -16,7 +16,4 @@ fi
 
 SITE_NAME=$1
 
-
-SITE_QUALIFIED_NAME="site-com-$SITE_NAME"
-
-docker exec -ti "$SITE_QUALIFIED_NAME" bash
+docker exec -ti "$SITE_NAME" bash

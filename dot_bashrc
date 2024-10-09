@@ -215,7 +215,9 @@ else
 fi
 
 #############################
-# Set the window title
+# Set the tab title
 #############################
+# Doc: https://learn.microsoft.com/en-us/windows/terminal/tutorials/tab-title
+# echo -ne "\033]0;New Title\a"
 trap 'echo -ne "\e]0;$BASH_COMMAND\007"' DEBUG
 
