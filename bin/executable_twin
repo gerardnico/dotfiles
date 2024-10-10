@@ -1,0 +1,44 @@
+#!/bin/bash
+# @description Switch or create a new window
+# @arg $1 the window name
+# @arg $2 the start directory
+#         The start directory if empty is derived from `$WINDOW_DIR_HOME/$WINDOW_NAME`
+#         where `$WINDOW_DIR_HOME` is a global variable
+# @exitcode 0 start or switch the window
+# @exitcode 1 if the start dir does not exist
+
+set -Eeuo pipefail
+source bashlib-echo.sh
+
+WINDOW_NAME=$1
+WINDOW_DIR=${2:-}
+WINDOW_DIR_HOME=${WINDOW_DIR_HOME:-"$HOME"/code}
+
+# Check if the window exists
+if tmux list-windows | grep -q "$WINDOW_NAME"; then
+  # Switch to the window if it exists
+  tmux select-window -t "$WINDOW_NAME"
+else
+  # Create the window if it doesn't exist
+  if [ "$WINDOW_DIR" = "" ]; then
+    case $WINDOW_NAME in
+      "combo")
+        WINDOW_DIR="$WINDOW_DIR_HOME/site-com-combostrap"
+        ;;
+      *)
+        WINDOW_DIR="$WINDOW_DIR_HOME/$WINDOW_NAME"
+        ;;
+    esac
+    if [ ! -d "$WINDOW_DIR" ]; then
+      echo::err "WINDOW_DIR not given. Derived directory ($WINDOW_DIR) from window name ($WINDOW_NAME) does not exists"
+      exit 1
+    fi
+  fi
+
+  # https://man.openbsd.org/tmux#new-window
+  # n: windows name
+  # c: directory
+  tmux new-window \
+    -c "$WINDOW_DIR" \
+    -n "$WINDOW_NAME"
+fi

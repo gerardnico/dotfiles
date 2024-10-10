@@ -200,8 +200,6 @@ if [ -d "$ANSIBLE_SCRIPTS" ]; then
 fi
 
 
-
-
 ##############################
 # DirEnv hook
 ##############################
@@ -219,5 +217,14 @@ fi
 #############################
 # Doc: https://learn.microsoft.com/en-us/windows/terminal/tutorials/tab-title
 # echo -ne "\033]0;New Title\a"
-trap 'echo -ne "\e]0;$BASH_COMMAND\007"' DEBUG
+# trap 'echo -ne "\e]0;$BASH_COMMAND\007"' DEBUG
 
+#############################
+# Start Tmux if not inside
+#############################
+if [ -z "$TMUX" ]; then
+  echo "Start Tmux Base Session"
+  tstart
+else
+  echo "Inside Tmux"
+fi

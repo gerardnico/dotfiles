@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Attach or create a session if it does not exist
+# A: attach or new
+# n: windows name
+# s: session name
+tmux new-session \
+  -A \
+  -n base \
+  -s base
