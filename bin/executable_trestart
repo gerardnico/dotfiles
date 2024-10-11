@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Reload
+tmux kill-server && tstart

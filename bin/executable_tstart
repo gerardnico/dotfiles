@@ -6,5 +6,5 @@
 # s: session name
 tmux new-session \
   -A \
-  -n base \
-  -s base
+  -n "${USER}" \
+  -s "${USER}"

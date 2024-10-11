@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Reload the conf
+tmux source-file ~/.tmux.conf
