@@ -1,4 +1,6 @@
-#!/bin/bash
+
+
+# see also https://github.com/ajeetdsouza/zoxide
 
 # This function defines a 'cd' replacement function capable of keeping,
 # displaying and accessing history of visited directories, up to 10 entries.

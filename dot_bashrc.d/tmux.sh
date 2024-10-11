@@ -15,3 +15,4 @@ fi
 # (and we call bashrc from /etc/profile)
 # making it nested
 
+# alias website="tmux attach-session -t website"
