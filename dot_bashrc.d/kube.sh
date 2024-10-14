@@ -20,3 +20,9 @@ if [ -x "$(command -v kubectl)" ]; then
   complete -o default -F __start_kubectl k
 
 fi
+
+##############################
+# Kube Utilities
+# https://github.com/gerardnico/kube
+##############################
+export KUBE_APP_HOME=$HOME/code/argocd
