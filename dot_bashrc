@@ -219,11 +219,3 @@ fi
 # echo -ne "\033]0;New Title\a"
 # trap 'echo -ne "\e]0;$BASH_COMMAND\007"' DEBUG
 
-#############################
-# Start Tmux if not inside
-#############################
-# https://wiki.archlinux.org/title/Tmux#Start_tmux_on_every_shell_login
-if [ -x "$(command -v tmux)" ] && [ -n "${DISPLAY}" ] && [ -z "${TMUX}" ]; then
-  echo "Start Tmux Base Session"
-  tstart
-fi
