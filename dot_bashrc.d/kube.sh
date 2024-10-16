@@ -26,3 +26,4 @@ fi
 # https://github.com/gerardnico/kube
 ##############################
 export KUBE_APP_HOME=$HOME/code/argocd
+export KUBE_PUBLIC_KEY=$HOME/.ssh/nico02_rsa.pub

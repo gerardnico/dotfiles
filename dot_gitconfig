@@ -2,11 +2,14 @@
 	name = Nicolas GERARD
 	email = gerardnico@gmail.com
 [core]
+    # https://git-scm.com/docs/gitattributes#_eol
+    # LF line endings on checkouts
+    eol = lf
     # https://git-scm.com/docs/gitattributes#_end_of_line_conversion
     # No CRLF at all o
     # This feature means that it will push with LF and check out with CRLF
     # We don't want that on WSL
-    # Idea gives a warning, ignore itB
+    # Idea gives a warning, ignore it
 	autocrlf = false
 [init]
 	defaultBranch = main

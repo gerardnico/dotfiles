@@ -139,6 +139,27 @@ if [ -d "$HOME/.local/bin" ] ; then
     export PATH="$HOME/.local/bin:$PATH"
 fi
 
+##############################################
+# Executable: Add Homebrew bin
+# It should be first as it had binary to the PATH
+# And we test the presence of binary to add shell completion
+# that almost always comes with the binary itself
+###############################################
+if [ -f /home/linuxbrew/.linuxbrew/bin/brew ]; then
+  # add Homebrew to your PATH
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+#################################################
+# Add the krew bin
+# Krew is a plugin package manager
+# https://krew.sigs.k8s.io/docs/user-guide/setup/install/
+##################################################
+KREW_BIN=${KREW_ROOT:-$HOME/.krew}/bin
+if [ -d "$KREW_BIN" ]; then
+  export PATH="$KREW_BIN:$PATH"
+fi
+
 
 #####################
 # Go Environment Variables"
