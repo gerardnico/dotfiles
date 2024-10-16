@@ -1,6 +1,8 @@
 
 
 # see also:
+# Fuzzy cd at https://github.com/junegunn/fzf#fuzzy-completion-for-bash-and-zsh
+# `cd yolo**` or `ALT-C`
 # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/scd - smart change of directory
 # https://github.com/ajeetdsouza/zoxide
 
