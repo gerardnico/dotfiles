@@ -1,70 +1,18 @@
 
+# * https://github.com/ajeetdsouza/zoxide
+# `brew install zoxide`
+# It has fzf integration
+if [ ! -x "$(command -v zoxide)" ]; then
+  echo "Zoxide is not installed"
+  brew install zoxide
+fi
 
-# see also:
-# Fuzzy cd at https://github.com/junegunn/fzf#fuzzy-completion-for-bash-and-zsh
+eval "$(zoxide init bash)"
+
+
+# * Fuzzy cd at https://github.com/junegunn/fzf#fuzzy-completion-for-bash-and-zsh
 # `cd yolo**` or `ALT-C`
-# https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/scd - smart change of directory
-# https://github.com/ajeetdsouza/zoxide
 
-# This function defines a 'cd' replacement function capable of keeping,
-# displaying and accessing history of visited directories, up to 10 entries.
-# Type in `cd --` to get a recent list of directories.
-# acd_func 1.0.5, 10-nov-2004
-# Petar Marinov, http:/geocities.com/h2428, this is public domain
-cd_func ()
- {
-   local x2 the_new_dir adir index
-   local -i cnt
+# Concurrent, Others
+# * https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/scd - smart change of directory
 
-   if [[ $1 ==  "--" ]]; then
-     dirs -v
-     return 0
-   fi
-
-   the_new_dir=$1
-   [[ -z $1 ]] && the_new_dir=$HOME
-
-   if [[ ${the_new_dir:0:1} == '-' ]]; then
-     #
-     # Extract dir N from dirs
-     index=${the_new_dir:1}
-     [[ -z $index ]] && index=1
-     adir=$(dirs +$index)
-     if [[ -z "$adir" ]]; then
-         if [[ "$SHELL" == "/bin/zsh" ]]; then
-             cd ~${index}
-             return 0
-             else
-                echo "ADIR is null. Terminating." && return 1
-         fi
-     fi
-     the_new_dir=$adir
-   fi
-
-   #
-   # '~' has to be substituted by ${HOME}
-   [[ ${the_new_dir:0:1} == '~' ]] && the_new_dir="${HOME}${the_new_dir:1}"
-
-   #
-   # Now change to the new dir and add to the top of the stack
-   pushd "${the_new_dir}" > /dev/null || return 1
-   the_new_dir=$(pwd)
-
-   # Trim down everything beyond 11th entry
-   popd -n +11 2>/dev/null 1>/dev/null
-
-   #
-   # Remove any other occurrence of this dir, skipping the top of the stack
-   for ((cnt=1; cnt <= 10; cnt++)); do
-     x2=$(dirs +${cnt} 2>/dev/null) || return 0
-     [[ ${x2:0:1} == '~' ]] && x2="${HOME}${x2:1}"
-     if [[ "${x2}" == "${the_new_dir}" ]]; then
-       popd -n +$cnt 2>/dev/null 1>/dev/null
-       cnt=$((cnt-1))
-     fi
-   done
-
-   return 0
- }
-
-alias cd=cd_func
