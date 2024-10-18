@@ -33,3 +33,12 @@ if [ -f ~/git-prompt.sh ]; then
 fi
 
 
+# https://github.com/tj/git-extras/blob/main/Installation.md
+# Only brew is maintained by the author
+# brew install git-extras
+
+## Not installed but found
+# https://github.com/Bhupesh-V/ugit (Conflict with git-extras)
+# Terminal GUI: https://github.com/jesseduffield/lazygit
+
+

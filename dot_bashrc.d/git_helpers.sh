@@ -12,31 +12,16 @@ git::diff(){
   git diff HEAD "$1" | $EDITOR
 }
 
-# @description Go to the default branch (main/master)
-# @example
-#   git::checkout_main
-function git::checkout_main() {
-  git checkout "$(git::get_default_branch)"
-  git pull
-}
-
-# @description Delete the current branch and go to the default branch
-function git::delete_branch() {
-  git checkout "$(git::get_default_branch)"
-  # delete
-  git branch -D "$(git::get_current_branch)"
-  git pull
-}
-
 
 
 # Alias
 # See also gitconfig alias
+# `call` is a git alias to add, commit, and push and accepts the message
+alias gca='git call'
 alias gd='git diff | nvim'
 alias gan='git add --renormalize .'
 alias gau='git add --update'
 alias gc='git commit -v'
-alias gca='git commit -v -a'
 alias gb='git branch'
 alias gba='git branch -a'
 alias gco='git checkout'
