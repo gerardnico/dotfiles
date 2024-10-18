@@ -6,7 +6,11 @@
 # You can do it also declaratively by using a yaml file [Package](https://www.chezmoi.io/user-guide/advanced/install-packages-declaratively/)
 # Run with `chezmoi apply` or `chezmoi update`
 
-echo "Install Package"
+# The file run only if it has changed
+# You can delete the script cache to run it again without changing the content
+# See https://www.chezmoi.io/user-guide/use-scripts-to-perform-actions/#run-a-script-when-the-contents-of-another-file-changes
+#
+echo "OnChange Install Packages"
 
 # Example
 # A list of command
