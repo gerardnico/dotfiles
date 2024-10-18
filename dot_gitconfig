@@ -17,7 +17,7 @@
     # https://git-scm.com/book/ms/v2/Git-Basics-Git-Aliases
     # Since version 1.5.0, Git supports aliases executing non-git commands, by prefixing the value with "!"
     # After the !, this is just shell script
-    call = "!git::commit_all_push"
+    call = "!source bashlib-git.sh;git::commit_all_push"
     main = "!git::commit_all_push"
     last = log -1 HEAD
     ci = commit -v

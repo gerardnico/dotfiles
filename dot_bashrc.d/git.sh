@@ -36,9 +36,12 @@ fi
 # https://github.com/tj/git-extras/blob/main/Installation.md
 # Only brew is maintained by the author
 # brew install git-extras
+# Install also Standup: https://github.com/kamranahmedse/git-standup
+
 
 ## Not installed but found
-# https://github.com/Bhupesh-V/ugit (Conflict with git-extras)
+# Git Stats: https://github.com/arzzen/git-quick-stats
+# Undo: https://github.com/Bhupesh-V/ugit (Conflict with git-extras)
 # Terminal GUI: https://github.com/jesseduffield/lazygit
 
 
