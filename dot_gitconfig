@@ -13,3 +13,30 @@
 	autocrlf = false
 [init]
 	defaultBranch = main
+[alias]
+    # https://git-scm.com/book/ms/v2/Git-Basics-Git-Aliases
+    # Since version 1.5.0, Git supports aliases executing non-git commands, by prefixing the value with "!"
+    # After the !, this is just shell script
+    call = "!git::commit_all_push"
+    last = log -1 HEAD
+    ci = commit -v
+    ca = commit --amend
+    st = status --short --branch
+    co = checkout
+    br = branch
+    bv = branch -vv
+    ba = branch -ra
+    bd = branch -d
+    unstage = reset HEAD --
+    ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+    ld = log --pretty=format:"%C(yellow)%h\\ %C(green)%ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short --graph
+    ls = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=relative
+    # Log graph
+    lg = log --all --decorate --oneline --graph
+    mm = merge --no-ff
+    tg = tag -a
+    pu = push --tags
+    un = reset --hard HEAD
+    uh = reset --hard HEAD^
+[init]
+    defaultBranch = main

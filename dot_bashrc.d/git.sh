@@ -32,4 +32,4 @@ if [ -f ~/git-prompt.sh ]; then
   export PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n$(__git_ps1 "(%s)")\$ '
 fi
 
-source bashlib-git.sh
+

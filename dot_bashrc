@@ -66,16 +66,7 @@ shopt -s cdspell
 # is installed.  Any completions you add in ~/.bash_completion are
 # sourced last.
 
-# History Options
-#
-# Don't put duplicate lines in the history.
-# export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
-#
-# Ignore some controlling instructions
-# HISTIGNORE is a colon-delimited list of patterns which should be excluded.
-# The '&' is a special pattern which suppresses duplicate entries.
-# export HISTIGNORE=$'[ \t]*:&:[fb]g:exit'
-# export HISTIGNORE=$'[ \t]*:&:[fb]g:exit:ls' # Ignore the ls command as well
+
 #
 # Whenever displaying the prompt, write the previous line to disk
 # export PROMPT_COMMAND="history -a"
@@ -160,15 +151,11 @@ if [ -d "$KREW_BIN" ]; then
   export PATH="$KREW_BIN:$PATH"
 fi
 
+#####################
+# Editor
+#####################
+export EDITOR=nvim
 
-#####################
-# Go Environment Variables"
-#####################
-if [ -d "/usr/local/go" ]; then
-	export GOROOT=/usr/local/go
-	export GOPATH=$HOME/go
-	export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
-fi
 
 ##############################
 # Secrets
@@ -202,35 +189,6 @@ if [ -d ~/.bashrc.d ]; then
     [ -r "$file" ] && source "$file"
   done
   unset file
-fi
-
-
-##############################
-# Ansible Docker Env
-##############################
-# https://github.com/gerardnico/ansible
-export ANSIBLE_CONFIG=ansible.cfg
-export ANSIBLE_HOME=ansible
-ANSIBLE_SCRIPTS=$HOME/code/ansible
-if [ -d "$ANSIBLE_SCRIPTS" ]; then
-  export PATH="$ANSIBLE_SCRIPTS:$PATH"
-fi
-ANSIBLE_LOCAL_HOME=$HOME/code/infra
-if [ -d "$ANSIBLE_SCRIPTS" ]; then
-  export ANSIBLE_LOCAL_HOME
-fi
-
-
-##############################
-# DirEnv hook
-##############################
-# https://github.com/direnv/direnv
-# https://direnv.net/docs/installation.html
-# We put it here to make sure it appears even after git-prompt and other shell extensions that manipulate the prompt.
-if [ -x "$(command -v direnv)" ]; then
-  eval "$(direnv hook bash)"
-else
-  echo "You should install direnv"
 fi
 
 #############################

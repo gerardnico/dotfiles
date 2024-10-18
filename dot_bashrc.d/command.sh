@@ -1,4 +1,17 @@
-# Command
+# Command History
+
+# Options for the `Ctrl+R` with fzf
+
+# History Options
+#
+# Don't put duplicate lines in the history.
+export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
+#
+# Ignore some controlling instructions
+# HISTIGNORE is a colon-delimited list of patterns which should be excluded.
+# The '&' is a special pattern which suppresses duplicate entries.
+# export HISTIGNORE=$'[ \t]*:&:[fb]g:exit'
+# export HISTIGNORE=$'[ \t]*:&:[fb]g:exit:ls' # Ignore the ls command as well
 
 # History
 # Histfile (This is the default)
