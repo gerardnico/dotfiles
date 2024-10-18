@@ -17,6 +17,7 @@ git::diff(){
 # Alias
 # See also gitconfig alias
 # `call` is a git alias to add, commit, and push and accepts the message
+alias gs='git st'
 alias gca='git call'
 alias gd='git diff | nvim'
 alias gan='git add --renormalize .'
