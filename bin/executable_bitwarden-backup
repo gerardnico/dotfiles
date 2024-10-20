@@ -59,16 +59,16 @@ EOT
 on_exit() {
     local exit_code=$?
 
-    # Check if the user is logged in to Bitwarden
+    # Check if the user is logged in to BitWarden
     if bw login --check > /dev/null 2>&1; then
       # User is logged in, perform logout
       bw logout "${quiet:+--quiet}"
-      log "Logged out from Bitwarden."
+      echo::info "Logged out from BitWarden."
     fi
 
     # Check if the temporary folder exists before deleting
     if [ -d "$temp_dir" ]; then
-        rm -rf "$temp_dir" && log "Temporary files cleaned up successfully."
+        rm -rf "$temp_dir" && echo::info "Temporary files cleaned up successfully."
     fi
 
     exit $exit_code
@@ -78,7 +78,7 @@ on_exit() {
 check_dependencies() {
   # Check if jq is installed
   if ! command -v jq &> /dev/null; then
-    echo::err "jq is not installed. Please install jq to proceed."
+    echo::err "jq was not found"
     exit 1
   fi
 
@@ -151,16 +151,16 @@ export_data() {
   local organization_id="$4"
   local organization_name="$5"
 
-  # Login to Bitwarden vault
+  # Login to BitWarden vault
   key=$(bw login "$email" "$password" --raw)
   export BW_SESSION="$key"
 
   # Check if login is successful
   if bw login --check > /dev/null 2>&1; then
     if [ -n "$organization_id" ]; then
-      log "Logged on $server with $email as Organization."
+      echo::info "Logged on $server with $email as Organization."
     else
-      log "Logged in on $server with $email."
+      echo::info "Logged in on $server with $email."
     fi
   else
     echo::err "Login failed. Exiting."
@@ -194,11 +194,11 @@ export_data() {
 # Function for the backup subcommand
 backup_command() {
 
-  # Check if the user is logged in to Bitwarden
+  # Check if the user is logged in to BitWarden
   if bw login --check > /dev/null 2>&1; then
     # User is logged in, perform logout
     bw logout "${quiet:+--quiet}"
-    log "Logged out from Bitwarden."
+    echo::warn "User was logged in. Logged out from BitWarden."
   fi
 
   # Check if the configuration file exists
@@ -215,11 +215,12 @@ backup_command() {
 
   # Check if non_interactive mode is enabled
   if [ "$non_interactive" = true ]; then
+
       # Log that non-interactive mode is enabled
-      log "Non-interactive mode is enabled."
+      echo::info "Non-interactive mode is enabled."
 
       # Check if passphrase is set
-      if [ -z "$passphrase" ]; then
+      if [ "$passphrase" == '' ]; then
           # Log an error and exit
           echo::err "Passphrase is required in non-interactive mode."
           exit 1
@@ -228,7 +229,7 @@ backup_command() {
       # Check if GPG is enabled
       if [ "$gpg" = true ]; then
           # Check if GPG passphrase is set
-          if [ -z "$gpg_passphrase" ]; then
+          if [ "$gpg_passphrase" = '' ]; then
               # Log an error and exit
               echo::err "GPG passphrase is required in non-interactive mode."
               exit 1
@@ -246,8 +247,8 @@ backup_command() {
   accounts=($(jq -c '.accounts[]' "$config_file"))
 
   # Check if passphrase is already set by flag
-  if [ -n "$passphrase" ]; then
-    log "Using pre-defined passphrase."
+  if [ "$passphrase" == '' ]; then
+    echo::info "Using pre-defined passphrase."
     decryption_passphrase="$passphrase"
   else
     # Check if the encryption passphrase is correct
@@ -263,10 +264,10 @@ backup_command() {
   # Check if the temporary folder exists
   if [ ! -d "$temp_dir" ]; then
       # Create the folder if it doesn't exist
-      mkdir -p "$temp_dir" && log "Temporary folder created successfully."
+      mkdir -p "$temp_dir" && echo::info "Temporary folder created successfully."
   else
       # Clear the existing content if the folder already exists
-      rm -rf "${temp_dir:?}"/* && log "Cleared existing content in the temporary folder."
+      rm -rf "${temp_dir:?}"/* && echo::info "Cleared existing content in the temporary folder."
   fi
 
   # Configure Bitwarden with the extracted server
@@ -313,7 +314,7 @@ backup_command() {
 
   # Check if gpg enabled
   if [ "$gpg" = true ]; then
-    log "Encrypting the Archive file with GPG..."
+    echo::info "Encrypting the Archive file with GPG..."
 
     # Check if GPG passphrase is set
     if [ -z "$gpg_passphrase" ]; then
@@ -324,15 +325,15 @@ backup_command() {
       tar cz -C "$temp_dir" . | gpg --batch --passphrase "$gpg_passphrase" --symmetric --cipher-algo AES256 -o "$output_file.tar.gz.gpg"
     fi
 
-    log "Encryption completed. Encrypted file: $output_file.tar.gz.gpg"
+    echo::info "Encryption completed. Encrypted file: $output_file.tar.gz.gpg"
   else
-    log warning "The output file is saved unencrypted because gpg is not enabled."
-    log "Creating the TAR archive..."
+    echo::warn "The output file is saved unencrypted because gpg is not enabled."
+    echo::info "Creating the TAR archive..."
 
     # Creating the TAR archive without encryption
     tar czpf "$output_file.tar.gz" -C "$temp_dir" .
 
-    log "TAR archive created. File: $output_file.tar.gz"
+    echo::info "TAR archive created. File: $output_file.tar.gz"
   fi
 
 }
@@ -463,7 +464,7 @@ generate_command() {
 extract_command() {
 
     # Check if the 'archive' variable is set
-    if [ -z "$archive" ]; then
+    if [ "$archive" = '' ]; then
         echo::err "The path to the archive is not specified."
         exit 1
     fi
@@ -492,7 +493,7 @@ extract_command() {
     # Check if non_interactive mode is enabled
     if [ "$non_interactive" = true ]; then
         # Log that non-interactive mode is enabled
-        log "Non-interactive mode is enabled."
+        echo::info "Non-interactive mode is enabled."
 
         # Check if GPG is enabled
         if [ "$gpg" = true ]; then
@@ -508,10 +509,10 @@ extract_command() {
 
     # Check if gpg enabled
     if [ "$gpg" = true ]; then
-      log "Decrypting the GPG encrypted TAR file..."
+      echo::info "Decrypting the GPG encrypted TAR file..."
 
       # Check if GPG passphrase is set
-      if [ -z "$gpg_passphrase" ]; then
+      if [ "$gpg_passphrase" = '' ]; then
         # Decrypt the GPG encrypted TAR file without passphrase
         gpg --decrypt --output "$output_file.tar.gz" "$archive"
       else
@@ -519,7 +520,7 @@ extract_command() {
         gpg --batch --passphrase $gpg_passphrase --decrypt --output "$output_file.tar.gz" "$archive"
       fi
 
-      log "Decryption completed. Decrypted file: $output_file.tar.gz"
+      echo::info "Decryption completed. Decrypted file: $output_file.tar.gz"
     fi
 
     # Check if the output directory exists, if not create it
@@ -528,13 +529,13 @@ extract_command() {
     fi
 
 
-    log "Extracting the TAR archive..."
+    echo::info "Extracting the TAR archive..."
     tar xzf "$output_file.tar.gz" -C "$output_file"
 
     # Remove the temporary TAR.GZ file
     rm "$output_file.tar.gz"
 
-    log "Extraction completed. Files are extracted to: $output_file"
+    echo::info "Extraction completed. Files are extracted to: $output_file"
 
 }
 
@@ -543,6 +544,7 @@ trap on_exit EXIT
 # Process command line arguments
 subcommand=""
 passphrase=""
+gpg_passphrase=''
 while [[ $# -gt 0 ]]; do
   case "$1" in
     backup)
