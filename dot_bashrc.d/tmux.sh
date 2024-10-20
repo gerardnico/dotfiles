@@ -4,11 +4,7 @@
 # Tmux
 #############################
 if [ ! -x "$(command -v tmux)" ]; then
-  echo "Tmux is not installed "
-  echo "https://github.com/tmux/tmux/wiki/Installing"
-  echo "On debian"
-  echo "  sudo apt install -y tmux"
-  echo "Don't forget to disable the ALT+Fn shortcut on MinTty Wsl"
+  echo "Tmux is not available"
 fi
 
 # We can't start tmux in bashrc because

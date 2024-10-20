@@ -4,7 +4,7 @@
 # It has fzf integration
 if [ ! -x "$(command -v zoxide)" ]; then
   echo "Zoxide is not installed"
-  brew install zoxide
+  return
 fi
 
 eval "$(zoxide init bash)"

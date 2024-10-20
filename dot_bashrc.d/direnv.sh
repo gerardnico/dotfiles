@@ -9,5 +9,5 @@
 if [ -x "$(command -v direnv)" ]; then
   eval "$(direnv hook bash)"
 else
-  echo "You should install direnv"
+  echo "direnv is not available"
 fi

@@ -5,21 +5,33 @@
 ##############################
 # Git Completion
 # https://git-scm.com/book/en/v2/Appendix-A%3A-Git-in-Other-Environments-Git-in-Bash
-if [[ ! -f ~/git-completion.bash ]]; then
-	echo "Git Completion Not Found. Download"
-	curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o ~/git-completion.bash
+GIT_COMPLETION_SCRIPT=$HOME/git-completion.bash
+if [[ ! -f $GIT_COMPLETION_SCRIPT ]]; then
+	echo "Download Git Completion Script ($GIT_COMPLETION_SCRIPT)"
+	if [[ $(uname -a) =~ "CYGWIN" ]]; then
+      GIT_COMPLETION_SCRIPT=$(cygpath -w "$GIT_COMPLETION_SCRIPT")
+	    echo "Cygwin detected. Download at: ($GIT_COMPLETION_SCRIPT)"
+    fi
+	curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o "$GIT_COMPLETION_SCRIPT"
 fi
-if [ -f "$HOME"/git-completion.bash ]; then
-  . "$HOME"/git-completion.bash
+if [ -f "$GIT_COMPLETION_SCRIPT" ]; then
+  # shellcheck disable=SC1090
+  source "$GIT_COMPLETION_SCRIPT"
 fi
 # Git Prompt Customization
 # https://git-scm.com/book/en/v2/Appendix-A%3A-Git-in-Other-Environments-Git-in-Bash
-if [[ ! -f ~/git-prompt.sh ]]; then
-    echo "Git Prompt Not Found. Download"
-	curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh -o ~/git-prompt.sh
+GIT_PROMPT_SCRIPT=$HOME/git-prompt.sh
+if [[ ! -f "$GIT_PROMPT_SCRIPT" ]]; then
+  echo "Download Git Completion Script ($GIT_PROMPT_SCRIPT)"
+  if [[ $(uname -a) =~ "CYGWIN" ]]; then
+    GIT_PROMPT_SCRIPT=$(cygpath -w "$GIT_PROMPT_SCRIPT")
+    echo "Cygwin detected. Download at: ($GIT_PROMPT_SCRIPT)"
+  fi
+	curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh -o "$GIT_PROMPT_SCRIPT"
 fi
-if [ -f ~/git-prompt.sh ]; then
-  . "$HOME"/git-prompt.sh
+if [ -f "$GIT_PROMPT_SCRIPT" ]; then
+  # shellcheck disable=SC1090
+  source "$GIT_PROMPT_SCRIPT"
   export GIT_PS1_SHOWDIRTYSTATE=1
   # PS1:
   # This is the default PS1 where we have added the __git_ps1 function just before the dollar character
