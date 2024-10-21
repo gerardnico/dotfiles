@@ -17,6 +17,18 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
+install_git_extras(){
+  ## https://github.com/tj/git-extras/blob/main/Installation.md
+  ## Only brew is maintained by the author
+  if ! git standup; then
+    echo "Installing Git Extras"
+    brew install git-extras
+  else
+    echo "Git Extra founds"
+  fi
+}
+
+
 if ! command_exists git; then
   echo "Installing Git"
   sudo apt install git
@@ -57,3 +69,7 @@ if ! command_exists tmux; then
 else
   echo "Tmux Found"
 fi
+
+# Call Install function
+install_git_extras
+

@@ -45,16 +45,26 @@ if [ -f "$GIT_PROMPT_SCRIPT" ]; then
 fi
 
 
-# https://github.com/tj/git-extras/blob/main/Installation.md
-# Only brew is maintained by the author
-# brew install git-extras
-# Install also Standup: https://github.com/kamranahmedse/git-standup
+# Alias
+# See also gitconfig alias
+# `call` is a git alias to add, commit, and push and accepts the message
+alias gs='git st'
+alias gca='git call'
+alias gd='git diff | nvim'
+alias gan='git add --renormalize .'
+alias gau='git add --update'
+alias gc='git commit -v'
+alias gb='git branch'
+alias gba='git branch -a'
+alias gco='git checkout'
+alias gcob='git checkout -b'
+alias gcot='git checkout -t'
+alias gcotb='git checkout --track -b'
+alias glog='git log'
+alias glogp='git log --pretty=format:"%h %s" --graph'
 
 
-## Not installed but found
-# Git Stats: https://github.com/arzzen/git-quick-stats
-# Git Absorb: Don't create new commit. https://github.com/tummychow/git-absorb/
-# Undo: https://github.com/Bhupesh-V/ugit (Conflict with git-extras)
-# Terminal GUI: https://github.com/jesseduffield/lazygit
-
-
+# Taken as default by Git
+GIT_AUTHOR_NAME=Nicolas GERARD
+GIT_AUTHOR_EMAIL=gerardnico@gmail.com
+# GIT_AUTHOR_DATE

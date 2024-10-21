@@ -5,7 +5,8 @@ if [ ! -x "$(command -v fzf)" ]; then
   return
 fi
 
-if ! fzf --help 2>&1 | grep bash; then
+# Old Fzf (found in cygwin for instance)
+if ! fzf --help 2>&1 | grep bash > /dev/null; then
   echo "Fzf does not support bash completion"
   echo "Fzf Version: $(fzf --version)"
 else
