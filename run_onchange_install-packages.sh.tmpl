@@ -5,27 +5,7 @@
 # If the output is empty, the script is not run
 # On Windows, we get `%1 is not a valid Win32 application.`
 
-# Install Package
-# https://www.chezmoi.io/user-guide/use-scripts-to-perform-actions/#install-packages-with-scripts
-# You can do it also declaratively by using a yaml file [Package](https://www.chezmoi.io/user-guide/advanced/install-packages-declaratively/)
-# Run with `chezmoi apply` or `chezmoi update`
-
-# The file run only if it has changed
-# You can delete the script cache to run it again without changing the content
-# See https://www.chezmoi.io/user-guide/use-scripts-to-perform-actions/#run-a-script-when-the-contents-of-another-file-changes
-#
-echo "OnChange Install Packages"
-
-sudo apt install git
-# cd on
-brew install zoxide
-# fuzzy finder
-brew install fzf
-# rsync
-sudo apt install -y rsync
-# tmux
-echo "https://github.com/tmux/tmux/wiki/Installing"
-sudo apt install -y tmux
-echo "Don't forget to disable the ALT+Fn shortcut on MinTty Wsl/Cygwin"
+# To get the syntax highlighting we moved the installation script
+install_all
 
 {{ end }}

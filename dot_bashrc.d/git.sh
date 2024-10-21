@@ -53,6 +53,7 @@ fi
 
 ## Not installed but found
 # Git Stats: https://github.com/arzzen/git-quick-stats
+# Git Absorb: Don't create new commit. https://github.com/tummychow/git-absorb/
 # Undo: https://github.com/Bhupesh-V/ugit (Conflict with git-extras)
 # Terminal GUI: https://github.com/jesseduffield/lazygit
 

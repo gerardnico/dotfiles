@@ -1,0 +1,59 @@
+#!/bin/bash
+# This script is called by the `run_onchange_install-packages.sh.tmpl`
+
+# Install Package
+# https://www.chezmoi.io/user-guide/use-scripts-to-perform-actions/#install-packages-with-scripts
+# You can do it also declaratively by using a yaml file [Package](https://www.chezmoi.io/user-guide/advanced/install-packages-declaratively/)
+# Run with `chezmoi apply` or `chezmoi update`
+
+# The file run only if it has changed
+# You can delete the script cache to run it again without changing the content
+# See https://www.chezmoi.io/user-guide/use-scripts-to-perform-actions/#run-a-script-when-the-contents-of-another-file-changes
+#
+echo "Install my Packages"
+
+# Function to check if a command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+if ! command_exists git; then
+  echo "Installing Git"
+  sudo apt install git
+else
+  echo "Git Found"
+fi
+
+# cd on
+if ! command_exists zoxide; then
+  echo "Installing Zoxide"
+  brew install zoxide
+else
+  echo "Zoxide Found"
+fi
+
+# fuzzy finder
+if ! command_exists fzf; then
+  echo "Installing Fzf"
+  brew install fzf
+else
+  echo "Fzf Found"
+fi
+
+# rsync
+if ! command_exists rsync; then
+  echo "Installing Rsync"
+  sudo apt install -y rsync
+else
+  echo "Rsync Found"
+fi
+
+# tmux
+if ! command_exists tmux; then
+  echo "Installing Tmux"
+  # https://github.com/tmux/tmux/wiki/Installing
+  sudo apt install -y tmux
+  echo "Tmux: Don't forget to disable the ALT+Fn shortcut on MinTty Wsl/Cygwin"
+else
+  echo "Tmux Found"
+fi
