@@ -1,5 +1,4 @@
-{{ if eq .chezmoi.os "linux" }}
-#!/bin/bash
+{{ if eq .chezmoi.os "linux" }}#!/bin/bash
 # Shebang is mandatory: https://github.com/twpayne/chezmoi/issues/666#issuecomment-612677019
 # We use a template to disable the script on windows/cygwin
 # If the output is empty, the script is not run
