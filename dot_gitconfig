@@ -42,3 +42,5 @@
     uh = reset --hard HEAD^
 [init]
     defaultBranch = main
+[pull]
+	rebase = true
