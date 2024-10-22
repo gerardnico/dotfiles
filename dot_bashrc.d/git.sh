@@ -48,8 +48,9 @@ fi
 # Alias
 # See also gitconfig alias
 # `call` is a git alias to add, commit, and push and accepts the message
-alias gs='git st'
-alias gca='git call'
+alias gx='git exec'
+alias gxs='git exec st'
+alias gxac='git exec auto-commit'
 alias gd='git diff | nvim'
 alias gan='git add --renormalize .'
 alias gau='git add --update'
