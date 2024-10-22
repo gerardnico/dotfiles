@@ -2,4 +2,8 @@
 
 
 # Git extra
-git standup
+# Date Format https://github.com/kamranahmedse/git-standup?tab=readme-ov-file#specifying-the-date-format
+# https://git-scm.com/docs/git-log#Documentation/git-log.txt---dateltformatgt
+pushd $GITX_REPOS_HOME > /dev/null
+git standup -D "format:%H:%M"
+popd > /dev/null
