@@ -17,6 +17,8 @@
     # https://git-scm.com/book/ms/v2/Git-Basics-Git-Aliases
     # Since version 1.5.0, Git supports aliases executing non-git commands, by prefixing the value with "!"
     # After the !, this is just a script/command
+    # check example with parameters 
+    # https://github.com/mrnugget/dotfiles/blob/c4624ed521d539856bcf764f04a295bb19093566/gitconfig#L13-L17
     ac = "!git-auto-commit"
     ap = "!git-auto-pull"
     main = "!git::commit_all_push"
