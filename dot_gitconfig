@@ -19,6 +19,7 @@
     # After the !, this is just a script/command
     # check example with parameters 
     # https://github.com/mrnugget/dotfiles/blob/c4624ed521d539856bcf764f04a295bb19093566/gitconfig#L13-L17
+    ## fuzzy chechout https://github.com/mrnugget/dotfiles/blob/c4624ed521d539856bcf764f04a295bb19093566/zshrc#L162-L169
     ac = "!git-auto-commit"
     ap = "!git-auto-pull"
     main = "!git::commit_all_push"
