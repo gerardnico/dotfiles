@@ -1,0 +1,34 @@
+#!/bin/bash
+
+source bashlib-echo.sh
+source bashlib-error.sh
+error::set_trap
+
+to_uri() {
+  s="${1//'%'/%25}"
+  s="${s//' '/%20}"
+  s="${s//'\"'/%22}"
+  s="${s//'#'/%23}"
+  s="${s//'\$'/%24}"
+  s="${s//'&'/%26}"
+  s="${s//'+'/%2B}"
+  s="${s//','/%2C}"
+  s="${s//'/'/%2F}"
+  s="${s//':'/%3A}"
+  s="${s//';'/%3B}"
+  s="${s//'='/%3D}"
+  s="${s//'?'/%3F}"
+  s="${s//'@'/%40}"
+  s="${s//'['/%5B}"
+  s="${s//']'/%5D}"
+  printf %s "$s"
+}
+
+LANGUAGE=$1
+# delete the first argument from the set of
+# positional argument
+shift
+QUERY="$*" # all other arguments as one variable
+URI=cht.sh/$LANGUAGE/$(to_uri "$QUERY")
+echo::info "Asking $URI"
+curl "$URI"
