@@ -1,0 +1,36 @@
+#!/bin/bash
+
+source bashlib-linux.sh
+source bashlib-echo.sh
+source bashlib-error.sh
+error::set_trap
+
+cli=$(basename "$0")
+
+# Main script
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <permissions>"
+    echo "Convert from symbolic (rwxrwxrwx) to numeric (777)"
+    echo "Convert from numeric (777) to symbolic (rwxrwxrwx)"
+    echo "Examples:"
+    echo "  $cli 755"
+    echo "  $cli rwxr-xr-x"
+    exit 1
+fi
+
+# Check if input is empty
+# Detect format and convert
+perm=$1
+if [[ $perm =~ ^[0-7]{3,4}$ ]]; then
+    # Numeric format detected
+    linux::mode_to_symbolic "$perm"
+elif [[ $perm =~ ^[rwx-]{9}$ ]]; then
+    # Symbolic format detected
+    linux::mode_to_numeric "$perm"
+else
+    echo::err "Error: Invalid permission format"
+    echo::err "Valid formats:"
+    echo::err "  - Numeric: 3 or 4 digits (0-7), e.g., 755"
+    echo::err "  - Symbolic: 9 characters (rwx-), e.g., rwxr-xr-x"
+    exit 1
+fi
