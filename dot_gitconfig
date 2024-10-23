@@ -23,7 +23,6 @@
     ac = "!git-auto-commit"
     ap = "!git-auto-pull"
     main = "!git::commit_all_push"
-    last = log -1 HEAD
     ci = commit -v
     ca = commit --amend
     stb = status --short --branch

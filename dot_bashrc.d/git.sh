@@ -66,7 +66,7 @@ alias glogp='git log --pretty=format:"%h %s" --graph'
 
 
 # Taken as default by Git
-export GIT_AUTHOR_NAME=Nicolas GERARD
+export GIT_AUTHOR_NAME="Nicolas GERARD"
 export GIT_AUTHOR_EMAIL=gerardnico@gmail.com
 # GIT_AUTHOR_DATE
 

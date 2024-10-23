@@ -73,3 +73,11 @@ fi
 # Call Install function
 install_git_extras
 
+if ! command_exists lazygit; then
+  echo "Installing LazyGit"
+  brew install jesseduffield/lazygit/lazygit
+else
+  echo "LazyGit Found"
+fi
+
+
