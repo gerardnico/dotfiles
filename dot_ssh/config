@@ -1,0 +1,18 @@
+# Test conf with
+Host github*
+    # HostName is only need if the git host name is not the DNS  hostname
+    # HostName github.com
+    User gerardnico
+    # Specifies a file from which the user's identity key is read when using public key authentication.
+    IdentityFile ~/.ssh/id_nico_github
+    IdentitiesOnly yes
+    PreferredAuthentications publickey
+    AddKeysToAgent yes
+    # Security options
+    IdentitiesOnly yes
+    HashKnownHosts yes
+    # Connection options
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+    # Compression can help with slower connections
+    Compression yes
