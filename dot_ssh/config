@@ -1,4 +1,4 @@
-# Test conf with
+# Test conf with `ssh -G gerardnico@github.com`
 # pattern name or ip
 Host github*
     # HostName is only need if the git host name is not the DNS  hostname
