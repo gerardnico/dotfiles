@@ -25,7 +25,7 @@ Host github*
     #   * ask, ssh(1) will require confirmation using the SSH_ASKPASS program
     #   * confirm (optionally followed by time interval) each use of the key must be confirmed, as if the -c option was specified to ssh-add(1).
     #   * a time interval to specify the key's lifetime 
-    AddKeysToAgent yes
+    AddKeysToAgent 5m
     # don't try to use ssh-agent identity (keys)
     IdentitiesOnly yes
     HashKnownHosts yes
