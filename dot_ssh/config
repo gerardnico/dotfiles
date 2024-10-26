@@ -1,14 +1,32 @@
 # Test conf with
+# pattern name or ip
 Host github*
     # HostName is only need if the git host name is not the DNS  hostname
+    # Numeric IP addresses is permitted 
     # HostName github.com
     User gerardnico
-    # Specifies a file from which the user's identity key is read when using public key authentication.
+    # Used for public key authentication, value may be:
+    #   * a public key file to use the corresponding private key loaded in ssh-agent(1) 
+    #   * private key
+    #   * none
+    # a template value may be used
+    #  * tilde or '%d' (local user's home directory),
+    #  * '%u' (local user name),
+    #  * '%l' (local host name),
+    #  * '%h' (remote host name) 
+    #  * '%r' (remote user name).
+    #  * more see tokens section https://man7.org/linux/man-pages/man5/ssh_config.5.html
+    # multiple identity files is allowed 
     IdentityFile ~/.ssh/id_nico_github
     IdentitiesOnly yes
     PreferredAuthentications publickey
+    # added to the agent with the default lifetime,
+    # This option can be set to 
+    #   * ask, ssh(1) will require confirmation using the SSH_ASKPASS program
+    #   * confirm (optionally followed by time interval) each use of the key must be confirmed, as if the -c option was specified to ssh-add(1).
+    #   * a time interval to specify the key's lifetime 
     AddKeysToAgent yes
-    # Security options
+    # don't try to use ssh-agent identity (keys)
     IdentitiesOnly yes
     HashKnownHosts yes
     # Connection options
@@ -16,3 +34,11 @@ Host github*
     ServerAliveCountMax 3
     # Compression can help with slower connections
     Compression yes
+    # check the host IP address in the known_hosts file (prevent dns spoofing)
+    CheckHostIP yes
+    # never automatically add host keys to the ~/.ssh/known_hosts
+    # the /etc/ssh/ssh_known_hosts file should be maintained 
+    # the default value is ask
+    StrictHostKeyChecking yes
+    # DNS and SSHFP resource records
+    VerifyHostKeyDNS yes
