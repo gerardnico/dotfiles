@@ -1,33 +1,21 @@
-# Test conf with `ssh -G gerardnico@github.com`
+# Man Page
+# https://man.openbsd.org/ssh_config
+
 # pattern name or ip
-Host github*
+# Test conf with `ssh -G gerardnico@github.com -vvv`
+Host github.com
     # HostName is only need if the git host name is not the DNS  hostname
     # Numeric IP addresses is permitted 
     # HostName github.com
-    User gerardnico
-    # Used for public key authentication, value may be:
-    #   * a public key file to use the corresponding private key loaded in ssh-agent(1) 
-    #   * private key
-    #   * none
-    # a template value may be used
-    #  * tilde or '%d' (local user's home directory),
-    #  * '%u' (local user name),
-    #  * '%l' (local host name),
-    #  * '%h' (remote host name) 
-    #  * '%r' (remote user name).
-    #  * more see tokens section https://man7.org/linux/man-pages/man5/ssh_config.5.html
-    # multiple identity files is allowed 
-    IdentityFile ~/.ssh/id_nico_github
-    IdentitiesOnly yes
+    # User gerardnico # always git
     PreferredAuthentications publickey
     # added to the agent with the default lifetime,
     # This option can be set to 
     #   * ask, ssh(1) will require confirmation using the SSH_ASKPASS program
     #   * confirm (optionally followed by time interval) each use of the key must be confirmed, as if the -c option was specified to ssh-add(1).
-    #   * a time interval to specify the key's lifetime 
-    AddKeysToAgent 5m
-    # don't try to use ssh-agent identity (keys)
-    IdentitiesOnly yes
+    #   * a time interval to specify the key's lifetime
+    # Time format:  https://man.openbsd.org/sshd_config.5#TIME_FORMATS
+    AddKeysToAgent 10m
     HashKnownHosts yes
     # Connection options
     ServerAliveInterval 60
@@ -42,3 +30,30 @@ Host github*
     # StrictHostKeyChecking yes
     # DNS and SSHFP resource records
     # VerifyHostKeyDNS yes
+
+
+# Global conf
+# Should be at the end because the first conf matched win
+Host *
+    AddKeysToAgent 15m
+    # Used for public key authentication, value may be:
+    #   * a public key file to use the corresponding private key loaded in ssh-agent(1)
+    #   * private key
+    #   * none
+    # a template value may be used
+    #  * tilde or '%d' (local user's home directory),
+    #  * '%u' (local user name),
+    #  * '%l' (local host name),
+    #  * '%h' (remote host name)
+    #  * '%r' (remote user name).
+    #  * more see tokens section https://man.openbsd.org/ssh_config#IdentityFile
+    # multiple identity files is allowed
+    IdentityFile ~/.ssh/id_%r_%h
+    # don't try to use ssh-agent identity (keys)
+    IdentitiesOnly yes
+    # Proxy command allows this parameters
+    # %h : The remote hostname
+    # %n : The original remote hostname
+    # %p : The remote port
+    # %r : The remote username
+    # ProxyCommand ssx-proxy-command %h %n %p %r

@@ -80,4 +80,16 @@ else
   echo "LazyGit Found"
 fi
 
+if ! command_exists nc; then
+  sudo apt install -y netcat-openbsd
+else
+  echo "Netcat installed"
+fi
+
+# Needed with ssh
+if ! command_exists ssh-askpass; then
+  sudo apt install -y ssh-askpass
+else
+  echo "ssh-askpass installed"
+fi
 
