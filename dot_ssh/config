@@ -35,10 +35,10 @@ Host github*
     # Compression can help with slower connections
     Compression yes
     # check the host IP address in the known_hosts file (prevent dns spoofing)
-    CheckHostIP yes
+    # CheckHostIP yes
     # never automatically add host keys to the ~/.ssh/known_hosts
     # the /etc/ssh/ssh_known_hosts file should be maintained 
     # the default value is ask
-    StrictHostKeyChecking yes
+    # StrictHostKeyChecking yes
     # DNS and SSHFP resource records
-    VerifyHostKeyDNS yes
+    # VerifyHostKeyDNS yes
