@@ -48,7 +48,7 @@ Host *
     #  * '%r' (remote user name).
     #  * more see tokens section https://man.openbsd.org/ssh_config#IdentityFile
     # multiple identity files is allowed
-    IdentityFile ~/.ssh/id_%r_%h
+    IdentityFile ~/.ssh/id_%r_%h.pub
     # don't try to use ssh-agent identity (keys)
     IdentitiesOnly yes
     # Proxy command allows this parameters
