@@ -1,4 +1,5 @@
 # Command History
+# Note if you don't want to have a specific command show up in .bash_history, prefix the command with a space.
 
 # Options for the `Ctrl+R` with fzf
 
