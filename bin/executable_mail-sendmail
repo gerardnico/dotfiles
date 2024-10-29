@@ -26,9 +26,11 @@ SMTP_URI="smtp://$SMTP_HOST:$SMTP_PORT;notls"
 echo "URI: $SMTP_URI"
 
 # https://mailutils.org/manual/mailutils.html#Invoking-Mail
+# See Variable (verbose, sendmail, ...) here: https://mailutils.org/manual/html_node/Mail-Variables.html#Mail-Variables
 mail \
   --subject "$SUBJECT" \
   --exec 'set verbose' \
+  --exec 'set debug=trace9' \
   --exec "set sendmail=$SMTP_URI" \
   --append "From:$FROM" \
   $TO <<<"$MESSAGE"
