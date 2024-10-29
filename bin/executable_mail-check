@@ -25,7 +25,7 @@ for client in "${clients[@]}"; do
 done
 
 # SMTP Client with sendmail interface
-sendmail_interface=("sendmail" "ssmtp" "msmtp")
+sendmail_interface=("sendmail" "ssmtp" "msmtp" "mail-sendmail")
 echo "Sendmail Client" # send a message
 for client in "${sendmail_interface[@]}"; do
   echo_exist "$client"

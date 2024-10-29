@@ -22,8 +22,11 @@ $BODY"
 # Send the email using the SMTP server
 # echo "$MESSAGE" | /usr/bin/env ssmtp -au "$SMTP_USER" -ap "$SMTP_PASS" "$TO"
 
-mail --subject "$SUBJECT" \
- --exec "set sendmail=smtp://$SMTP_HOST:$SMTP_PORT;notls" \
+# https://mailutils.org/manual/mailutils.html#Invoking-Mail
+# --exec "set sendmail=smtp://$SMTP_HOST:$SMTP_PORT;notls;domain=localhost" \
+mail \
+--subject "$SUBJECT" \
  --exec 'set verbose' \
+ --set="sendmail=smtp://$SMTP_HOST:$SMTP_PORT;notls;domain=localhost" \
  --append "From:$FROM" \
  $TO <<<"$MESSAGE"

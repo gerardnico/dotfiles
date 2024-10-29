@@ -99,3 +99,9 @@ if ! command_exists mail; then
 else
   echo "Mailutils installed"
 fi
+
+if ! command_exists telnet; then
+  sudo apt install -y telnet
+else
+  echo "Telnet installed"
+fi
