@@ -1,2 +1,10 @@
+# All config are here
+# https://learn.microsoft.com/en-us/windows/wsl/wsl-config
+
 [wsl2]
-networkingMode=mirrored # add this line if file already exists
+# Access windows service as localhost from wsl
+# https://github.com/microsoft/WSL/issues/5211
+# You can check by running in Debian: `wslinfo --networking-mode`
+networkingMode=mirrored
+#
+hostAddressLoopback=true
