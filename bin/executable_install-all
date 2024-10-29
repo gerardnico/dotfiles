@@ -93,3 +93,9 @@ else
   echo "ssh-askpass installed"
 fi
 
+# https://mailutils.org
+if ! command_exists mail; then
+  sudo apt install -y mailutils
+else
+  echo "Mailutils installed"
+fi

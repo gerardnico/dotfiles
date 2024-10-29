@@ -1,0 +1,32 @@
+#!/bin/bash
+# Check the utility
+source bashlib-command.sh
+source bashlib-echo.sh
+
+# @description
+#     Check if a command exists
+#
+# @exitcode 0 if it exists
+# @exitcode 1 if it does not exist
+echo_exist(){
+  if command::exist "$1"; then
+    echo::echo "$1: Found"
+  else
+    echo::echo "$1: Not Found"
+  fi
+}
+
+# Utility
+# mail is from mailutils (replace mailx)
+echo "Terminal Client" # help write a message, read a mailbox, ...
+clients=("mail" "mailx" "mutt" "mpack")
+for client in "${clients[@]}"; do
+  echo_exist "$client"
+done
+
+# SMTP Client with sendmail interface
+sendmail_interface=("sendmail" "ssmtp" "msmtp")
+echo "Sendmail Client" # send a message
+for client in "${sendmail_interface[@]}"; do
+  echo_exist "$client"
+done

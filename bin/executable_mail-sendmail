@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Set the SMTP server details
+SMTP_HOST="localhost"
+SMTP_PORT="25"
+SMTP_USER="your_username"
+SMTP_PASS="your_password"
+
+# Set the email details
+FROM="sender@example.com"
+TO="recipient@example.com"
+SUBJECT="Test Email"
+BODY="This is the body of the email."
+
+# Construct the email message
+MESSAGE="From: $FROM
+To: $TO
+Subject: $SUBJECT
+
+$BODY"
+
+# Send the email using the SMTP server
+# echo "$MESSAGE" | /usr/bin/env ssmtp -au "$SMTP_USER" -ap "$SMTP_PASS" "$TO"
+
+mail --subject "$SUBJECT" \
+ --exec "set sendmail=smtp://$SMTP_HOST:$SMTP_PORT;notls" \
+ --exec 'set verbose' \
+ --append "From:$FROM" \
+ $TO <<<"$MESSAGE"
