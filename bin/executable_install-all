@@ -96,6 +96,8 @@ fi
 # https://mailutils.org
 if ! command_exists mail; then
   sudo apt install -y mailutils
+  sudo apt install -y libmailutils-dev # mailutils command
+  sudo apt install -y mailutils-mda # putmail
 else
   echo "Mailutils installed"
 fi
