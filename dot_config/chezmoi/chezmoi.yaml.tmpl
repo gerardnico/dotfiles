@@ -1,15 +1,19 @@
+# Melissa 01
 {{ if eq .chezmoi.hostname "MELISSA01" }}
 sourceDir: C:/Users/hotitem/code/dotfiles
 {{ end }}
+
+# Mini Nico
 {{ if eq .chezmoi.hostname "MINI-NICO" }}
-{{ if eq .chezmoi.os "linux" }}
+{{     if eq .chezmoi.os "linux" }}
 sourceDir: /home/admin/code/dotfiles
-{{ end }}
-{{ if eq .chezmoi.os "windows" }}
+{{     end }}
+{{     if eq .chezmoi.os "windows" }}
 sourceDir: C:/Users/ngera/code/dotfiles
-{{ end }}
+{{     end }}
 {{ end }}
 
+# All windows
 {{ if eq .chezmoi.os "windows" }}
 [edit]
     command = "C:\\Notepad++\\notepad++.exe"
