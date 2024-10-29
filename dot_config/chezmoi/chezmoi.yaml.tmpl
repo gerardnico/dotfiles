@@ -2,5 +2,11 @@
 sourceDir: C:/Users/hotitem/code/dotfiles
 {{ end }}
 {{ if eq .chezmoi.hostname "MINI-NICO" }}
+{{ if eq .chezmoi.os "linux" }}
 sourceDir: /home/admin/code/dotfiles
 {{ end }}
+{{ if eq .chezmoi.os "windows" }}
+sourceDir: C:/Users/ngera/code/dotfiles
+{{ end }}
+{{ end }}
+
