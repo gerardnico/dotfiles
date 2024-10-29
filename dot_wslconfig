@@ -1,0 +1,2 @@
+[wsl2]
+networkingMode=mirrored # add this line if file already exists

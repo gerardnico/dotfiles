@@ -1,2 +1,6 @@
 # all files LF
+
 * text=auto eol=lf
+
+# Wsl Config is a Windows WSL config file
+.wslconfig text eol=crlf
