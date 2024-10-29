@@ -10,3 +10,8 @@ sourceDir: C:/Users/ngera/code/dotfiles
 {{ end }}
 {{ end }}
 
+{{ if eq .chezmoi.os "windows" }}
+[edit]
+    command = "C:\\Notepad++\\notepad++.exe"
+	args = [ "-multiInst", "-notabbar", "-nosession", "-noPlugin"]
+{{ end }}
