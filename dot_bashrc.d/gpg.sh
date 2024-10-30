@@ -5,6 +5,9 @@
 GPG_TTY=$(tty)
 export GPG_TTY
 
+# Eliminate SSH keys and use a GNU Privacy Guard (GPG) subkey instead.
+# Use GPG key instead of SSH private keys
+# GPG make key distribution and backup easier
 # If you enabled the Ssh Agent Support, you also need to tell ssh about it by adding this to your init script:
 # From: https://gnupg.org/documentation/manuals/gnupg/Agent-Examples.html
 # unset SSH_AGENT_PID
