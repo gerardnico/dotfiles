@@ -56,4 +56,4 @@ Host *
     # %n : The original remote hostname
     # %p : The remote port
     # %r : The remote username
-    ProxyCommand ssh-auth-proxy-command %h %n %p %r
+    ProxyCommand ssh-x-auth-proxy-command %h %n %p %r
