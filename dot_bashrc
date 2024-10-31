@@ -113,8 +113,8 @@ alias du='du -h'
 #####################
 # Add Bash Library
 #####################
-export BASH_LIB_DIR=$HOME/code/bash-lib/lib
-export PATH=$HOME/code/bash-lib/lib:$PATH
+export BASHLIB_DIR=$HOME/code/bash-lib/lib
+export PATH=$BASHLIB_DIR:$PATH
 
 #####################
 # Executable: Add the bin
