@@ -9,7 +9,7 @@ source bashlib-echo.sh
 # @exitcode 0 if it exists
 # @exitcode 1 if it does not exist
 echo_exist(){
-  if command::exist "$1"; then
+  if command::exists "$1"; then
     echo::echo "$1: Found"
   else
     echo::echo "$1: Not Found"
