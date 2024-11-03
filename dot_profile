@@ -1,6 +1,9 @@
 #!/bin/bash
 
 # ~/.profile: executed by the command interpreter for login shells.
+# Note:
+# Running wsl (bash.exe) without arguments (or with the ~ argument) will launch bash as a login shell.
+
 # Executed when the terminal is starting (ie non-interactive)
 # On Windows, the terminal is started with: `wsl.exe --distribution Debian`
 #

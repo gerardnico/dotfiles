@@ -117,6 +117,7 @@ export BASHLIB_DIR=$HOME/code/bash-lib/lib
 export PATH=$BASHLIB_DIR:$PATH
 export BASHLIB_ECHO_LEVEL=3 # info level
 
+
 #####################
 # Executable: Add the bin
 #####################

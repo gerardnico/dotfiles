@@ -56,4 +56,4 @@ Host *
     # %n : The original remote hostname
     # %p : The remote port
     # %r : The remote username
-    ProxyCommand ~/code/ssh-x/bin/ssh-x-auth-proxy-command %h %n %p %r
+    ProxyCommand env BASHLIB_LIBRARY_PATH=~/code/bash-lib/lib ~/code/ssh-x/bin/ssh-x-auth-proxy-command %h %n %p %r
