@@ -4,7 +4,9 @@
 
 
 # Start the agent
-eval $(ssh-x-agent-init)
+if ! eval "$(ssh-x-agent-init)"; then
+  echo "SSH Agent Started Not successfully" >/dev/tty
+fi
 
 # An alias
 alias ssx="ssh-x"

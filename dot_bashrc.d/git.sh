@@ -31,8 +31,8 @@ if [[ ! -f "$GIT_PROMPT_SCRIPT" ]]; then
 fi
 if [ -f "$GIT_PROMPT_SCRIPT" ]; then
   # shellcheck disable=SC1090
-  source "$GIT_PROMPT_SCRIPT"
   export GIT_PS1_SHOWDIRTYSTATE=1
+  source "$GIT_PROMPT_SCRIPT"
   # PS1:
   # This is the default PS1 where we have added the __git_ps1 function just before the dollar character
   # Explanation:
@@ -41,7 +41,9 @@ if [ -f "$GIT_PROMPT_SCRIPT" ]; then
   # \[exxx] are color formatting syntax
   # and __git_ps1 " (%s)" calls the function provided by git-prompt.sh with a formatting argument.
 
+  # __git_ps1 starts bashrc, I don't know why
   export PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n$(__git_ps1 "(%s)")\$ '
+  #export PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
 fi
 
 

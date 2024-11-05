@@ -36,9 +36,13 @@
 
 # User dependent .bashrc file
 
-# If not running interactively, don't do anything
-# [[ "$-" != *i* ]] && return
-
+# Avoid recursion due to script
+# If we are not running interactively, we return
+# Why? Otherwise we will have a recursion:
+# * with script (due to the shebang starting bash)
+# * and function (the prompt function such as `__git_ps1 " (%s)")
+[[ "$-" != *i* ]] && return
+echo ".bashrc called" >/dev/tty
 
 # Shell Options
 #
@@ -115,7 +119,7 @@ alias du='du -h'
 #####################
 export BASHLIB_DIR=$HOME/code/bash-lib/lib
 export PATH=$BASHLIB_DIR:$PATH
-export BASHLIB_ECHO_LEVEL=3 # info level
+export BASHLIB_ECHO_LEVEL=4 # info level
 
 
 #####################
