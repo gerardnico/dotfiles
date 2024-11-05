@@ -30,6 +30,11 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
+# Function to check if a package is installed
+package_installed() {
+    dpkg -l "$1" >/dev/null 2>&1
+}
+
 install_git_extras(){
   ## https://github.com/tj/git-extras/blob/main/Installation.md
   ## Only brew is maintained by the author
@@ -41,6 +46,21 @@ install_git_extras(){
   fi
 }
 
+install_gpg(){
+  if ! command_exists info; then
+    # info is needed to get the pinentry doc
+    # with `info pinentry`
+    sudo apt install -y info
+  else
+      echo "Info command found"
+  fi
+  # Doc for pinentry
+  if ! package_installed pinentry-doc; then
+    sudo apt install -y pinentry-doc
+  else
+    echo "Ggp pinentry-doc found"
+  fi
+}
 
 if ! command_exists git; then
   echo "Installing Git"
@@ -126,3 +146,6 @@ if ! command_exists envsubst; then
 else
   echo "GetText envsubst installed"
 fi
+
+# Gpg
+install_gpg
