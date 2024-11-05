@@ -5,6 +5,7 @@
 GPG_TTY=$(tty)
 export GPG_TTY
 
+# See https://wiki.archlinux.org/title/GnuPG#SSH_agent
 # Eliminate SSH keys and use a GNU Privacy Guard (GPG) subkey instead.
 # Use GPG key instead of SSH private keys
 # GPG make key distribution and backup easier
