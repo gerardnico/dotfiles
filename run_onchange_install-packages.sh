@@ -38,7 +38,7 @@ package_installed() {
 install_git_extras(){
   ## https://github.com/tj/git-extras/blob/main/Installation.md
   ## Only brew is maintained by the author
-  if ! git standup; then
+  if ! command_exists git-standup; then
     echo "Installing Git Extras"
     brew install git-extras
   else
@@ -47,6 +47,24 @@ install_git_extras(){
 }
 
 install_gpg(){
+
+  if ! command_exists gpg; then
+    # https://packages.debian.org/bookworm/gpg
+    # https://packages.debian.org/bookworm/gpg-agent
+    sudo apt -y install gnupg2 gnupg-agent
+  else
+    echo "gpg command found"
+  fi
+
+  # Gui Pin for the IDE
+  if ! command_exists pinentry-gnome3; then
+    echo "Installing pinentry-gnome3"
+    sudo apt -y install pinentry-gnome3
+    echo "Installed pinentry-gnome3"
+  else
+    echo "pinentry-gnome3 command found"
+  fi
+
   if ! command_exists info; then
     # info is needed to get the pinentry doc
     # with `info pinentry`
