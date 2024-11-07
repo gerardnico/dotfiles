@@ -73,4 +73,4 @@ export GIT_AUTHOR_EMAIL=gerardnico@gmail.com
 # GIT_AUTHOR_DATE
 
 # Gitx
-export GITX_REPOS_HOME=$HOME/code
+export GIT_X_REPOS_DIR=$HOME/code
