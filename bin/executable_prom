@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Get only metrics from a URL
+
+curl -s "$1" | grep '^[a-z]' | sed 's/{.*//g' | sort | uniq -c | sort -nr
