@@ -23,11 +23,10 @@ fi
 
 ##############################
 # Kube Utilities
-# https://github.com/gerardnico/kube
+# https://github.com/gerardnico/kube-x
 ##############################
-export KUBE_X_APP_HOME=$HOME/code/argocd
-export KUBE_PUBLIC_KEY=$HOME/.ssh/nico02_rsa.pub
-
+export KUBE_X_APP_HOME="$HOME/code/argocd"
 export KUBE_X_CLUSTER="beau"
 export KUBE_X_USER="default"
+export KUBE_X_KUBECTL="kubectx"
 
