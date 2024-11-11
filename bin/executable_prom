@@ -2,3 +2,4 @@
 # Get only metrics from a URL
 
 curl -s "$1" | grep '^[a-z]' | sed 's/{.*//g' | sort | uniq -c | sort -nr
+# wget -q -O /dev/stdout "$1" | grep '^[a-z]' | sed 's/{.*//g' | sort | uniq -c | sort -nr
