@@ -1,4 +1,7 @@
 
+# Install ssh-x
+export PATH=$HOME/code/ssh-x/bin:$PATH
+
 # Private Key in pass
 export SSH_X_KEY_STORE="pass"
 
