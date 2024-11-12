@@ -6,5 +6,8 @@ export PATH=$HOME/code/ssh-x/bin:$PATH
 export SSH_X_KEY_STORE="pass"
 
 # Load ssh-agent env if any
-# shellcheck disable=SC1090
-test -f "$SSH_X_AGENT_ENV" && source "$SSH_X_AGENT_ENV" >| /dev/null
+SSH_X_AGENT_ENV=$HOME/.ssh/ssh-x-agent.env
+if [ -f "$SSH_X_AGENT_ENV" ]; then
+  # shellcheck disable=SC1090
+  source "$SSH_X_AGENT_ENV" >| /dev/null
+fi
