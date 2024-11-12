@@ -45,7 +45,7 @@
 # * with script (due to the shebang starting bash)
 # * and function (the prompt function such as `__git_ps1 " (%s)")
 [[ "$-" != *i* ]] && return
-echo ".bashrc called" >/dev/tty
+echo ".bashrc called by ${0}" >/dev/tty
 
 # Shell Options
 #
@@ -138,6 +138,7 @@ fi
 if [ -d "$HOME/.local/bin" ] ; then
     export PATH="$HOME/.local/bin:$PATH"
 fi
+
 
 ##############################################
 # Executable: Add Homebrew bin

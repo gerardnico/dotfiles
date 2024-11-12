@@ -2,13 +2,31 @@
 # Shebang is not needed as the script is not executed but sourced
 # but we use it to get the IDE file type
 
-# Environment in IDE
-# Called only in non-interactive mode
-# Should set only ENV
-[[ "$-" == *i* ]] && return
-echo ".bashenv called" >/dev/tty
+# Non-Interactive environment
 
-# For SSH-X (ie loading of key in Intellij)
-source "$HOME/.bashrc.d/ssh-x.sh"
-source "$HOME/.bashrc.d/pass.sh"
+# Executed by:
+# * IDE: `wsl git`
+# * bash script with shebang
+
+###########################################
+# The scripts should set env or source env file only,
+# not executing any bash script to avoid any recursion
+# (ie a bash script executed will source this file)
+###########################################
+
+[[ "$-" == *i* ]] && return
+echo ".bashenv called by ${0}" >/dev/stderr
+
+##############################
+# Load sub bash env script
+##############################
+if [ -d "$HOME/.bashenv.d" ]; then
+  # All file loaded in a directory should have a sh extension
+  # This is how /etc/profile also work
+  for file in "$HOME"/.bashenv.d/*.sh; do
+    # shellcheck disable=SC1090
+    [ -r "$file" ] && source "$file"
+  done
+  unset file
+fi
 

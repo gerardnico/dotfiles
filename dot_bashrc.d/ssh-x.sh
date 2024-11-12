@@ -2,11 +2,8 @@
 # SSH Env
 ##############################
 
-# Private Key in pass
-export SSH_X_KEY_STORE="pass"
-
-# If not interactive, return
-[[ "$-" != *i* ]] && return
+# Env
+source "$HOME/.bashenv.d/ssh-x.sh"
 
 # Start the agent only in interactive mode
 # Otherwise we get a recursion because `ssh-x-agent-init`
