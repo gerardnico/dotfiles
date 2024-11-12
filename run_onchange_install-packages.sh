@@ -46,7 +46,7 @@ install_git_extras(){
   fi
 }
 
-install_gpg(){
+install_gpg_pinentry(){
 
   if ! command_exists gpg; then
     # https://packages.debian.org/bookworm/gpg
@@ -56,13 +56,12 @@ install_gpg(){
     echo "gpg command found"
   fi
 
-  # Gui Pin for the IDE
-  if ! command_exists pinentry-gnome3; then
-    echo "Installing pinentry-gnome3"
-    sudo apt -y install pinentry-gnome3
-    echo "Installed pinentry-gnome3"
+  if ! command_exists pinentry-qt; then
+        echo "Installing pinentry-qt"
+        sudo apt -y install pinentry-qt
+        echo "Installed pinentry-qt"
   else
-    echo "pinentry-gnome3 command found"
+    echo "pinentry-qt command found"
   fi
 
   if ! command_exists info; then
@@ -166,4 +165,4 @@ else
 fi
 
 # Gpg
-install_gpg
+install_gpg_pinentry

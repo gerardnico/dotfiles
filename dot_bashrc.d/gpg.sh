@@ -1,4 +1,5 @@
 
+
 # Gpg
 # As seen here:
 # https://gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html
@@ -15,3 +16,7 @@ export GPG_TTY
 # if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
 #  export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 # fi
+
+
+# More advanced Example
+# https://github.com/diablodale/pinentry-wsl-ps1?tab=readme-ov-file#example-configuration-files
