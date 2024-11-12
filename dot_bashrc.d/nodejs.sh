@@ -1,4 +1,6 @@
-#!/bin/bash
+
+# If not interactive, return
+[[ "$-" != *i* ]] && return
 
 ##############################
 # Node

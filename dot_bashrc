@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Shebang is not needed as the script is not executed but sourced
+# but we use it to get the IDE file type
+
 # Bashrc: Bash runtime configuration
 #
 # Run when the shell is interactive
