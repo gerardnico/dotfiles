@@ -4,6 +4,8 @@
 ##############################
 # Vault id
 export ANS_X_VAULT_ID_PASS=ansible/vault-password
+# SSH Key
+export ANS_X_SSH_KEY_PASS=ssh-x/id_gerardnico_kube
 
 # Project Dir
 ANS_X_PROJECT_DIR=$HOME/code/infra

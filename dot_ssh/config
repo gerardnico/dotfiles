@@ -30,12 +30,6 @@ Host github.com
     # StrictHostKeyChecking yes
     # DNS and SSHFP resource records
     # VerifyHostKeyDNS yes
-
-
-# Global conf
-# Should be at the end because the first conf matched win
-Host *
-    AddKeysToAgent 15m
     # Used for public key authentication, value may be:
     #   * a public key file to use the corresponding private key loaded in ssh-agent(1)
     #   * private key
@@ -57,3 +51,12 @@ Host *
     # %p : The remote port
     # %r : The remote username
     ProxyCommand env BASHLIB_LIBRARY_PATH=~/code/bash-lib/lib ~/code/ssh-x/bin/ssh-x-auth-proxy-command %h %n %p %r
+
+
+# Global conf
+# Should be at the end because the first conf matched win
+# We don't set any because the `~/.ssh` may be mounted in Docker
+Host *
+    AddKeysToAgent 15m
+
+
