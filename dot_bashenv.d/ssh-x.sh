@@ -7,7 +7,7 @@ export SSH_X_KEY_STORE="pass"
 
 
 # A caller logs
-SSH_X_CALLERS_LOG=/tmp/ssh-x-auth-proxy-parent.log
+export SSH_X_CALLERS_LOG=/tmp/ssh-x-auth-proxy-parent.log
 
 # Load ssh-agent env if any
 SSH_X_AGENT_ENV=$HOME/.ssh/ssh-x-agent.env

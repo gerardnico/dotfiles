@@ -74,4 +74,5 @@ export GIT_AUTHOR_EMAIL=gerardnico@gmail.com
 
 # Gitx
 export GIT_X_REPOS_DIR=$HOME/code
-export GIT_X_REPOS_PATH=/home/linuxbrew/.linuxbrew/Homebrew/Library/Taps/gerardnico/homebrew-tap
+export HOMEBREW_TAP_HOME=/home/linuxbrew/.linuxbrew/Homebrew/Library/Taps/gerardnico/homebrew-tap
+export GIT_X_REPOS_PATH=$HOMEBREW_TAP_HOME
