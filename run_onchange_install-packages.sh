@@ -79,6 +79,15 @@ install_gpg_pinentry(){
   fi
 }
 
+install_yq(){
+  if ! command_exists yq; then
+    echo "Installing yq"
+    brew install yq
+  else
+    echo "Yq found"
+  fi
+}
+
 if ! command_exists git; then
   echo "Installing Git"
   sudo apt install git
@@ -166,3 +175,5 @@ fi
 
 # Gpg
 install_gpg_pinentry
+# Yq
+install_yq
