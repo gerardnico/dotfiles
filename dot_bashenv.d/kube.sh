@@ -9,4 +9,4 @@ export KUBE_X_USER="default"
 export KUBE_X_KUBECTL="kubectx"
 export KUBE_X_BUSYBOX_IMAGE="ghcr.io/gerardnico/busybox@sha256:28e4627ee3c9f96eb36cb80de1acd7a8aa1e54b0940012ddb748ace5789954d6"
 
-export KUBI_ALERT_MANAGER_API_URL=https://alertmanager.eraldy.com/api/v2
+export KUBE_X_ALERT_MANAGER_URL=https://alertmanager.eraldy.com
