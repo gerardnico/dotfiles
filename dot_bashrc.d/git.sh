@@ -69,10 +69,18 @@ alias glogp='git log --pretty=format:"%h %s" --graph'
 
 # Taken as default by Git
 export GIT_AUTHOR_NAME="Nicolas GERARD"
-export GIT_AUTHOR_EMAIL=gerardnico@gmail.com
+export GIT_AUTHOR_EMAIL="gerardnico@gmail.com"
 # GIT_AUTHOR_DATE
 
 # Gitx
-export GIT_X_REPOS_DIR=$HOME/code
-export HOMEBREW_TAP_HOME=/home/linuxbrew/.linuxbrew/Homebrew/Library/Taps/gerardnico/homebrew-tap
-export GIT_X_REPOS_PATH=$HOMEBREW_TAP_HOME
+# Where all repo are
+export GIT_X_REPOS_DIR="$HOME/code"
+
+# Loss repo in the wild where the path is rigid
+# Brew Tap
+export HOMEBREW_TAP_HOME="/home/linuxbrew/.linuxbrew/Homebrew/Library/Taps/gerardnico/homebrew-tap"
+# Ansible collection
+# path is not directly the collection directory (https://docs.ansible.com/ansible/latest/reference_appendices/config.html#collections-paths)
+ANSIBLE_X_COLLECTION_PATH="$HOME/.ansible/collections/ansible_collections/gerardnico/ansible_x_collection"
+# Path
+export GIT_X_REPOS_PATH="$HOMEBREW_TAP_HOME:$ANSIBLE_X_COLLECTION_PATH"
