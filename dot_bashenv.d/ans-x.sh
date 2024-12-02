@@ -14,6 +14,7 @@ if [ -d "$ANS_X_BIN_DIR" ]; then
   export PATH="$ANS_X_BIN_DIR:$PATH"
 fi
 
+
 ##############################
 # Ansible Docker Env
 ##############################
