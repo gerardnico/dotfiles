@@ -81,6 +81,6 @@ export GIT_X_REPOS_DIR="$HOME/code"
 HOMEBREW_TAP_HOME="/home/linuxbrew/.linuxbrew/Homebrew/Library/Taps/gerardnico/homebrew-tap"
 # Ansible collection
 # path is not directly the collection directory (https://docs.ansible.com/ansible/latest/reference_appendices/config.html#collections-paths)
-ANSIBLE_X_COLLECTION_PATH="$HOME/.ansible/collections/ansible_collections/ans_x/default"
+ANSIBLE_X_COLLECTION_PATH="$HOME/.ansible/collections/ansible_collections/ans_x/ans_x_collection"
 # Path
 export GIT_X_REPOS_PATH="$HOMEBREW_TAP_HOME:$ANSIBLE_X_COLLECTION_PATH"
