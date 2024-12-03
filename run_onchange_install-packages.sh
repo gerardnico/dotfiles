@@ -99,6 +99,18 @@ install_vagrant(){
   fi
 }
 
+install_kind_kube_on_docker(){
+  # Installation possibility is on quick start
+  # https://kind.sigs.k8s.io/docs/user/quick-start
+  if ! command_exists kind; then
+    echo "Installing Kind"
+    brew install kind
+  else
+    echo "Kind installed"
+  fi
+
+}
+
 if ! command_exists git; then
   echo "Installing Git"
   sudo apt install git
@@ -189,4 +201,6 @@ install_gpg_pinentry
 # Yq
 install_yq
 # Vagrant
-install_vagrant
+# install_vagrant
+
+install_kind_kube_on_docker
