@@ -88,6 +88,17 @@ install_yq(){
   fi
 }
 
+install_vagrant(){
+  if ! command_exists vagrant; then
+    sudo apt install -y libfuse2
+    echo "Installing Vagrant"
+    brew tap hashicorp/tap
+    brew install hashicorp/tap/vagrant
+  else
+    echo "Vagrant Found"
+  fi
+}
+
 if ! command_exists git; then
   echo "Installing Git"
   sudo apt install git
@@ -177,3 +188,5 @@ fi
 install_gpg_pinentry
 # Yq
 install_yq
+# Vagrant
+install_vagrant
