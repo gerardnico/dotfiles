@@ -78,9 +78,11 @@ export GIT_X_REPOS_DIR="$HOME/code"
 
 # Loss repo in the wild where the path is rigid
 # Brew Tap
-HOMEBREW_TAP_HOME="/home/linuxbrew/.linuxbrew/Homebrew/Library/Taps/gerardnico/homebrew-tap"
+# export to be able to query them with env
+export HOMEBREW_TAP_HOME="/home/linuxbrew/.linuxbrew/Homebrew/Library/Taps/gerardnico/homebrew-tap"
 # Ansible collection
 # path is not directly the collection directory (https://docs.ansible.com/ansible/latest/reference_appendices/config.html#collections-paths)
-ANSIBLE_X_COLLECTION_PATH="$HOME/.ansible/collections/ansible_collections/ans_x/ans_x_collection"
+# export to be able to query them with env
+export ANSIBLE_X_COLLECTION_PATH="$HOME/.ansible/collections/ansible_collections/ans_x/ans_x_base"
 # Path
 export GIT_X_REPOS_PATH="$HOMEBREW_TAP_HOME:$ANSIBLE_X_COLLECTION_PATH"
