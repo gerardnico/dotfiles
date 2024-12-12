@@ -111,6 +111,18 @@ install_kind_kube_on_docker(){
 
 }
 
+install_mkcert(){
+  if ! command_exists mkcert; then
+    # https://github.com/FiloSottile/mkcert?tab=readme-ov-file#linux
+    echo "Installing mkcert"
+    sudo apt install -y libnss3-tools
+    brew install mkcert
+    echo "mkcert installed"
+  else
+    echo "mkcert installed"
+  fi
+}
+
 if ! command_exists git; then
   echo "Installing Git"
   sudo apt install git
@@ -204,3 +216,5 @@ install_yq
 # install_vagrant
 
 install_kind_kube_on_docker
+# Mkcert
+install_mkcert
