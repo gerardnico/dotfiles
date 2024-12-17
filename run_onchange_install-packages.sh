@@ -117,18 +117,29 @@ install_mkcert(){
     echo "Installing mkcert"
     sudo apt install -y libnss3-tools
     brew install mkcert
-    echo "mkcert installed"
-  else
-    echo "mkcert installed"
   fi
+  echo "mkcert installed"
+
 }
 
-if ! command_exists git; then
-  echo "Installing Git"
-  sudo apt install git
-else
-  echo "Git Found"
-fi
+install_cert_manager_cmctl(){
+  ## https://cert-manager.io/docs/reference/cmctl/#installation
+    if ! command_exists cmctl; then
+      echo "Installing cmctl"
+      brew install cmctl
+    fi
+    echo "cmctl installed"
+}
+
+install_git(){
+  if ! command_exists git; then
+    echo "Installing Git"
+    sudo apt install git
+  fi
+  echo "Git Installed"
+}
+
+install_git
 
 # cd on
 if ! command_exists zoxide; then
@@ -218,3 +229,5 @@ install_yq
 install_kind_kube_on_docker
 # Mkcert
 install_mkcert
+# Cert manager cmctl
+install_cert_manager_cmctl
