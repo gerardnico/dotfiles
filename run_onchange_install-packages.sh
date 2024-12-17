@@ -204,6 +204,48 @@ install_jsonnet_bundler_manager(){
 
 }
 
+# https://github.com/brancz/gojsontoyaml/releases/tag/v0.1.0
+install_go_json_to_yaml(){
+
+  local BINARY="gojsontoyaml"
+
+  if ! command_exists "$BINARY"; then
+
+    # https://github.com/brancz/gojsontoyaml/releases/tag/v0.1.0
+    local VERSION="0.1.0"
+    echo "Installing $BINARY version $VERSION"
+
+    # Download URL
+    ARCHIVE_NAME="${BINARY}_${VERSION}_$(get_os_name)_$(get_cpu_arch_name).tar.gz"
+    DOWNLOAD_URL="https://github.com/brancz/gojsontoyaml/releases/download/v${VERSION}/$ARCHIVE_NAME"
+    echo "Downloading $ARCHIVE_NAME..."
+    # Temporary directory for extraction
+    TEMP_DIR=$(mktemp -d)
+    curl -L -o "$TEMP_DIR/$ARCHIVE_NAME" "$DOWNLOAD_URL"
+
+    echo "Extracting archive..."
+    tar -xzf "$TEMP_DIR/$ARCHIVE_NAME" -C "$TEMP_DIR"
+    # Find the binary in the extracted files
+    BINARY_PATH=$(find "$TEMP_DIR" -name "${BINARY}" -type f)
+    # Check if binary was found
+    if [ -z "$BINARY_PATH" ]; then
+        echo "Error: Could not find '${BINARY}' binary in the archive"
+        rm -rf "$TEMP_DIR"
+        exit 1
+    fi
+    # Installation directory
+    INSTALL_DIR="/usr/local/bin"
+    echo "Installing to $INSTALL_DIR/$BINARY..."
+    sudo cp "$BINARY_PATH" "$INSTALL_DIR/$BINARY"
+    sudo chmod +x "$INSTALL_DIR/$BINARY"
+    # Clean up temporary files
+    rm -rf "$TEMP_DIR"
+
+  fi
+
+  echo "$BINARY is installed"
+}
+
 install_git
 
 # cd on
@@ -298,3 +340,6 @@ install_mkcert
 install_cert_manager_cmctl
 # Install jsonnet bundler (package manager)
 install_jsonnet_bundler_manager
+# Install utility gojsontoyaml
+install_go_json_to_yaml
+
