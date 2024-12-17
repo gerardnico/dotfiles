@@ -139,6 +139,71 @@ install_git(){
   echo "Git Installed"
 }
 
+get_os_name(){
+  # Detect operating system
+  uname -s | tr '[:upper:]' '[:lower:]'
+}
+
+get_cpu_arch_name(){
+
+  # Detect CPU architecture
+  ARCH=$(uname -m)
+
+  # Map architecture to the binary names
+  case "$ARCH" in
+      x86_64)
+          ARCH_NAME="amd64"
+          ;;
+      aarch64)
+          ARCH_NAME="arm64"
+          ;;
+      arm*)
+          ARCH_NAME="arm"
+          ;;
+      *)
+          echo "Unsupported architecture: $ARCH"
+          return 1
+          ;;
+  esac
+  echo $ARCH_NAME
+
+}
+
+install_jsonnet_bundler_manager(){
+
+  if ! command_exists jb; then
+
+    echo "Installing jsonnet-bundler"
+    # Construct the binary filename
+    BINARY_NAME="jb-$(get_os_name)-$(get_cpu_arch_name)"
+
+    # For Windows, add .exe extension
+    if [ "$OS" == "windows" ]; then
+        BINARY_NAME="${BINARY_NAME}.exe"
+    fi
+
+    # Base URL for downloads
+    BASE_URL="https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.6.0/"
+
+    # Full download URL
+    DOWNLOAD_URL="${BASE_URL}${BINARY_NAME}"
+
+    # Installation directory
+    INSTALL_DIR="/usr/local/bin"
+
+    # Download the binary directly to the system bin directory
+    echo "Downloading $BINARY_NAME to $INSTALL_DIR/jb..."
+    sudo curl -L -o "$INSTALL_DIR/jb" "$DOWNLOAD_URL"
+
+    # Make the binary executable
+    sudo chmod +x "$INSTALL_DIR/jb"
+
+  fi
+
+  echo "jsonnet-bundler is installed (jsonnet package manager)"
+
+}
+
 install_git
 
 # cd on
@@ -231,3 +296,5 @@ install_kind_kube_on_docker
 install_mkcert
 # Cert manager cmctl
 install_cert_manager_cmctl
+# Install jsonnet bundler (package manager)
+install_jsonnet_bundler_manager
