@@ -6,6 +6,9 @@ fi
 
 # https://cert-manager.io/docs/reference/cmctl/#completion
 
+# cmctl supports auto-completion for both subcommands as well as suggestions for runtime objects.
+# cmctl approve -n <TAB> <TAB>
+
 # shellcheck disable=SC1090
 source <(cmctl completion bash)
 # To load completions for each session, execute once:
