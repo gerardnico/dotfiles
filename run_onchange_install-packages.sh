@@ -246,6 +246,16 @@ install_go_json_to_yaml(){
   echo "$BINARY is installed"
 }
 
+# https://github.com/google/go-jsonnet
+install_jsonnet(){
+  if ! command_exists "jsonnet"; then
+    echo "Installing jsonnet"
+    brew install go-jsonnet
+  fi
+
+  echo "jsonnet is installed"
+}
+
 install_git
 
 # cd on
@@ -342,4 +352,6 @@ install_cert_manager_cmctl
 install_jsonnet_bundler_manager
 # Install utility gojsontoyaml
 install_go_json_to_yaml
+# Install jsonnet
+install_jsonnet
 
