@@ -3,7 +3,8 @@
 # Kube Utilities
 # https://github.com/gerardnico/kube-x
 ##############################
-export KUBE_X_APP_HOME="$HOME/code/argocd/apps:$HOME/code/argocd/infra"
+export KUBE_X_CHARTS_PATH="$HOME/code/argocd/charts"
+export KUBE_X_CLUSTERS_PATH="$HOME/code/argocd/clusters"
 export KUBE_X_CLUSTER="beau"
 export KUBE_X_USER="default"
 
