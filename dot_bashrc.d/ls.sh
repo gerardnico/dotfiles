@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# see also: https://github.com/eza-community/eza
+# see also: 
+# https://github.com/eza-community/eza
+# fork of unmaintained https://github.com/ogham/exa
 
 # Some shortcuts for different directory listings
 alias ls='ls -hF --color=tty'                 # classify files in colour
