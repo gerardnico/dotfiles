@@ -5,8 +5,7 @@
 ##############################
 export KUBE_X_CHARTS_PATH="$HOME/code/argocd/charts"
 export KUBE_X_CLUSTERS_PATH="$HOME/code/argocd/clusters"
-export KUBE_X_CLUSTER="beau"
-export KUBE_X_USER="default"
+
 
 # Alert Manager Connection for the API
 export KUBE_X_ALERT_MANAGER_URL=https://alertmanager.eraldy.com
