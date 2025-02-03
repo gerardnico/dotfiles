@@ -256,6 +256,18 @@ install_jsonnet(){
   echo "jsonnet is installed"
 }
 
+# https://nix.dev/manual/nix/2.24/installation/
+install_nix(){
+
+  if ! command_exists "nix-shell"; then
+      echo "Installing Nix"
+      bash <(curl -L https://nixos.org/nix/install) --no-daemon
+  fi
+
+  echo "Nix is already installed"
+
+}
+
 install_git
 
 # cd on
@@ -354,4 +366,6 @@ install_jsonnet_bundler_manager
 install_go_json_to_yaml
 # Install jsonnet
 install_jsonnet
+# Install nix
+install_nix
 
