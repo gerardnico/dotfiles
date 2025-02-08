@@ -46,6 +46,16 @@ install_git_extras(){
   fi
 }
 
+install_helm(){
+  # See get Helms section at https://helm.sh/
+  if ! command_exists helm; then
+    echo "Installing Helm"
+    brew install helm
+  else
+    echo "Helm founds"
+  fi
+}
+
 install_gpg_pinentry(){
 
   if ! command_exists gpg; then
@@ -368,4 +378,5 @@ install_go_json_to_yaml
 install_jsonnet
 # Install nix
 install_nix
-
+# Helm
+install_helm
