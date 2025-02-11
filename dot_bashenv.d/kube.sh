@@ -3,7 +3,7 @@
 # Kube Utilities
 # https://github.com/gerardnico/kubee
 ##############################
-export KUBEE_CHARTS_PATH="$HOME/code/argocd/charts"
+export KUBEE_CHARTS_PATH="$HOME/code/argocd/charts:$HOME/code/kubee/resources/charts-wip"
 export KUBEE_CLUSTERS_PATH="$HOME/code/argocd/clusters"
 
 
