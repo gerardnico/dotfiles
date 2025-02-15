@@ -23,3 +23,9 @@ CODE_HOME="$HOME"/code
 
 # Execute the function
 add_bin_dirs_from_code_repo "$CODE_HOME"
+
+# Bash lib
+BASHLIB_LIBRARY_PATH="$CODE_HOME/bash-lib/lib"
+if [ -d "$BASHLIB_LIBRARY_PATH" ]; then
+  export PATH="$BASHLIB_LIBRARY_PATH:$PATH"
+fi

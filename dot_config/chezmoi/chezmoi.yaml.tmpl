@@ -1,6 +1,9 @@
 # Melissa 01
 {{ if eq .chezmoi.hostname "MELISSA01" }}
 sourceDir: C:/Users/hotitem/code/dotfiles
+interpreters:
+  sh:
+    command: "bash"
 {{ end }}
 
 # Mini Nico
@@ -19,3 +22,4 @@ edit:
     command: "C:\\Notepad++\\notepad++.exe"
     args: [ "-multiInst", "-notabbar", "-nosession", "-noPlugin"]
 {{ end }}
+

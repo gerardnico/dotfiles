@@ -50,9 +50,9 @@ fi
 # Alias
 # See also gitconfig alias
 # `call` is a git alias to add, commit, and push and accepts the message
-alias gx='git exec'
-alias gxs='git exec st'
-alias gxac='git exec auto-commit'
+alias gx='git-exec' # and not git exec as git does a different call that messed up glob expansion
+alias gxs='git-exec st'
+alias gxac='git-exec auto-commit'
 alias gd='git diff | nvim'
 alias gan='git add --renormalize .'
 alias gau='git add --update'

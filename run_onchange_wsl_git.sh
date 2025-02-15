@@ -4,12 +4,11 @@
 # Standard env
 SCRIPT_NAME=$(basename "$0")
 
-# A script should not run on Windows if there is no interpreter
+# This script should not run on Windows if there is no interpreter
 # https://www.chezmoi.io/reference/target-types/#scripts-on-windows
 # but WSL install bash.exe at C:\Windows\System32\bash.exe
-# We don't run it if the pwd is `/mnt/c/Users`
-if [[ "$PWD" =~ "/mnt/c/Users" ]]; then
-  echo "$SCRIPT_NAME - Running from bash Windows, exiting"
+if [ "$CHEZMOI_OS" == "windows" ]; then
+  echo "$(basename "$0") - Running from bash Windows, exiting"
   exit
 fi
 
