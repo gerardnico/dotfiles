@@ -53,14 +53,31 @@ install_helm(){
   fi
 }
 
+install_gpg(){
+
+  if  command_exists gpg; then
+      echo "gpg command found"
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "gpg Windows Installation"
+    # used by gopass
+    winget install -e --id GnuPG.Gpg4win
+    return
+  fi
+
+  # https://packages.debian.org/bookworm/gpg
+  # https://packages.debian.org/bookworm/gpg-agent
+  echo "gpg command installation"
+  sudo apt -y install gnupg2 gnupg-agent
+
+}
+
 install_gpg_pinentry(){
 
-  if ! command_exists gpg; then
-    # https://packages.debian.org/bookworm/gpg
-    # https://packages.debian.org/bookworm/gpg-agent
-    sudo apt -y install gnupg2 gnupg-agent
-  else
-    echo "gpg command found"
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "gpg pinentry Windows Installation not supported skipping"
+      return
   fi
 
   if ! command_exists pinentry-qt; then
@@ -87,63 +104,97 @@ install_gpg_pinentry(){
 }
 
 install_yq(){
-  if ! command_exists yq; then
-    echo "Installing yq"
-    brew install yq
-  else
+  if command_exists yq; then
     echo "Yq found"
   fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    winget install -e --id MikeFarah.yq
+    return
+  fi
+  echo "Installing yq"
+  brew install yq
 }
 
 install_vagrant(){
-  if ! command_exists vagrant; then
-    sudo apt install -y libfuse2
-    echo "Installing Vagrant"
-    brew tap hashicorp/tap
-    brew install hashicorp/tap/vagrant
-  else
+  if command_exists vagrant; then
     echo "Vagrant Found"
+    return
   fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Vagrant Windows Installation Not done Skipping"
+    return
+  fi
+  sudo apt install -y libfuse2
+  echo "Installing Vagrant"
+  brew tap hashicorp/tap
+  brew install hashicorp/tap/vagrant
 }
 
 install_kind_kube_on_docker(){
   # Installation possibility is on quick start
   # https://kind.sigs.k8s.io/docs/user/quick-start
-  if ! command_exists kind; then
-    echo "Installing Kind"
-    brew install kind
-  else
+  if command_exists kind; then
     echo "Kind installed"
+    return
   fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Kind Windows Installation Not done Skipping"
+    return
+  fi
+  echo "Installing Kind"
+  brew install kind
+
 
 }
 
 install_mkcert(){
-  if ! command_exists mkcert; then
-    # https://github.com/FiloSottile/mkcert?tab=readme-ov-file#linux
-    echo "Installing mkcert"
-    sudo apt install -y libnss3-tools
-    brew install mkcert
+
+  if command_exists mkcert; then
+    echo "mkcert installed"
+    return
   fi
-  echo "mkcert installed"
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "mkcert Windows Installation Not done Skipping"
+    return
+  fi
+  # https://github.com/FiloSottile/mkcert?tab=readme-ov-file#linux
+  echo "Installing mkcert"
+  sudo apt install -y libnss3-tools
+  brew install mkcert
 
 }
 
 install_cert_manager_cmctl(){
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Cmctl Windows Installation Not done Skipping"
+      return
+  fi
   ## https://cert-manager.io/docs/reference/cmctl/#installation
-    if ! command_exists cmctl; then
-      echo "Installing cmctl"
-      brew install cmctl
-    fi
+  if command_exists cmctl; then
     echo "cmctl installed"
+    return
+  fi
+
+  echo "Installing cmctl"
+  brew install cmctl
+
 }
 
 install_git(){
-  if ! command_exists git; then
-    echo "Installing Git"
-    sudo apt install git
+
+  if command_exists git; then
+    echo "Git Installed"
+    return
   fi
-  echo "Git Installed"
+
+  echo "Installing Git"
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    winget install -e --id Git.Git
+    return
+  fi
+
+  sudo apt install git
+
 }
 
 get_os_name(){
@@ -178,36 +229,35 @@ get_cpu_arch_name(){
 
 install_jsonnet_bundler_manager(){
 
-  if ! command_exists jb; then
-
-    echo "Installing jsonnet-bundler"
-    # Construct the binary filename
-    BINARY_NAME="jb-$(get_os_name)-$(get_cpu_arch_name)"
-
-    # For Windows, add .exe extension
-    if [ "$OS" == "windows" ]; then
-        BINARY_NAME="${BINARY_NAME}.exe"
-    fi
-
-    # Base URL for downloads
-    BASE_URL="https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.6.0/"
-
-    # Full download URL
-    DOWNLOAD_URL="${BASE_URL}${BINARY_NAME}"
-
-    # Installation directory
-    INSTALL_DIR="/usr/local/bin"
-
-    # Download the binary directly to the system bin directory
-    echo "Downloading $BINARY_NAME to $INSTALL_DIR/jb..."
-    sudo curl -L -o "$INSTALL_DIR/jb" "$DOWNLOAD_URL"
-
-    # Make the binary executable
-    sudo chmod +x "$INSTALL_DIR/jb"
-
+  if  command_exists jb; then
+    echo "jsonnet-bundler is installed (jsonnet package manager)"
+    return
   fi
 
-  echo "jsonnet-bundler is installed (jsonnet package manager)"
+  echo "Installing jsonnet-bundler"
+  # Construct the binary filename
+  BINARY_NAME="jb-$(get_os_name)-$(get_cpu_arch_name)"
+
+  # For Windows, add .exe extension
+  if [ "$OS" == "windows" ]; then
+      BINARY_NAME="${BINARY_NAME}.exe"
+  fi
+
+  # Base URL for downloads
+  BASE_URL="https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.6.0/"
+
+  # Full download URL
+  DOWNLOAD_URL="${BASE_URL}${BINARY_NAME}"
+
+  # Installation directory
+  INSTALL_DIR="/usr/local/bin"
+
+  # Download the binary directly to the system bin directory
+  echo "Downloading $BINARY_NAME to $INSTALL_DIR/jb..."
+  sudo curl -L -o "$INSTALL_DIR/jb" "$DOWNLOAD_URL"
+
+  # Make the binary executable
+  sudo chmod +x "$INSTALL_DIR/jb"
 
 }
 
@@ -255,6 +305,10 @@ install_go_json_to_yaml(){
 
 # https://github.com/google/go-jsonnet
 install_jsonnet(){
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Jsonnet Windows Installation Not done Skipping"
+      return
+  fi
   if ! command_exists "jsonnet"; then
     echo "Installing jsonnet"
     brew install go-jsonnet
@@ -266,6 +320,10 @@ install_jsonnet(){
 # https://nix.dev/manual/nix/2.24/installation/
 install_nix(){
 
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Nix does not support windows - Skipping"
+    return
+  fi
   if ! command_exists "nix-shell"; then
       echo "Installing Nix"
       bash <(curl -L https://nixos.org/nix/install) --no-daemon
@@ -275,15 +333,69 @@ install_nix(){
 
 }
 
+install_zoxide_cd(){
+  # cd on
+  if command_exists zoxide; then
+    echo "Zoxide Found"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Zoxide Windows Installation"
+    winget install ajeetdsouza.zoxide
+    return
+  fi
+  echo "Brew Installing Zoxide"
+  brew install zoxide
+
+}
+
+install_lazy_git(){
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "LazyGit Windows Installation Not done Skipping"
+    return
+  fi
+  if ! command_exists lazygit; then
+    echo "Installing LazyGit"
+    brew install jesseduffield/lazygit/lazygit
+  else
+    echo "LazyGit Found"
+  fi
+}
+
+install_envsubst(){
+  if command_exists envsubst; then
+    echo "GetText envsubst installed"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "envsubst on Windows should be installed with Cygwin"
+    return
+  fi
+
+  sudo apt install -y gettext
+
+}
+
+install_telnet(){
+  if command_exists telnet; then
+    echo "Telnet installed"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Telnet Windows Installation"
+      # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc771275(v=ws.10)
+      pkgmgr /iu:"TelnetClient"
+      return
+  fi
+  echo "Telnet Apt Installation"
+  sudo apt install -y telnet
+}
+
 install_git
 
-# cd on
-if ! command_exists zoxide; then
-  echo "Installing Zoxide"
-  brew install zoxide
-else
-  echo "Zoxide Found"
-fi
+install_zoxide_cd
+
 
 # fuzzy finder
 if ! command_exists fzf; then
@@ -314,12 +426,8 @@ fi
 # Call Install function
 install_git_extras
 
-if ! command_exists lazygit; then
-  echo "Installing LazyGit"
-  brew install jesseduffield/lazygit/lazygit
-else
-  echo "LazyGit Found"
-fi
+# Lazy git
+install_lazy_git
 
 if ! command_exists nc; then
   sudo apt install -y netcat-openbsd
@@ -343,25 +451,19 @@ else
   echo "Mailutils installed"
 fi
 
-if ! command_exists telnet; then
-  sudo apt install -y telnet
-else
-  echo "Telnet installed"
-fi
 
-if ! command_exists envsubst; then
-  sudo apt install -y gettext
-else
-  echo "GetText envsubst installed"
-fi
+install_telnet
+
+install_envsubst
+
 
 # Gpg
+install_gpg
 install_gpg_pinentry
 # Yq
 install_yq
 # Vagrant
 # install_vagrant
-
 install_kind_kube_on_docker
 # Mkcert
 install_mkcert

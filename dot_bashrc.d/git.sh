@@ -50,7 +50,7 @@ fi
 # Alias
 # See also gitconfig alias
 # `call` is a git alias to add, commit, and push and accepts the message
-alias gx='git-exec' # and not git exec as git does a different call that messed up glob expansion
+alias gx='git-exec' # and not git exec if you are working with Cygwin otherwise there is a path problem
 alias gxs='git-exec st'
 alias gxac='git-exec auto-commit'
 alias gd='git diff | nvim'
