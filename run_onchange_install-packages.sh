@@ -6,7 +6,7 @@ set -TCEeuo pipefail
 # Install Package
 # https://www.chezmoi.io/user-guide/use-scripts-to-perform-actions/#install-packages-with-scripts
 # You can do it also declaratively by using a yaml file [Package](https://www.chezmoi.io/user-guide/advanced/install-packages-declaratively/)
-3
+
 # Run with `chezmoi apply` or `chezmoi update`after a file change
 
 # The file run only if it has changed
@@ -20,22 +20,49 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
+# sudo is not available on windows
+# This function executes it only if found
+sudo_safe(){
+  echo "Executing $*"
+  if command -v sudo; then
+    sudo "$@"
+    return
+  fi
+  eval "$*"
+}
+
+# Winget modify the PATH of windows
+# If we are working in a IDE, the path is not up to date
+# We use this function to check if the package is already installed
+winget_package_play(){
+
+  local package_id="$1"
+  # Check if the package is installed
+  if winget list --id "$package_id" &> /dev/null; then
+      echo "Package '$package_id' is installed."
+      return
+  fi
+
+  echo "Winget installing '$package_id'"
+  winget install --exact --id "$package_id"
+
+}
+
 # Binary
 # Version
 # Base
 #
-install_from_github_release(){
+install_from_github_go_release(){
 
-    # https://github.com/brancz/gojsontoyaml/releases/tag/v0.1.0
-    local BINARY="$1" # The project
-    local VERSION="$2"
-    local BASE_URL="$3"
+    local REPO="$1"
+    local BINARY="$2" # The project
+    local VERSION="$3"
     local FINAL_BINARY="${4:-$BINARY}"
     echo "Installing $BINARY version $VERSION"
 
     # Download URL
     ARCHIVE_NAME="${BINARY}_${VERSION}_$(get_os_name)_$(get_cpu_arch_name).tar.gz"
-    DOWNLOAD_URL="$BASE_URL/releases/download/v${VERSION}/$ARCHIVE_NAME"
+    DOWNLOAD_URL="https://github.com/$REPO/releases/download/v${VERSION}/$ARCHIVE_NAME"
     echo "Downloading $ARCHIVE_NAME..."
     # Temporary directory for extraction
     TEMP_DIR=$(mktemp -d)
@@ -60,6 +87,38 @@ install_from_github_release(){
     rm -rf "$TEMP_DIR"
 }
 
+# Install from a exe file
+# Not an archive
+install_from_github_binary(){
+
+    local REPO="$1"
+    local BINARY_NAME=$2 # the target name example: jb
+    local version="$3"
+    local downloadFileName="${4:-$2}" # the file to download. ex: jb-win.exe
+    # Base URL for downloads
+    local BASE_URL="https://github.com/$REPO/releases/download/$version/"
+
+    # Full download URL
+    local DOWNLOAD_URL="${BASE_URL}${downloadFileName}"
+
+    # Installation directory
+    local INSTALL_DIR="/usr/local/bin"
+    # Local bin is not created in a cygwin/git bash env
+    if [ ! -d "$INSTALL_DIR" ]; then
+      INSTALL_DIR="/usr/bin";
+    fi
+
+    # Download the binary directly to the system bin directory
+    echo "Downloading $BINARY_NAME to $INSTALL_DIR/$BINARY_NAME..."
+    sudo_safe curl -L -o "$INSTALL_DIR/$BINARY_NAME" "$DOWNLOAD_URL"
+
+
+    # Make the binary executable
+    sudo_safe chmod +x "$INSTALL_DIR/$BINARY_NAME"
+
+
+}
+
 # Function to check if a package is installed
 package_installed() {
     dpkg -l "$1" >/dev/null 2>&1
@@ -79,11 +138,14 @@ install_git_extras(){
      (
       local WORK_DIR
       WORK_DIR="${TMPDIR:-${TEMP:-${TMP:-/tmp}}}/git-extras"
-      cd "$WORK_DIR";
-      git clone https://github.com/tj/git-extras.git
+      rm -rf "$WORK_DIR"
+      mkdir -p "$WORK_DIR"
+      git clone https://github.com/tj/git-extras.git "$WORK_DIR"
       # checkout the latest tag (optional)
+      cd "$WORK_DIR";
       git checkout "$(git describe --tags "$(git rev-list --tags --max-count=1)")"
-      install.sh
+      chmod +x install.cmd
+      ./install.cmd
       )
       return
   fi
@@ -122,7 +184,7 @@ install_gpg(){
   if [ "$CHEZMOI_OS" == "windows" ]; then
     echo "gpg Windows Installation"
     # used by gopass
-    winget install -e --id GnuPG.Gpg4win
+    winget_package_play GnuPG.Gpg4win
     return
   fi
 
@@ -168,7 +230,7 @@ install_yq(){
     echo "Yq found"
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-    winget install -e --id MikeFarah.yq
+    winget_package_play MikeFarah.yq
     return
   fi
   echo "Installing yq"
@@ -199,7 +261,7 @@ install_kind_kube_on_docker(){
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
     echo "Kind Windows Installation"
-    winget install Kubernetes.kind
+    winget_package_play Kubernetes.kind
     return
   fi
   echo "Brew Installing Kind"
@@ -215,7 +277,7 @@ install_mkcert(){
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
     echo "mkcert Windows Installation"
-    winget install -e --id FiloSottile.mkcert
+    winget_package_play FiloSottile.mkcert
     return
   fi
   # https://github.com/FiloSottile/mkcert?tab=readme-ov-file#linux
@@ -248,13 +310,15 @@ install_git(){
     return
   fi
 
-  echo "Installing Git"
+
   if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Winget Installing Git"
     winget install -e --id Git.Git
     return
   fi
 
-  sudo apt install git
+  echo "Brew Installing Git"
+  brew install git
 
 }
 
@@ -304,21 +368,8 @@ install_jsonnet_bundler_manager(){
       BINARY_NAME="${BINARY_NAME}.exe"
   fi
 
-  # Base URL for downloads
-  BASE_URL="https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.6.0/"
+  install_from_github_binary "jsonnet-bundler/jsonnet-bundler" "jb" "v0.6.0" "jb-windows-amd64.exe"
 
-  # Full download URL
-  DOWNLOAD_URL="${BASE_URL}${BINARY_NAME}"
-
-  # Installation directory
-  INSTALL_DIR="/usr/local/bin"
-
-  # Download the binary directly to the system bin directory
-  echo "Downloading $BINARY_NAME to $INSTALL_DIR/jb..."
-  sudo curl -L -o "$INSTALL_DIR/jb" "$DOWNLOAD_URL"
-
-  # Make the binary executable
-  sudo chmod +x "$INSTALL_DIR/jb"
 
 }
 
@@ -332,26 +383,28 @@ install_go_json_to_yaml(){
     return
   fi
 
-  install_from_github_release "$BINARY" "0.1.0" "https://github.com/brancz/gojsontoyaml"
+  install_from_github_go_release "brancz/gojsontoyaml" "$BINARY" "0.1.0"
 
 }
 
 # https://github.com/google/go-jsonnet
 install_jsonnet(){
 
-  if command_exists "jsonnet"; then
+  local FINAL_BINARY="jsonnet"
+  if command_exists "$FINAL_BINARY"; then
     echo "Jsonnet is already installed"
     return
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
       echo "Jsonnet Windows Installation Not done Skipping"
-      install_from_github_release "go-jsonnet" "0.20.0" "https://github.com/google/go-jsonnet"
+      install_from_github_go_release "google/go-jsonnet" "go-jsonnet" "0.20.0" "$FINAL_BINARY"
       return
   fi
 
   echo "brew jsonnet installation"
   brew install go-jsonnet
+
 }
 
 # https://nix.dev/manual/nix/2.24/installation/
@@ -378,7 +431,7 @@ install_zoxide_cd(){
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
     echo "Zoxide Windows Installation"
-    winget install ajeetdsouza.zoxide
+    winget_package_play "ajeetdsouza.zoxide"
     return
   fi
   echo "Brew Installing Zoxide"
@@ -387,31 +440,53 @@ install_zoxide_cd(){
 }
 
 install_lazy_git(){
-  if [ "$CHEZMOI_OS" == "windows" ]; then
-    echo "LazyGit Windows Installation Not done Skipping"
+
+  if command_exists lazygit; then
+    echo "LazyGit Found"
     return
   fi
-  if ! command_exists lazygit; then
-    echo "Installing LazyGit"
-    brew install jesseduffield/lazygit/lazygit
-  else
-    echo "LazyGit Found"
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "LazyGit Windows Installation"
+      winget_package_play JesseDuffield.lazygit
+      return
   fi
+
+  echo "Brew Installing LazyGit"
+  brew install jesseduffield/lazygit/lazygit
+
 }
 
 install_envsubst(){
+
   if command_exists envsubst; then
     echo "GetText envsubst installed"
     return
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-    echo "envsubst on Windows should be installed with Cygwin"
+    echo "envsubst on Windows should be installed with the GetText Cygwin Package"
     return
   fi
 
   sudo apt install -y gettext
 
+}
+
+# fuzzy finder
+install_fzf(){
+  if command_exists fzf; then
+    echo "Fzf Found"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      # https://github.com/junegunn/fzf#windows-packages
+      echo "Windows fzf Windows Installation"
+      winget_package_play "fzf"
+      return
+  fi
+  echo "Brew Installing Fzf"
+  brew install fzf
 }
 
 install_telnet(){
@@ -422,6 +497,12 @@ install_telnet(){
   if [ "$CHEZMOI_OS" == "windows" ]; then
       echo "Telnet Windows Installation"
       # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc771275(v=ws.10)
+      if ! net session; then
+        echo "To install telnet, you should be in a elevated terminal"
+        echo "Execute"
+        echo "pkgmgr /iu:\"TelnetClient\""
+        return 1
+      fi
       pkgmgr /iu:"TelnetClient"
       return
   fi
@@ -429,71 +510,153 @@ install_telnet(){
   sudo apt install -y telnet
 }
 
-install_git
+# https://rsync.samba.org/download.html
+install_rsync(){
 
-install_zoxide_cd
+  # rsync
+  if command_exists rsync; then
+    echo "Rsync Found"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Rsync Windows Installation should be done via Cygwin"
+    return
+  fi
+  echo "Brew Installing Rsync"
+  brew install rsync
 
+}
 
-# fuzzy finder
-if ! command_exists fzf; then
-  echo "Installing Fzf"
-  brew install fzf
-else
-  echo "Fzf Found"
-fi
+install_tmux(){
+  if command_exists tmux; then
+    echo "Tmux Found"
+    return
+  fi
 
-# rsync
-if ! command_exists rsync; then
-  echo "Installing Rsync"
-  sudo apt install -y rsync
-else
-  echo "Rsync Found"
-fi
-
-# tmux
-if ! command_exists tmux; then
-  echo "Installing Tmux"
   # https://github.com/tmux/tmux/wiki/Installing
-  sudo apt install -y tmux
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Tmux is not supported on Windows"
+      return
+  fi
+
+  echo "Installing Tmux"
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "Tmux: Don't forget to disable the ALT+Fn shortcut on MinTty Wsl/Cygwin"
-else
-  echo "Tmux Found"
-fi
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
-# Call Install function
+  brew install tmux
+
+}
+
+
+# https://sectools.org/tool/netcat/
+# https://netcat.sourceforge.net/
+install_netcat_nmap(){
+  if command_exists nc; then
+    echo "Netcat found"
+    return;
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      # On windows, ncat from nmap
+      # https://nmap.org/ncat/
+      echo "Windows install ncat (via nmap)"
+      winget_package_play Insecure.Nmap
+      return
+  fi
+
+  # https://formulae.brew.sh/formula/netcat
+  brew install netcat
+
+}
+
+# ? A ssh askpass gui prompt
+# https://packages.debian.org/bookworm/ssh-askpass
+# Orphaned: https://tracker.debian.org/pkg/ssh-askpass
+# Do we really need that? Uses nix instead
+install_ssh_askpass(){
+  # Needed with ssh
+  if command_exists ssh-askpass; then
+    echo "ssh-askpass installed"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Ssh askpass is not a windows package"
+    return
+  fi
+  echo "Installing askpass"
+  sudo apt install -y ssh-askpass
+}
+
+install_mail_utils(){
+  # https://mailutils.org
+  if command_exists mail; then
+    echo "Mailutils installed"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Mailutils package Installation should be done from Cygwin"
+    return
+  fi
+
+  # Apt Old
+  #  sudo apt install -y mailutils
+  #  sudo apt install -y libmailutils-dev # mailutils command
+  #  sudo apt install -y mailutils-mda # putmail
+  echo "Brew Install Mailtuils"
+  # https://formulae.brew.sh/formula/mailutils
+  brew install mailutils
+
+}
+
+# https://github.com/Foundry376/Mailspring/tree/master
+install_mail_spring_gui(){
+
+  if command_exists mailspring; then
+    echo "Mail spring installed"
+    return
+  fi
+
+  # https://github.com/Foundry376/Mailspring/tree/master
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Mailspring Windows Installation"
+      # https://winget.run/pkg/Foundry376/Mailspring
+      winget install -e --id Foundry376.Mailspring
+      return
+  fi
+
+  echo "Mailspring Brew Installation"
+  # https://formulae.brew.sh/cask/mailspring#default
+  brew install --cask mailspring
+
+}
+
+## Installation
+
+# Git
+install_git
+# Zoxide cd
+install_zoxide_cd
+# Fuzzy finder
+install_fzf
+# Rsync
+install_rsync
+# tmux
+install_tmux
+# standup
 install_git_extras
-
 # Lazy git
 install_lazy_git
-
-if ! command_exists nc; then
-  sudo apt install -y netcat-openbsd
-else
-  echo "Netcat installed"
-fi
-
-# Needed with ssh
-if ! command_exists ssh-askpass; then
-  sudo apt install -y ssh-askpass
-else
-  echo "ssh-askpass installed"
-fi
-
-# https://mailutils.org
-if ! command_exists mail; then
-  sudo apt install -y mailutils
-  sudo apt install -y libmailutils-dev # mailutils command
-  sudo apt install -y mailutils-mda # putmail
-else
-  echo "Mailutils installed"
-fi
-
-
+# nc / netcat
+install_netcat_nmap
+# Mail Util
+install_mail_utils
+# Telnet
 install_telnet
-
+# Get text subset
 install_envsubst
-
-
 # Gpg
 install_gpg
 install_gpg_pinentry
