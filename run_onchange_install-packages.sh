@@ -1,30 +1,63 @@
 #!/usr/bin/env bash
-
-
-# This script should not run on Windows if there is no interpreter
-# https://www.chezmoi.io/reference/target-types/#scripts-on-windows
-# but WSL install bash.exe at C:\Windows\System32\bash.exe
-if [ "$CHEZMOI_OS" == "windows" ]; then
-  echo "$(basename "$0") - Running from bash Windows, exiting"
-  exit
-fi
-
 # Shebang is mandatory: https://github.com/twpayne/chezmoi/issues/666#issuecomment-612677019
+
+set -TCEeuo pipefail
 
 # Install Package
 # https://www.chezmoi.io/user-guide/use-scripts-to-perform-actions/#install-packages-with-scripts
 # You can do it also declaratively by using a yaml file [Package](https://www.chezmoi.io/user-guide/advanced/install-packages-declaratively/)
-# Run with `chezmoi apply` or `chezmoi update`
+3
+# Run with `chezmoi apply` or `chezmoi update`after a file change
 
 # The file run only if it has changed
 # You can delete the script cache to run it again without changing the content
 # See https://www.chezmoi.io/user-guide/use-scripts-to-perform-actions/#run-a-script-when-the-contents-of-another-file-changes
 #
-echo "Install my Packages"
+echo "$(basename "$0") - Install my Packages"
 
 # Function to check if a command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
+}
+
+# Binary
+# Version
+# Base
+#
+install_from_github_release(){
+
+    # https://github.com/brancz/gojsontoyaml/releases/tag/v0.1.0
+    local BINARY="$1" # The project
+    local VERSION="$2"
+    local BASE_URL="$3"
+    local FINAL_BINARY="${4:-$BINARY}"
+    echo "Installing $BINARY version $VERSION"
+
+    # Download URL
+    ARCHIVE_NAME="${BINARY}_${VERSION}_$(get_os_name)_$(get_cpu_arch_name).tar.gz"
+    DOWNLOAD_URL="$BASE_URL/releases/download/v${VERSION}/$ARCHIVE_NAME"
+    echo "Downloading $ARCHIVE_NAME..."
+    # Temporary directory for extraction
+    TEMP_DIR=$(mktemp -d)
+    curl -L -o "$TEMP_DIR/$ARCHIVE_NAME" "$DOWNLOAD_URL"
+
+    echo "Extracting archive..."
+    tar -xzf "$TEMP_DIR/$ARCHIVE_NAME" -C "$TEMP_DIR"
+    # Find the binary in the extracted files
+    BINARY_PATH=$(find "$TEMP_DIR" -name "${FINAL_BINARY}" -type f)
+    # Check if binary was found
+    if [ -z "$BINARY_PATH" ]; then
+        echo "Error: Could not find '${FINAL_BINARY}' binary in the archive"
+        rm -rf "$TEMP_DIR"
+        exit 1
+    fi
+    # Installation directory
+    INSTALL_DIR="/usr/local/bin"
+    echo "Installing to $INSTALL_DIR/$FINAL_BINARY..."
+    sudo cp "$BINARY_PATH" "$INSTALL_DIR/$FINAL_BINARY"
+    sudo chmod +x "$INSTALL_DIR/$FINAL_BINARY"
+    # Clean up temporary files
+    rm -rf "$TEMP_DIR"
 }
 
 # Function to check if a package is installed
@@ -35,22 +68,49 @@ package_installed() {
 install_git_extras(){
   ## https://github.com/tj/git-extras/blob/main/Installation.md
   ## Only brew is maintained by the author
-  if ! command_exists git-standup; then
-    echo "Installing Git Extras"
-    brew install git-extras
-  else
+  if command_exists git-standup; then
     echo "Git Extra founds"
+    return
   fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      # https://github.com/tj/git-extras/blob/main/Installation.md#windows
+      # Subshell to not change the working directory
+     (
+      local WORK_DIR
+      WORK_DIR="${TMPDIR:-${TEMP:-${TMP:-/tmp}}}/git-extras"
+      cd "$WORK_DIR";
+      git clone https://github.com/tj/git-extras.git
+      # checkout the latest tag (optional)
+      git checkout "$(git describe --tags "$(git rev-list --tags --max-count=1)")"
+      install.sh
+      )
+      return
+  fi
+
+  echo "Installing Git Extras"
+  brew install git-extras
+
 }
 
 install_helm(){
+
   # See get Helms section at https://helm.sh/
-  if ! command_exists helm; then
-    echo "Installing Helm"
-    brew install helm
-  else
+  if command_exists helm; then
     echo "Helm founds"
+    return
   fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Helm Windows Installation"
+      # https://helm.sh/docs/intro/install/#from-winget-windows
+      winget install Helm.Helm
+      return
+  fi
+
+  echo "Brew Installing Helm"
+  brew install helm
+
 }
 
 install_gpg(){
@@ -138,12 +198,12 @@ install_kind_kube_on_docker(){
     return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-    echo "Kind Windows Installation Not done Skipping"
+    echo "Kind Windows Installation"
+    winget install Kubernetes.kind
     return
   fi
-  echo "Installing Kind"
+  echo "Brew Installing Kind"
   brew install kind
-
 
 }
 
@@ -154,7 +214,8 @@ install_mkcert(){
     return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-    echo "mkcert Windows Installation Not done Skipping"
+    echo "mkcert Windows Installation"
+    winget install -e --id FiloSottile.mkcert
     return
   fi
   # https://github.com/FiloSottile/mkcert?tab=readme-ov-file#linux
@@ -175,7 +236,7 @@ install_cert_manager_cmctl(){
     return
   fi
 
-  echo "Installing cmctl"
+  echo "Brew Installing cmctl"
   brew install cmctl
 
 }
@@ -266,55 +327,31 @@ install_go_json_to_yaml(){
 
   local BINARY="gojsontoyaml"
 
-  if ! command_exists "$BINARY"; then
-
-    # https://github.com/brancz/gojsontoyaml/releases/tag/v0.1.0
-    local VERSION="0.1.0"
-    echo "Installing $BINARY version $VERSION"
-
-    # Download URL
-    ARCHIVE_NAME="${BINARY}_${VERSION}_$(get_os_name)_$(get_cpu_arch_name).tar.gz"
-    DOWNLOAD_URL="https://github.com/brancz/gojsontoyaml/releases/download/v${VERSION}/$ARCHIVE_NAME"
-    echo "Downloading $ARCHIVE_NAME..."
-    # Temporary directory for extraction
-    TEMP_DIR=$(mktemp -d)
-    curl -L -o "$TEMP_DIR/$ARCHIVE_NAME" "$DOWNLOAD_URL"
-
-    echo "Extracting archive..."
-    tar -xzf "$TEMP_DIR/$ARCHIVE_NAME" -C "$TEMP_DIR"
-    # Find the binary in the extracted files
-    BINARY_PATH=$(find "$TEMP_DIR" -name "${BINARY}" -type f)
-    # Check if binary was found
-    if [ -z "$BINARY_PATH" ]; then
-        echo "Error: Could not find '${BINARY}' binary in the archive"
-        rm -rf "$TEMP_DIR"
-        exit 1
-    fi
-    # Installation directory
-    INSTALL_DIR="/usr/local/bin"
-    echo "Installing to $INSTALL_DIR/$BINARY..."
-    sudo cp "$BINARY_PATH" "$INSTALL_DIR/$BINARY"
-    sudo chmod +x "$INSTALL_DIR/$BINARY"
-    # Clean up temporary files
-    rm -rf "$TEMP_DIR"
-
+  if command_exists "$BINARY"; then
+    echo "$BINARY is already installed"
+    return
   fi
 
-  echo "$BINARY is installed"
+  install_from_github_release "$BINARY" "0.1.0" "https://github.com/brancz/gojsontoyaml"
+
 }
 
 # https://github.com/google/go-jsonnet
 install_jsonnet(){
-  if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Jsonnet Windows Installation Not done Skipping"
-      return
-  fi
-  if ! command_exists "jsonnet"; then
-    echo "Installing jsonnet"
-    brew install go-jsonnet
+
+  if command_exists "jsonnet"; then
+    echo "Jsonnet is already installed"
+    return
   fi
 
-  echo "jsonnet is installed"
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Jsonnet Windows Installation Not done Skipping"
+      install_from_github_release "go-jsonnet" "0.20.0" "https://github.com/google/go-jsonnet"
+      return
+  fi
+
+  echo "brew jsonnet installation"
+  brew install go-jsonnet
 }
 
 # https://nix.dev/manual/nix/2.24/installation/
