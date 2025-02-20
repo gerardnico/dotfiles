@@ -17,7 +17,8 @@ echo "$(basename "$0") - Install my Packages"
 
 # Function to check if a command exists
 command_exists() {
-    command -v "$1" >/dev/null 2>&1
+    # start to check subcommand such as `kubectl oidc-login`
+    command -v "$@" >/dev/null 2>&1
 }
 
 # sudo is not available on windows
@@ -124,6 +125,21 @@ package_installed() {
     dpkg -l "$1" >/dev/null 2>&1
 }
 
+install_kubectl_oidc_login(){
+  if command_exists kubectl oidc-login; then
+      echo "Kubectl oidc-login found"
+      return
+  fi
+
+  if ! command_exists kubectl; then
+    echo "Kubectl was not found. oidc-login cannot be installed"
+    return 1
+  fi
+  # Windows, linux, ...
+  # https://github.com/int128/kubelogin/tree/master?tab=readme-ov-file#setup
+  kubectl krew install oidc-login
+
+}
 install_git_extras(){
   ## https://github.com/tj/git-extras/blob/main/Installation.md
   ## Only brew is maintained by the author
@@ -679,3 +695,5 @@ install_jsonnet
 install_nix
 # Helm
 install_helm
+# Install kubectl and oidc-login
+install_kubectl_oidc_login
