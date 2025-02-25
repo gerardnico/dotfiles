@@ -1,23 +1,10 @@
-[user]
-	name = Nicolas GERARD
-	email = gerardnico@gmail.com
-[core]
-    # https://git-scm.com/docs/gitattributes#_eol
-    # LF line endings on checkouts
-    eol = lf
-    # https://git-scm.com/docs/gitattributes#_end_of_line_conversion
-    # No CRLF at all o
-    # This feature means that it will push with LF and check out with CRLF
-    # We don't want that on WSL
-    # Idea gives a warning, ignore it
-	autocrlf = false
-[init]
-	defaultBranch = main
+# See also: https://blog.gitbutler.com/how-git-core-devs-configure-git/
+
 [alias]
     # https://git-scm.com/book/ms/v2/Git-Basics-Git-Aliases
     # Since version 1.5.0, Git supports aliases executing non-git commands, by prefixing the value with "!"
     # After the !, this is just a script/command
-    # check example with parameters 
+    # check example with parameters
     # https://github.com/mrnugget/dotfiles/blob/c4624ed521d539856bcf764f04a295bb19093566/gitconfig#L13-L17
     ## fuzzy chechout https://github.com/mrnugget/dotfiles/blob/c4624ed521d539856bcf764f04a295bb19093566/zshrc#L162-L169
     ac = "!git-auto-commit"
@@ -44,94 +31,104 @@
     un = reset --hard HEAD
     uh = reset --hard HEAD^
 
-[pull]
-	rebase = true
-
-# 
-# from https://blog.gitbutler.com/how-git-core-devs-configure-git/
-# clearly makes git better
+[branch]
+    # sorts the list by the most recent commit date (so probably more interesting at the top) rather than by alpha order.
+    sort = -committerdate
 
 [column]
-# put the branch names in a column format so you can see more per screen.
-# affects the output of other listing commands (clean, status, tag)
-        ui = auto
-[branch]
-# sorts the list by the most recent commit date (so probably more interesting at the top) rather than by alpha order. 
-        sort = -committerdate
-[tag]
-# Nobody wants 0.5.101 to come after 0.5.1000, but that’s alpha order
-# treat dotted version numbers as a series of integer values for sorting purposes.
-        sort = version:refname
-[init]
-        defaultBranch = main
-[diff]
-# default Git will use an old, fast, pretty reliable diff algorithm called "myers diff".
-# it was first published in a paper in 1986, so it’s almost 40 years old now.
-# Git actually ships with 4 built in diff algorithms it can use: myers, minimal, patience and histogram
-# histogram or patience might make better defaults
-        algorithm = histogram
-        colorMoved = plain
-        mnemonicPrefix = true
-        renames = true
-[push]
-# simple default is built more or less for centralized workflows and by default pushes the current branch to the same name on the remote. 
-        default = simple
-# to avoid fatal: The current branch my-branch-name has no upstream branch.
-        autoSetupRemote = true
-# push all tags that you have locally that aren’t on the server, every time you push anything. 
-        followTags = true
-        
-[fetch]
-# make sure we delete branch origin/blah if blah is deleted on the server, 
-# and also do it automatically for all the remotes that we have configured. 
-        prune = true
-        pruneTags = true
-        all = true
+    # put the branch names in a column format so you can see more per screen.
+    # affects the output of other listing commands (clean, status, tag)
+    ui = auto
 
-# why the hell not?
+[commit]
+    # give more context by putting the whole diff output in the default commit  message
+    # the diff will be removed from the commit message (everything under the hilarious -- >8 -- "scissors" line)
+    verbose = true
+
+[core]
+    # https://git-scm.com/docs/gitattributes#_eol
+    # LF line endings on checkouts
+    eol = lf
+    # https://git-scm.com/docs/gitattributes#_end_of_line_conversion
+    # No CRLF at all o
+    # This feature means that it will push with LF and check out with CRLF
+    # We don't want that on WSL
+    # Idea gives a warning, ignore it
+	autocrlf = false
+    # a ~/.gitignore file with global values.
+    # note that Git will already look for global ignore values in the following two places: ~/git/ignore and ~/.config/git/ignore
+    excludesfile = ~/.gitignore
+    # run a filesystem watcher/monitor (per repository) that notices file changes and updates a cache so that git status doesn’t have to crawl every file and see if anything changed via a thousand mtime stat calls, it can just look at a simple log of file changes.
+    # this will run a single process per repository that you are active in, which can be a lot. They mostly don't do much as they're event based, so it shouldn't affect memory or CPU noticeably,
+    # fsmonitor = true
+    # untrackedCache = true
+
+[diff]
+    # default Git will use an old, fast, pretty reliable diff algorithm called "myers diff".
+    # it was first published in a paper in 1986, so it’s almost 40 years old now.
+    # Git actually ships with 4 built in diff algorithms it can use: myers, minimal, patience and histogram
+    # histogram or patience might make better defaults
+    algorithm = histogram
+    colorMoved = plain
+    mnemonicPrefix = true
+    renames = true
+
+[fetch]
+    # make sure we delete branch origin/blah if blah is deleted on the server,
+    # and also do it automatically for all the remotes that we have configured.
+    prune = true
+    pruneTags = true
+    all = true
+
+[init]
+    # New default repo branch is named main
+	defaultBranch = main
 
 [help]
-# guess what you meant and try to run it.
-# https://blog.gitbutler.com/why-is-git-autocorrect-too-fast-for-formula-one-drivers/
-        autocorrect = prompt
-[commit]
-# give more context by putting the whole diff output in the default commit  message
-# the diff will be removed from the commit message (everything under the hilarious -- >8 -- "scissors" line)
-        verbose = true
+    # guess what you meant and try to run it.
+    # https://blog.gitbutler.com/why-is-git-autocorrect-too-fast-for-formula-one-drivers/
+    autocorrect = prompt
+
+[merge]
+    # Git has nearly always had diff3 as a strategy. I'm recommending zdiff3 here, which stands for "zealous diff3"
+    # in addition to the <<<<<< and >>>>>> sections that show you how you changed the block and how the other person changed it, it adds a ||||||| block that shows you what the block looked like before either of you changed it.
+    # (just 'diff3' if git version < 2.3)
+    # conflictstyle = zdiff3
+
+[pull]
+    # make git pull --rebase, default
+	rebase = true
+
+[push]
+    # simple default is built more or less for centralized workflows and by default pushes the current branch to the same name on the remote.
+    default = simple
+    # to avoid fatal: The current branch my-branch-name has no upstream branch.
+    autoSetupRemote = true
+    # push all tags that you have locally that aren’t on the server, every time you push anything.
+    followTags = true
 
 # Reuse recorded resolutions
 # setting are only useful if you’re doing rebases with conflicts over and over again.
 # https://blog.gitbutler.com/git-tips-1-theres-a-git-config-for-that/#reuse-recorded-resolution
 [rerere]
-# make sure it records the before and after states of rebase conflicts
-        enabled = true
-# automatically re-apply the resolutions if it sees them again. 
-        autoupdate = true
+    # make sure it records the before and after states of rebase conflicts
+    enabled = true
+    # automatically re-apply the resolutions if it sees them again.
+    autoupdate = true
 
-[core]
-# a ~/.gitignore file with global values.
-# note that Git will already look for global ignore values in the following two places: ~/git/ignore and ~/.config/git/ignore
-        excludesfile = ~/.gitignore
 
 [rebase]
-# https://blog.gitbutler.com/git-autosquash/
-        autoSquash = true
-        autoStash = true
-# takes stacked refs in a branch and makes sure they're also moved when a branch is rebased.
-        updateRefs = true
+    # https://blog.gitbutler.com/git-autosquash/
+    autoSquash = true
+    autoStash = true
+    # takes stacked refs in a branch and makes sure they're also moved when a branch is rebased.
+    updateRefs = true
 
-# a matter of taste (uncomment if you dare)
+[tag]
+    # Nobody wants 0.5.101 to come after 0.5.1000, but that’s alpha order
+    # treat dotted version numbers as a series of integer values for sorting purposes.
+    sort = version:refname
 
-[core]
-# run a filesystem watcher/monitor (per repository) that notices file changes and updates a cache so that git status doesn’t have to crawl every file and see if anything changed via a thousand mtime stat calls, it can just look at a simple log of file changes.
-# this will run a single process per repository that you are active in, which can be a lot. They mostly don't do much as they're event based, so it shouldn't affect memory or CPU noticeably,
-        # fsmonitor = true
-        # untrackedCache = true
-[merge]
-# Git has nearly always had diff3 as a strategy. I'm recommending zdiff3 here, which stands for "zealous diff3"
-# in addition to the <<<<<< and >>>>>> sections that show you how you changed the block and how the other person changed it, it adds a ||||||| block that shows you what the block looked like before either of you changed it.
-        # (just 'diff3' if git version < 2.3)
-        # conflictstyle = zdiff3 
-[pull]
-# make git pull --rebase, default
-        # rebase = true
+[user]
+	name = Nicolas GERARD
+	email = gerardnico@gmail.com
