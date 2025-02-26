@@ -18,6 +18,7 @@ echo "$(basename "$0") - Install my Packages"
 # Function to check if a command exists
 command_exists() {
     # start to check subcommand such as `kubectl oidc-login`
+    # does not work always for subcommand, you could just do `if command -help >/dev/null 2>1; then`
     command -v "$@" >/dev/null 2>&1
 }
 
@@ -126,6 +127,7 @@ package_installed() {
 }
 
 install_kubectl_oidc_login(){
+
   if command_exists kubectl oidc-login; then
       echo "Kubectl oidc-login found"
       return
@@ -141,6 +143,26 @@ install_kubectl_oidc_login(){
 
 }
 
+install_helm_plugin_schema(){
+
+  # The command exists does work with helm plugin ..
+  # Testing the help option instead
+  # shellcheck disable=SC2210
+  if helm schema --help >/dev/null 2>1; then
+      echo "helm schema found"
+      return
+  fi
+
+  if ! command_exists "helm"; then
+    echo "Helm was not found. schema cannot be installed"
+    return 1
+  fi
+
+  # Windows, linux, ...
+  # https://github.com/losisin/helm-values-schema-json#installation
+  helm plugin install https://github.com/losisin/helm-values-schema-json.git
+
+}
 install_helm_readme_generator(){
 
   if command_exists readme-generator-for-helm; then
@@ -718,5 +740,7 @@ install_nix
 install_helm
 # Install The readme generator
 install_helm_readme_generator
+# Install Helm Schema
+install_helm_plugin_schema
 # Install kubectl and oidc-login
 install_kubectl_oidc_login
