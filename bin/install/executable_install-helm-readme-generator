@@ -23,11 +23,10 @@ git clone https://github.com/bitnami/readme-generator-for-helm
 cd ./readme-generator-for-helm
 git checkout "$VERSION"
 npm install
-# Why Prefix
-# https://nixos.wiki/wiki/Node.js#Using_npm_install_-g_fails
-npm install --prefix ~/.npm-global -g @yao-pkg/pkg
-export PATH=$PATH:$HOME/.npm-global/bin
-pkg . -o "$BINARY"
+# Install without g
+# https://nixos.wiki/wiki/Node.js#Avoid_using_-g
+npm install @yao-pkg/pkg
+node_modules/.bin/pkg . -o "$BINARY"
 
 
 echo "Installing to $INSTALL_DIR/$BINARY..."
