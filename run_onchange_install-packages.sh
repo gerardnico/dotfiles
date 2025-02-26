@@ -140,6 +140,25 @@ install_kubectl_oidc_login(){
   kubectl krew install oidc-login
 
 }
+
+install_helm_readme_generator(){
+
+  if command_exists readme-generator-for-helm; then
+      echo "readme-generator-for-helm founds"
+      return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "readme-generator-for-helm Windows Installation not supported"
+      return
+  fi
+
+  # Nix script
+  echo "readme-generator-for-helm not found, installation"
+  "$HOME"/bin/install/install-helm-readme-generator
+  echo "readme-generator-for-helm installed"
+
+}
 install_git_extras(){
   ## https://github.com/tj/git-extras/blob/main/Installation.md
   ## Only brew is maintained by the author
@@ -195,6 +214,7 @@ install_gpg(){
 
   if  command_exists gpg; then
       echo "gpg command found"
+      return
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
@@ -244,6 +264,7 @@ install_gpg_pinentry(){
 install_yq(){
   if command_exists yq; then
     echo "Yq found"
+    return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
     winget_package_play MikeFarah.yq
@@ -695,5 +716,7 @@ install_jsonnet
 install_nix
 # Helm
 install_helm
+# Install The readme generator
+install_helm_readme_generator
 # Install kubectl and oidc-login
 install_kubectl_oidc_login

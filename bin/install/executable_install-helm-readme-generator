@@ -1,0 +1,37 @@
+#!/usr/bin/env nix-shell
+#! nix-shell -i bash
+#! nix-shell -p bash git openssl nodejs_22
+# Nix package is the env NIX_PATH
+# We don't use `-i bash --pure` for now as we get: TLS connect error: error:80000002:system library::No such file or directory
+
+# Note:
+# Install readme-generator-for-helm
+# https://github.com/bitnami/readme-generator-for-helm/tree/2.7.0?tab=readme-ov-file#single-binary
+
+# Tested with nodejs_22
+# as stated in the https://github.com/bitnami/readme-generator-for-helm/tree/2.7.0?tab=readme-ov-file#requirements
+
+set -TCEeuo pipefail
+
+VERSION=2.7.0
+INSTALL_DIR="/usr/local/bin"
+BINARY="readme-generator-for-helm"
+TEMP_DIR=$(mktemp -d)
+
+cd "$TEMP_DIR"
+git clone https://github.com/bitnami/readme-generator-for-helm
+cd ./readme-generator-for-helm
+git checkout "$VERSION"
+npm install
+# Why Prefix
+# https://nixos.wiki/wiki/Node.js#Using_npm_install_-g_fails
+npm install --prefix ~/.npm-global -g @yao-pkg/pkg
+export PATH=$PATH:$HOME/.npm-global/bin
+pkg . -o "$BINARY"
+
+
+echo "Installing to $INSTALL_DIR/$BINARY..."
+sudo cp "$BINARY" "$INSTALL_DIR/$BINARY"
+sudo chmod +x "$INSTALL_DIR/$BINARY"
+# Clean up temporary files
+rm -rf "$TEMP_DIR"
