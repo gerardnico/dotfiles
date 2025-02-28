@@ -143,25 +143,30 @@ install_kubectl_oidc_login(){
 
 }
 
-install_helm_plugin_schema(){
 
-  # The command exists does work with helm plugin ..
-  # Testing the help option instead
-  # shellcheck disable=SC2210
-  if helm schema --help >/dev/null 2>1; then
-      echo "helm schema found"
-      return
-  fi
+install_helm_plugin_schema(){
 
   if ! command_exists "helm"; then
     echo "Helm was not found. schema cannot be installed"
     return 1
   fi
 
+  # The command exists does work with helm plugin ..
+  # Testing the help option instead
+  # shellcheck disable=SC2210
+  if helm schema --help > /dev/null; then
+      echo "Helm schema plugin founds"
+      return
+  fi
+
   # Windows, linux, ...
-  # https://github.com/losisin/helm-values-schema-json#installation
+  # https://github.com/dadav/helm-schema#installation
   echo "helm schema installation"
-  helm plugin install https://github.com/losisin/helm-values-schema-json.git
+  helm plugin install https://github.com/dadav/helm-schema
+
+  # Deprecated
+  # https://github.com/losisin/helm-values-schema-json#installation
+  # helm plugin install https://github.com/losisin/helm-values-schema-json.git
 
 }
 
@@ -688,6 +693,20 @@ install_mail_utils(){
 
 }
 
+# Pre-commit
+# https://pre-commit.com/#installation
+install_pre_commit(){
+  if command_exists pre-commit; then
+     echo "Pre-commit already installed"
+     return
+  fi
+
+  echo "Pre-commit installation"
+  pip install pre-commit
+  echo "Pre-commit installed"
+
+}
+
 # https://github.com/Foundry376/Mailspring/tree/master
 install_mail_spring_gui(){
 
@@ -710,57 +729,74 @@ install_mail_spring_gui(){
 
 }
 
-## Installation
 
-# Git
-install_git
-# Zoxide cd
-install_zoxide_cd
-# Fuzzy finder
-install_fzf
-# Rsync
-install_rsync
-# tmux
-install_tmux
-# standup
-install_git_extras
-# Lazy git
-install_lazy_git
-# nc / netcat
-install_netcat_nmap
-# Mail Util
-install_mail_utils
-# Telnet
-install_telnet
-# Get text subset
-install_envsubst
-# Gpg
-install_gpg
-install_gpg_pinentry
-# Yq
-install_yq
-# Vagrant
-# install_vagrant
-install_kind_kube_on_docker
-# Mkcert
-install_mkcert
-# Cert manager cmctl
-install_cert_manager_cmctl
-# Install jsonnet bundler (package manager)
-install_jsonnet_bundler_manager
-# Install utility gojsontoyaml
-install_go_json_to_yaml
-# Install jsonnet
-install_jsonnet
-# Install nix
-install_nix
-# Helm
-install_helm
-# Install The readme generator
-install_helm_readme_generator
-# Install Helm Schema
-install_helm_plugin_schema
-# Install kubectl and oidc-login
-install_kubectl_oidc_login
-# Install swaks email client
-install_swaks
+## Installation
+main(){
+
+  # For python installation, the venv should be configured
+  local PYTHON_CONF="$HOME/.bashrc.d/python.sh"
+  if [ ! -f "$PYTHON_CONF" ]; then
+    echo "Python venv conf file was not found ($PYTHON_CONF)"
+    return 1
+  fi
+  # shellcheck disable=SC1090
+  source "$PYTHON_CONF"
+
+  # Pre-commit
+  install_pre_commit
+
+  # Git
+  install_git
+  # Zoxide cd
+  install_zoxide_cd
+  # Fuzzy finder
+  install_fzf
+  # Rsync
+  install_rsync
+  # tmux
+  install_tmux
+  # standup
+  install_git_extras
+  # Lazy git
+  install_lazy_git
+  # nc / netcat
+  install_netcat_nmap
+  # Mail Util
+  install_mail_utils
+  # Telnet
+  install_telnet
+  # Get text subset
+  install_envsubst
+  # Gpg
+  install_gpg
+  install_gpg_pinentry
+  # Yq
+  install_yq
+  # Vagrant
+  # install_vagrant
+  install_kind_kube_on_docker
+  # Mkcert
+  install_mkcert
+  # Cert manager cmctl
+  install_cert_manager_cmctl
+  # Install jsonnet bundler (package manager)
+  install_jsonnet_bundler_manager
+  # Install utility gojsontoyaml
+  install_go_json_to_yaml
+  # Install jsonnet
+  install_jsonnet
+  # Install nix
+  install_nix
+  # Helm
+  install_helm
+  # Install The readme generator
+  install_helm_readme_generator
+  # Install Helm Schema
+  install_helm_plugin_schema
+  # Install kubectl and oidc-login
+  install_kubectl_oidc_login
+  # Install swaks email client
+  install_swaks
+}
+
+main
