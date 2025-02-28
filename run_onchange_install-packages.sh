@@ -170,8 +170,23 @@ install_helm_plugin_schema(){
 
 }
 
+install_go_task(){
+  if command_exists task; then
+        echo "task founds"
+        return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "tasks installation on Windows"
+      winget install Task.Task
+      return
+  fi
+  echo "installing brew task"
+  brew install go-task/tap/go-task
+  echo "tasks installed"
+}
+
 # https://jetmore.org/john/code/swaks/installation.html
-install_swaks(){
+install_mail_swaks(){
 
   if command_exists swaks; then
       echo "swaks founds"
@@ -742,6 +757,9 @@ main(){
   # shellcheck disable=SC1090
   source "$PYTHON_CONF"
 
+  # Task Runner
+  install_go_task
+
   # Pre-commit
   install_pre_commit
 
@@ -796,7 +814,7 @@ main(){
   # Install kubectl and oidc-login
   install_kubectl_oidc_login
   # Install swaks email client
-  install_swaks
+  install_mail_swaks
 }
 
 main
