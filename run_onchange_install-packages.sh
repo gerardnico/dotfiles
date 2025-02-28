@@ -160,9 +160,27 @@ install_helm_plugin_schema(){
 
   # Windows, linux, ...
   # https://github.com/losisin/helm-values-schema-json#installation
+  echo "helm schema installation"
   helm plugin install https://github.com/losisin/helm-values-schema-json.git
 
 }
+
+# https://jetmore.org/john/code/swaks/installation.html
+install_swaks(){
+
+  if command_exists swaks; then
+      echo "swaks founds"
+      return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "swaks installation on Windows not supported"
+      return
+  fi
+  echo "installing swaks"
+  brew install swaks
+  echo "swaks installed"
+}
+
 install_helm_readme_generator(){
 
   if command_exists readme-generator-for-helm; then
@@ -744,3 +762,5 @@ install_helm_readme_generator
 install_helm_plugin_schema
 # Install kubectl and oidc-login
 install_kubectl_oidc_login
+# Install swaks email client
+install_swaks
