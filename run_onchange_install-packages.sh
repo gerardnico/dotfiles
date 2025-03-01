@@ -143,26 +143,27 @@ install_kubectl_oidc_login(){
 
 }
 
+install_helm_plugin(){
 
-install_helm_plugin_schema(){
-
+  local subcommand=$1
+  local url=$2
   if ! command_exists "helm"; then
-    echo "Helm was not found. schema cannot be installed"
+    echo "Helm was not found. $subcommand plugin cannot be installed"
     return 1
   fi
 
   # The command exists does work with helm plugin ..
   # Testing the help option instead
   # shellcheck disable=SC2210
-  if helm schema --help > /dev/null; then
-      echo "Helm schema plugin founds"
+  if helm "$subcommand" --help >/dev/null 2>&1 ; then
+      echo "Helm diff plugin founds"
       return
   fi
 
   # Windows, linux, ...
   # https://github.com/dadav/helm-schema#installation
-  echo "helm schema installation"
-  helm plugin install https://github.com/dadav/helm-schema
+  echo "helm $subcommand installation"
+  helm plugin install "$url"
 
   # Deprecated
   # https://github.com/losisin/helm-values-schema-json#installation
@@ -170,35 +171,37 @@ install_helm_plugin_schema(){
 
 }
 
+
+# https://taskfile.dev/installation/
 install_go_task(){
   if command_exists task; then
-        echo "task founds"
+        echo "Task founds"
         return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "tasks installation on Windows"
+      echo "Tasks installation on Windows"
       winget install Task.Task
       return
   fi
-  echo "installing brew task"
+  echo "Installing brew task"
   brew install go-task/tap/go-task
-  echo "tasks installed"
+  echo "Tasks installed"
 }
 
 # https://jetmore.org/john/code/swaks/installation.html
 install_mail_swaks(){
 
   if command_exists swaks; then
-      echo "swaks founds"
+      echo "Swaks founds"
       return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "swaks installation on Windows not supported"
+      echo "Swaks installation on Windows not supported"
       return
   fi
-  echo "installing swaks"
+  echo "Installing swaks"
   brew install swaks
-  echo "swaks installed"
+  echo "Swaks installed"
 }
 
 install_helm_readme_generator(){
@@ -810,7 +813,8 @@ main(){
   # Install The readme generator
   install_helm_readme_generator
   # Install Helm Schema
-  install_helm_plugin_schema
+  install_helm_plugin 'schema' 'https://github.com/dadav/helm-schema'
+  install_helm_plugin 'diff' 'https://github.com/databus23/helm-diff'
   # Install kubectl and oidc-login
   install_kubectl_oidc_login
   # Install swaks email client
