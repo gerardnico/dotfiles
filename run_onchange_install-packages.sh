@@ -171,7 +171,24 @@ install_helm_plugin(){
 
 }
 
+# Postal Installation Helper
+# https://docs.postalserver.io/getting-started/prerequisites#git-installation-helper-repository
+install_postal(){
+  if command_exists postal; then
+      echo "Postal founds"
+      return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      # it's bash script, should work
+      echo "Sorry postal installation on Windows not yet done"
+      return
+  fi
+  echo "Postal installation"
+  sudo git clone https://github.com/postalserver/install /opt/postal/install
+  sudo ln -s /opt/postal/install/bin/postal /usr/bin/postal
+  echo "Postal installation done"
 
+}
 # https://taskfile.dev/installation/
 install_go_task(){
   if command_exists task; then
@@ -819,6 +836,8 @@ main(){
   install_kubectl_oidc_login
   # Install swaks email client
   install_mail_swaks
+  # Install postal helper
+  install_postal
 }
 
 main
