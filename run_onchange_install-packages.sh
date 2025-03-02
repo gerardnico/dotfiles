@@ -270,6 +270,27 @@ install_git_extras(){
 
 }
 
+# https://github.com/norwoodj/helm-docs?tab=readme-ov-file#installation
+install_helm_docs(){
+  # See get Helms section at https://helm.sh/
+  if command_exists helm-docs; then
+    echo "Helm Docs founds"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Helm docs Windows Installation not yet implemented"
+      # should be
+      # docker run --rm --volume "$(pwd):/helm-docs" -u $(id -u) jnorwood/helm-docs:latest
+      return
+  fi
+
+  echo "Brew Installing Helm Docs"
+  brew install norwoodj/tap/helm-docs
+  echo "Helm Docs Installed"
+
+}
+
 install_helm(){
 
   # See get Helms section at https://helm.sh/
@@ -827,8 +848,10 @@ main(){
   install_nix
   # Helm
   install_helm
-  # Install The readme generator
-  install_helm_readme_generator
+  # Helm Docs
+  install_helm_docs
+  # Install The readme generator (Deprecated)
+  # install_helm_readme_generator
   # Install Helm Schema
   install_helm_plugin 'schema' 'https://github.com/dadav/helm-schema'
   install_helm_plugin 'diff' 'https://github.com/databus23/helm-diff'
