@@ -189,6 +189,43 @@ install_postal(){
   echo "Postal installation done"
 
 }
+
+# https://www.libspf2.net/
+# https://github.com/shevek/libspf2/
+install_email_spfquery(){
+  if command_exists SpfQuery; then
+      echo "SpfQuery founds"
+      return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      # should work on windows
+      # https://www.libspf2.net/download.html
+      # libsrs2 uses GNU autoconf and is known to compile on BSD, Linux, Solaris, OS/X and Windows.
+      echo "Sorry SpfQuery installation on Windows not yet done"
+      return
+  fi
+  echo "SpfQuery installation"
+  # no brew package
+  sudo apt install -y spfquery
+  echo "SpfQuery installation done"
+
+
+}
+# Return all data
+install_email_checkdmarc(){
+  if command_exists checkdmarc; then
+      echo "checkdmarc founds"
+      return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Sorry checkdmarc installation on Windows not yet done"
+      return
+  fi
+  echo "Checkdmarc installation"
+  brew install checkdmarc
+  echo "Checkdmarc installation done"
+}
+
 # https://taskfile.dev/installation/
 install_go_task(){
   if command_exists task; then
@@ -797,6 +834,9 @@ main(){
   fi
   # shellcheck disable=SC1090
   source "$PYTHON_CONF"
+
+  # SpfQuery
+  install_email_spfquery
 
   # Task Runner
   install_go_task
