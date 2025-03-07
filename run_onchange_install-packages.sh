@@ -193,7 +193,7 @@ install_postal(){
 # https://www.libspf2.net/
 # https://github.com/shevek/libspf2/
 install_email_spfquery(){
-  if command_exists SpfQuery; then
+  if command_exists spfquery; then
       echo "SpfQuery founds"
       return
   fi
@@ -226,6 +226,20 @@ install_email_checkdmarc(){
   echo "Checkdmarc installation done"
 }
 
+# https://fly.io/docs/flyctl/install/
+install_flyctl(){
+  if command_exists flyctl; then
+        echo "flyctl founds"
+        return
+    fi
+    if [ "$CHEZMOI_OS" == "windows" ]; then
+        echo "Sorry flyctl installation on Windows not yet done"
+        return
+    fi
+    echo "flyctl installation"
+    brew install flyctl
+    echo "flyctl installation done"
+}
 # https://taskfile.dev/installation/
 install_go_task(){
   if command_exists task; then
@@ -834,6 +848,9 @@ main(){
   fi
   # shellcheck disable=SC1090
   source "$PYTHON_CONF"
+
+  # FlyCtl
+  install_flyctl
 
   # SpfQuery
   install_email_spfquery
