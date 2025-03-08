@@ -80,9 +80,10 @@ export GIT_X_REPOS_DIR="$HOME/code"
 # Brew Tap
 # export to be able to query them with env
 export HOMEBREW_TAP_HOME="/home/linuxbrew/.linuxbrew/Homebrew/Library/Taps/gerardnico/homebrew-tap"
+export HOMEBREW_ERALDY_TAP_HOME="/home/linuxbrew/.linuxbrew/Homebrew/Library/Taps/eraldyhq/homebrew-tap"
 # Ansible collection
 # path is not directly the collection directory (https://docs.ansible.com/ansible/latest/reference_appendices/config.html#collections-paths)
 # export to be able to query them with env
 export ANSIBLE_X_COLLECTION_PATH="$HOME/.ansible/collections/ansible_collections/ans_e/ans_e_base"
 # Path
-export GIT_X_REPOS_PATH="$HOMEBREW_TAP_HOME:$ANSIBLE_X_COLLECTION_PATH"
+export GIT_X_REPOS_PATH="$HOMEBREW_TAP_HOME:$ANSIBLE_X_COLLECTION_PATH:$HOMEBREW_ERALDY_TAP_HOME"

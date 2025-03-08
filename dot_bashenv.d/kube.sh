@@ -3,9 +3,13 @@
 # Kube Utilities
 # https://github.com/gerardnico/kubee
 ##############################
-export KUBEE_CHARTS_PATH="$HOME/code/argocd/charts:$HOME/code/kubee/resources/charts/incubator"
+export KUBEE_CHARTS_PATH="$HOME/code/argocd/charts"
 export KUBEE_CLUSTERS_PATH="$HOME/code/argocd/clusters"
 export KUBEE_CLUSTER_NAME="beau"
+
+# kube env
+export HELM_BIN="kubee helm"
+export HELM_MAX_HISTORY=3
 
 
 # Alert Manager Connection for the API
