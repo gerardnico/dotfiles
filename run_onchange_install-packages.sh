@@ -587,11 +587,12 @@ install_jsonnet(){
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
       echo "Jsonnet Windows Installation Not done Skipping"
-      install_from_github_go_release "google/go-jsonnet" "go-jsonnet" "0.20.0" "$FINAL_BINARY"
+      install_from_github_go_release "google/go-jsonnet" "go-jsonnet" "0.21.0-rc1" "$FINAL_BINARY"
       return
   fi
 
   echo "brew jsonnet installation"
+  # https://formulae.brew.sh/formula/go-jsonnet
   brew install go-jsonnet
 
 }
