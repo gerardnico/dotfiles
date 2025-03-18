@@ -738,10 +738,22 @@ install_tmux(){
 
 }
 
+install_nmap(){
+  if command_exists nmap; then
+      echo "Nmap found"
+      return;
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Windows install nmap"
+      winget_package_play Insecure.Nmap
+      return
+  fi
+  brew install nmap
+}
 
 # https://sectools.org/tool/netcat/
 # https://netcat.sourceforge.net/
-install_netcat_nmap(){
+install_netcat(){
   if command_exists nc; then
     echo "Netcat found"
     return;
@@ -851,6 +863,9 @@ main(){
   source "$PYTHON_CONF"
 
   # FlyCtl
+  install_nmap
+
+  # FlyCtl
   install_flyctl
 
   # SpfQuery
@@ -877,7 +892,7 @@ main(){
   # Lazy git
   install_lazy_git
   # nc / netcat
-  install_netcat_nmap
+  install_netcat
   # Mail Util
   install_mail_utils
   # Telnet
