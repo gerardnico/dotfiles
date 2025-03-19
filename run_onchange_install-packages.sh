@@ -738,6 +738,25 @@ install_tmux(){
 
 }
 
+# https://github.com/spf13/cobra-cli/blob/main/README.md
+install_cobra_cli(){
+
+
+  if command_exists cobra-cli; then
+        echo "cobra-cli found"
+        return;
+  fi
+  
+  if ! command_exists go; then
+    echo "Error: go not found"
+    return 2;
+  fi
+
+  echo "Installing cobra-cli"
+  go install github.com/spf13/cobra-cli@latest
+  echo "Cobra-cli installed"
+
+}
 install_nmap(){
   if command_exists nmap; then
       echo "Nmap found"
@@ -862,7 +881,10 @@ main(){
   # shellcheck disable=SC1090
   source "$PYTHON_CONF"
 
-  # FlyCtl
+  # Cobra cli
+  install_cobra_cli
+
+  # Nmap
   install_nmap
 
   # FlyCtl

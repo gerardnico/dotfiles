@@ -1,0 +1,5 @@
+# https://github.com/spf13/cobra-cli/blob/main/README.md#configuring-the-cobra-generator
+author: Nicolas Gerard <nico@gerardnico.com>
+useViper: true
+year: 2025
+license: MIT
