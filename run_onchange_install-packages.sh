@@ -50,6 +50,9 @@ winget_package_play(){
 
 }
 
+
+
+
 # Install from a standard go release in github
 # Binary
 # Version
@@ -341,6 +344,7 @@ install_helm_docs(){
   echo "Helm Docs Installed"
 
 }
+
 
 install_helm(){
 
