@@ -346,6 +346,25 @@ install_helm_docs(){
 }
 
 
+# ko makes building Go container images easy
+# https://ko.build/install/
+install_go_tooling_ko(){
+  if command_exists ko; then
+    echo "ko founds"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Ko installation on Windows"
+      scoop install ko
+      return
+  fi
+
+  echo "Ko installation with brew"
+  brew install ko
+  echo "Ko installed"
+
+}
+
 install_helm(){
 
   # See get Helms section at https://helm.sh/
@@ -744,7 +763,7 @@ install_tmux(){
 }
 
 # https://github.com/spf13/cobra-cli/blob/main/README.md
-install_cobra_cli(){
+install_go_tooling_cobra_cli(){
 
 
   if command_exists cobra-cli; then
@@ -886,8 +905,11 @@ main(){
   # shellcheck disable=SC1090
   source "$PYTHON_CONF"
 
+  # ko
+  install_go_tooling_ko
+
   # Cobra cli
-  install_cobra_cli
+  install_go_tooling_cobra_cli
 
   # Nmap
   install_nmap
