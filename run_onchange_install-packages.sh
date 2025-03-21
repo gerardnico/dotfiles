@@ -50,10 +50,10 @@ winget_package_play(){
 
 }
 
+# Install from a standard go release in github
 # Binary
 # Version
 # Base
-#
 install_from_github_go_release(){
 
     local REPO="$1"
@@ -562,6 +562,7 @@ install_jsonnet_bundler_manager(){
 
 }
 
+# gojsontoyaml app
 # https://github.com/brancz/gojsontoyaml/releases/tag/v0.1.0
 install_go_json_to_yaml(){
 
