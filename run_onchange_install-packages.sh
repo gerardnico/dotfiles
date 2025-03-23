@@ -345,6 +345,25 @@ install_helm_docs(){
 
 }
 
+# https://git-cliff.org/docs/installation/
+install_git_cliff(){
+
+  if command_exists git-cliff; then
+    echo "Git-Cliff founds"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Git-Cliff installation on Windows"
+      winget install git-cliff
+      return
+  fi
+
+  echo "Git-cliff installation with brew"
+  brew install git-cliff
+  echo "Git-Cliff installed"
+
+}
+
 # https://jreleaser.org/guide/latest/install.html
 install_jreleaser(){
   if command_exists jreleaser; then
@@ -922,7 +941,10 @@ main(){
   # shellcheck disable=SC1090
   source "$PYTHON_CONF"
 
-  # ko
+  # Git-Cliff
+  install_git_cliff
+
+  # JReleaser
   install_jreleaser
 
   # ko
