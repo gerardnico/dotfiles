@@ -345,6 +345,23 @@ install_helm_docs(){
 
 }
 
+# https://jreleaser.org/guide/latest/install.html
+install_jreleaser(){
+  if command_exists jreleaser; then
+    echo "jreleaser founds"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Jreleaser installation on Windows"
+      winget install jreleaser
+      return
+  fi
+
+  echo "Jreleaser installation with brew"
+  brew install jreleaser/tap/jreleaser
+  echo "Jreleaser installed"
+
+}
 
 # ko makes building Go container images easy
 # https://ko.build/install/
@@ -904,6 +921,9 @@ main(){
   fi
   # shellcheck disable=SC1090
   source "$PYTHON_CONF"
+
+  # ko
+  install_jreleaser
 
   # ko
   install_go_tooling_ko
