@@ -364,6 +364,25 @@ install_git_cliff(){
 
 }
 
+# https://github.com/wagoodman/dive
+install_docker_dive(){
+
+  if command_exists dive; then
+    echo "Dive founds"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Dive installation on Windows"
+      winget install git-cliff--id wagoodman.dive
+      return
+  fi
+
+  echo "Dive installation with brew"
+  brew install wagoodman/dive/dive
+  echo "Dive installed"
+
+}
+
 # https://jreleaser.org/guide/latest/install.html
 install_jreleaser(){
   if command_exists jreleaser; then
@@ -940,6 +959,9 @@ main(){
   fi
   # shellcheck disable=SC1090
   source "$PYTHON_CONF"
+
+  # Docker dive
+  install_docker_dive
 
   # Git-Cliff
   install_git_cliff
