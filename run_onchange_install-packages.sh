@@ -261,22 +261,40 @@ install_go_task(){
 
 }
 
+install_nodejs(){
+  if command_exists node; then
+    echo "nodejs founds"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Node installation on Windows not yet done"
+    return 1
+  fi
+  echo "Nodejs installation"
+  brew install node
+  echo "Nodejs installed"
+}
+
 # https://commitlint.js.org/guides/getting-started.html
-install_commitlint(){
+install_nodejs_commitlint(){
 
   if command_exists commitlint; then
     echo "commitlint founds"
     return
   fi
-  if [ "$CHEZMOI_OS" == "windows" ]; then
-    echo "Commitlint on Windows not yet done"
-    return
+  if ! command_exists npm; then
+      echo "npm not founds !!! Install first node"
+      return 1
   fi
   echo "commitlint installation"
+  # We don't do it with nix
   # https://stackoverflow.com/questions/59323722/how-to-specify-multiple-packages-derivation-for-installation-by-nix-env
   # nix-env --install --from-expression 'with import <nixpkgs>{}; [ nodejs nodePackages."@commitlint/cli" nodePackages."@commitlint/config-conventional"]'
   # https://stackoverflow.com/questions/50802880/reproducible-nix-env-i-with-only-nix-no-nixos/50805575#50805575
-  nix-env -i -f "$HOME"/my-nix-derivation/commitlint.nix
+  npm install -g @commitlint/cli @commitlint/config-conventional
+  # then
+  # should work from anywhere
+  # commitlint --extends '@commitlint/config-conventional' <<< "yolo"
   echo "commitlint installed"
 
 }
@@ -1007,6 +1025,9 @@ main(){
   # shellcheck disable=SC1090
   source "$PYTHON_CONF"
 
+  # Install node
+  install_nodejs
+
   # Install nix
   install_nix
 
@@ -1014,7 +1035,7 @@ main(){
   install_nixfmt
 
   # Install commitlint
-  install_commitlint
+  install_nodejs_commitlint
 
   # Docker dive
   install_docker_dive
