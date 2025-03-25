@@ -245,6 +245,7 @@ install_flyctl(){
 }
 # https://taskfile.dev/installation/
 install_go_task(){
+
   if command_exists task; then
         echo "Task founds"
         return
@@ -257,6 +258,24 @@ install_go_task(){
   echo "Installing brew task"
   brew install go-task/tap/go-task
   echo "Tasks installed"
+
+}
+
+# https://commitlint.js.org/guides/getting-started.html
+install_commitlint(){
+
+  if command_exists commitlint; then
+    echo "commitlint founds"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Commitlint on Windows not yet done"
+    return
+  fi
+  echo "commitlint installation"
+  nix-env -iA nixpkgs.nodejs nixpkgs.nodePackages."@commitlint/cli" nixpkgs.nodePackages."@commitlint/config-conventional"
+  echo "commitlint installed"
+
 }
 
 # https://jetmore.org/john/code/swaks/installation.html
@@ -692,6 +711,30 @@ install_nix(){
 
 }
 
+# https://github.com/NixOS/nixfmt?tab=readme-ov-file#from-the-repository
+install_nixfmt(){
+
+  if command_exists "nixfmt"; then
+      echo "Nixfmt found"
+      return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Nixfmt does not support windows - Skipping"
+    return
+  fi
+
+  if command_exists "nix-env"; then
+      echo "nix should be installed"
+      return 1
+  fi
+
+  echo "Installing Nixfmt"
+  nix-env -i -f https://github.com/NixOS/nixfmt/archive/master.tar.gz
+  echo "Nixfmt was installed"
+
+}
+
 install_zoxide_cd(){
   # cd on
   if command_exists zoxide; then
@@ -957,8 +1000,18 @@ main(){
     echo "Python venv conf file was not found ($PYTHON_CONF)"
     return 1
   fi
+
   # shellcheck disable=SC1090
   source "$PYTHON_CONF"
+
+  # Install nix
+  install_nix
+
+  # Install nixfmt
+  install_nixfmt
+
+  # Install commitlint
+  install_commitlint
 
   # Docker dive
   install_docker_dive
@@ -1030,8 +1083,7 @@ main(){
   install_go_json_to_yaml
   # Install jsonnet
   install_jsonnet
-  # Install nix
-  install_nix
+
   # Helm
   install_helm
   # Helm Docs

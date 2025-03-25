@@ -12,4 +12,4 @@ fi
 # https://nix.dev/manual/nix#sec-channels / https://nixos.wiki/wiki/Nix_channels
 # Most users will want the stable/large channel
 # https://channels.nixos.org/
-export NIX_PATH="nixpkgs=channel:nixos-24.11"
+# export NIX_PATH="nixpkgs=channel:nixos-24.11"
