@@ -273,7 +273,10 @@ install_commitlint(){
     return
   fi
   echo "commitlint installation"
-  nix-env -iA nixpkgs.nodejs nixpkgs.nodePackages."@commitlint/cli" nixpkgs.nodePackages."@commitlint/config-conventional"
+  # https://stackoverflow.com/questions/59323722/how-to-specify-multiple-packages-derivation-for-installation-by-nix-env
+  # nix-env --install --from-expression 'with import <nixpkgs>{}; [ nodejs nodePackages."@commitlint/cli" nodePackages."@commitlint/config-conventional"]'
+  # https://stackoverflow.com/questions/50802880/reproducible-nix-env-i-with-only-nix-no-nixos/50805575#50805575
+  nix-env -i -f "$HOME"/my-nix-derivation/commitlint.nix
   echo "commitlint installed"
 
 }
