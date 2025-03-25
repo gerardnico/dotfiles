@@ -275,6 +275,21 @@ install_nodejs(){
   echo "Nodejs installed"
 }
 
+# https://goreleaser.com/install/
+install_goreleaser(){
+  if command_exists goreleaser; then
+    echo "goreleaser founds"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Goreleaser installation on Windows not yet done"
+    return 1
+  fi
+  echo "Goreleaser installation"
+  brew install goreleaser/tap/goreleaser
+  echo "Goreleaser installed"
+}
+
 # https://commitlint.js.org/guides/getting-started.html
 install_nodejs_commitlint(){
 
@@ -1039,6 +1054,9 @@ main(){
 
   # Docker dive
   install_docker_dive
+
+  # Goreleaser
+  install_goreleaser
 
   # Git-Cliff
   install_git_cliff
