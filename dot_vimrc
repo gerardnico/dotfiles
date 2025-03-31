@@ -1,5 +1,5 @@
-#!/bin/bash
+" Monokai conf https://github.com/sickill/vim-monokai/
+" Installed via dotfiles onchange_install
 
-# Monokai conf https://github.com/sickill/vim-monokai/
 syntax enable
 colorscheme monokai

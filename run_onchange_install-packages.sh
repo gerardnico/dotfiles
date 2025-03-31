@@ -290,6 +290,89 @@ install_goreleaser(){
   echo "Goreleaser installed"
 }
 
+# https://github.com/GNOME/libxslt/tree/master
+# https://gnome.pages.gitlab.gnome.org/libxslt/xsltproc.html
+install_xml_xsltproc(){
+  if command_exists xsltproc; then
+      echo "xsltproc founds"
+      return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Xsltproc installation not yet done on Windows"
+    return 1
+  fi
+  echo "xsltproc installation"
+  # https://formulae.brew.sh/formula/libxslt
+  # https://download.gnome.org/sources/libxslt/1.1/libxslt-1.1.43.tar.xz
+  brew install libxslt
+  echo "xsltproc installed"
+}
+
+# https://www.html-tidy.org/
+# https://github.com/htacg/tidy-html5
+install_html_tidy(){
+  if command_exists tidy; then
+      echo "tidy founds"
+      return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "tidy installation not yet done on Windows"
+    return 1
+  fi
+  echo "tidy installation"
+  brew install tidy-html5
+  echo "tidy installed"
+}
+
+# https://github.com/ku1ik/vim-monokai/blob/master/colors/monokai.vim
+install_vim_monokai(){
+
+  MONOKAI="$HOME/.vim/colors/monokai.vim"
+  if [ -f "$MONOKAI" ]; then
+     echo "vim monokai founds"
+     return
+  fi
+  mkdir -p "$(dirname "$MONOKAI")"
+  echo "Vim Monokai installation"
+  curl -L -o "$MONOKAI" "https://raw.githubusercontent.com/ku1ik/vim-monokai/refs/heads/master/colors/monokai.vim"
+  echo "Vim Monokai installed"
+
+}
+
+
+# https://github.com/sibprogrammer/xq
+install_xml_xq(){
+
+  if command_exists xq; then
+      echo "xq founds"
+      return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Xq installation not yet done on Windows"
+    return 1
+  fi
+  echo "Xq installation"
+  brew install xq
+  echo "Xq installed"
+
+}
+
+# https://maven.apache.org/install.html
+install_maven(){
+  if command_exists mvn; then
+    echo "mvn founds"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Mvn installation not yet on Windows"
+    # https://github.com/microsoft/winget-pkgs/issues/65391
+    return 1
+  fi
+  echo "Maven installation"
+  brew install maven
+  echo "Maven installed"
+}
+
 # https://commitlint.js.org/guides/getting-started.html
 install_nodejs_commitlint(){
 
@@ -1046,6 +1129,18 @@ main(){
   # Install nix
   install_nix
 
+  # Install xq
+  install_xml_xq
+
+  # Install xsltproc
+  install_xml_xsltproc
+
+  # Install tidy
+  install_html_tidy
+
+  # Install Vim Monokai
+  install_vim_monokai
+
   # Install nixfmt
   install_nixfmt
 
@@ -1057,6 +1152,9 @@ main(){
 
   # Goreleaser
   install_goreleaser
+
+  # Maven
+  install_maven
 
   # Git-Cliff
   install_git_cliff
