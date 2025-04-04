@@ -1,7 +1,7 @@
 
 
 # Env
-source "$HOME/.bashenv.d/kube.sh"
+source "$HOME/.profile.d/kube.sh"
 
 ##############################
 # Kube

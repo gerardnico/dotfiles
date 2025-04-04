@@ -38,8 +38,8 @@ cat << EOF | sudo tee $GIT_WSL_PATH
 # with the wsl cli from windows (ie Intellij)
 # ie wsl git
 
-source \$HOME/.bashenv.d/pass.sh
-source \$HOME/.bashenv.d/ssh-x.sh
+source \$HOME/.profile.d/pass.sh
+source \$HOME/.profile.d/ssh-x.sh
 
 /usr/bin/git "\$@"
 EOF

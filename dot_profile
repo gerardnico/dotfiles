@@ -1,6 +1,10 @@
 #!/bin/bash
 
+# Non-Interactive environment
+
 # ~/.profile: executed by the command interpreter for login shells.
+# Read by Idea Ide to set system env.
+
 # Note:
 # Running wsl (bash.exe) without arguments (or with the ~ argument) will launch bash as a login shell.
 
@@ -16,12 +20,35 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
+###########################################
+# The scripts should set env or source env file only,
+# not executing any bash script to avoid any recursion
+# (ie a bash script executed will source this file)
+###########################################
+
+[[ "$-" == *i* ]] && return
+echo ".profile called by ${0}" >/dev/stderr
+
+# Deprecated for profile.d
 # .bashrc does not run by default on non-interactive session
 # ie does not run when the terminal is started
-if [ -n "$BASH_VERSION" ]; then
-    # include .bashrc if it exists
-    if [ -f "$HOME/.bashrc" ]; then
-	    . "$HOME/.bashrc"
-    fi
-fi
+#if [ -n "$BASH_VERSION" ]; then
+#    # include .bashrc if it exists
+#    if [ -f "$HOME/.bashrc" ]; then
+#	    . "$HOME/.bashrc"
+#    fi
+#fi
 
+
+##############################
+# Load sub bash env script
+##############################
+if [ -d "$HOME/.profile.d" ]; then
+  # All file loaded in a directory should have a sh extension
+  # This is how /etc/profile also work
+  for file in "$HOME"/.profile.d/*.sh; do
+    # shellcheck disable=SC1090
+    [ -r "$file" ] && source "$file"
+  done
+  unset file
+fi

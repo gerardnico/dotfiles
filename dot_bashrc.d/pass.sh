@@ -1,2 +1,2 @@
 
-source "$HOME/.bashenv.d/pass.sh"
+source "$HOME/.profile.d/pass.sh"

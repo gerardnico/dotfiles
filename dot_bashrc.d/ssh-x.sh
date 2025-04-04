@@ -3,7 +3,7 @@
 ##############################
 
 # Env
-source "$HOME/.bashenv.d/ssh-x.sh"
+source "$HOME/.profile.d/ssh-x.sh"
 
 # Start the agent only in interactive mode
 # Otherwise we get a recursion because `ssh-x-agent-init`

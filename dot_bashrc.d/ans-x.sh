@@ -1,3 +1,3 @@
 
 # Env
-source "$HOME/.bashenv.d/ans-x.sh"
+source "$HOME/.profile.d/ans-x.sh"
