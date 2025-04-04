@@ -23,6 +23,12 @@ calling_command=$(ps -o cmd= -p $PPID)
 pstree -p $PPID
 echo "$HOME/.profile called ${0} (Sourced by (${BASH_SOURCE[1]}), $# Args: $*) <- Parent (command: $calling_command, Id $PPID) " >/dev/stderr
 
+# bug??? Called twice by Idea ??? but not by wsl
+if [ "${DOT_PROFILE_CALLED}" != "" ]; then
+  echo "$HOME/.profile already called (Idea bug)"
+  # We can't return otherwise the bash functions are not loaded
+fi
+export DOT_PROFILE_CALLED="yes"
 
 # the default umask is set in /etc/profile; for setting the umask
 # for ssh logins, install and configure the libpam-umask package.
