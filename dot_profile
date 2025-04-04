@@ -1,48 +1,37 @@
 #!/bin/bash
 
-# Non-Interactive environment
+# Login shell (ie start script)
+# Executed when bash is starting (for a terminal or for each script)
 
 # ~/.profile: executed by the command interpreter for login shells.
-# Read by Idea Ide to set system env.
+# Read by:
+#   * shell script at start
+#   * Idea Ide to set system env.
+#   * the terminal on startup
+#   * wsl.exe --distribution Debian (from windows(
 
-# Note:
-# Running wsl (bash.exe) without arguments (or with the ~ argument) will launch bash as a login shell.
-
-# Executed when the terminal is starting (ie non-interactive)
-# On Windows, the terminal is started with: `wsl.exe --distribution Debian`
-#
 # This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login
 # exists.
 # see /usr/share/doc/bash/examples/startup-files for examples.
 # the files are located in the bash-doc package.
 
+# bug??? Called twice by Idea ??? but not by wsl
+# You can test it by adding a return after the echo
+
+# Calling echo to check that it's not called a crazy number of times
+calling_command=$(ps -o cmd= -p $PPID)
+pstree -p $PPID
+echo "$HOME/.profile called ${0} (Sourced by (${BASH_SOURCE[1]}), $# Args: $*) <- Parent (command: $calling_command, Id $PPID) " >/dev/stderr
+
+
 # the default umask is set in /etc/profile; for setting the umask
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
-###########################################
-# The scripts should set env or source env file only,
-# not executing any bash script to avoid any recursion
-# (ie a bash script executed will source this file)
-###########################################
-
-[[ "$-" == *i* ]] && return
-echo ".profile called by ${0}" >/dev/stderr
-
-# Deprecated for profile.d
-# .bashrc does not run by default on non-interactive session
-# ie does not run when the terminal is started
-#if [ -n "$BASH_VERSION" ]; then
-#    # include .bashrc if it exists
-#    if [ -f "$HOME/.bashrc" ]; then
-#	    . "$HOME/.bashrc"
-#    fi
-#fi
-
-
 ##############################
-# Load sub bash env script
+# Loading env variable
 ##############################
+echo "Loading env variables"
 if [ -d "$HOME/.profile.d" ]; then
   # All file loaded in a directory should have a sh extension
   # This is how /etc/profile also work
@@ -52,3 +41,20 @@ if [ -d "$HOME/.profile.d" ]; then
   done
   unset file
 fi
+
+##############################
+# Loading bash env script (alias, function, ...)
+##############################
+# .bashrc does not run by default on login shell
+# ie does not run when the terminal is started
+# If we are not running interactively, we return
+[[ "$-" != *i* ]] && return
+echo "Loading bash env (alias, function, ...) for interactive/repl session"
+if [ -n "$BASH_VERSION" ]; then
+    # include .bashrc if it exists
+    if [ -f "$HOME/.bashrc" ]; then
+	    . "$HOME/.bashrc"
+    fi
+fi
+
+

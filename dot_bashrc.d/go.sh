@@ -19,4 +19,7 @@
 # fi
 
 export GOPATH=$HOME/go
-export PATH=$GOPATH/bin:$PATH
+# idempotent (why for whatever reason, idea calls profile 2 times when starting its terminal)
+if [[ ":$PATH:" != *":$GOPATH:"* ]]; then
+  export PATH=$GOPATH/bin:$PATH
+fi

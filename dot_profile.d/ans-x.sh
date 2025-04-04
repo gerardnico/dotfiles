@@ -10,7 +10,7 @@ export ANS_X_SSH_KEY_PASS=ssh-x/id_gerardnico_kube
 
 # Bin in Path (Add the ansible scripts)
 ANS_X_BIN_DIR=$HOME/code/ansible/bin
-if [ -d "$ANS_X_BIN_DIR" ]; then
+if [ -d "$ANS_X_BIN_DIR" ] && [[ ":$PATH:" != *":$ANS_X_BIN_DIR:"* ]]; then
   export PATH="$ANS_X_BIN_DIR:$PATH"
 fi
 
