@@ -38,8 +38,15 @@ cat << EOF | sudo tee $GIT_WSL_PATH
 # with the wsl cli from windows (ie Intellij)
 # ie wsl git
 
-source \$HOME/.profile.d/pass.sh
-source \$HOME/.profile.d/ssh-x.sh
+if [ -d "$HOME/.profile.d" ]; then
+  # All file loaded in a directory should have a sh extension
+  # This is how /etc/profile also work
+  for file in "$HOME"/.profile.d/*.sh; do
+    # shellcheck disable=SC1090
+    [ -r "\$file" ] && source "\$file"
+  done
+  unset file
+fi
 
 /usr/bin/git "\$@"
 EOF

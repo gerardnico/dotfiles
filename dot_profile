@@ -38,6 +38,7 @@ export DOT_PROFILE_CALLED="yes"
 
 ##############################
 # Loading env variable
+# Should be before bashrc as we add bin path
 ##############################
 echo "$HOME/.profile: Loading env variables" >/dev/stderr
 if [ -d "$HOME/.profile.d" ]; then
@@ -49,6 +50,8 @@ if [ -d "$HOME/.profile.d" ]; then
   done
   unset file
 fi
+
+
 echo "$HOME/.profile: Env variables loaded" >/dev/stderr
 ##############################
 # Loading bash env script (alias, function, ...)
