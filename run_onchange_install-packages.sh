@@ -243,6 +243,46 @@ install_flyctl(){
     brew install flyctl
     echo "flyctl installation done"
 }
+
+# https://aider.chat/docs/install.html
+install_aider(){
+
+  if command_exists aider; then
+        echo "aider founds"
+        return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Sorry aider installation on Windows not yet done"
+      return
+  fi
+  if ! command_exists python; then
+      echo "python is required to install aider"
+      return 1
+  fi
+  echo "aider installation"
+  python -m pip install aider-install
+  aider-install
+  echo "aider installation done"
+
+}
+
+# https://sqlite.org/download.html
+install_sqlite(){
+
+  if command_exists sqlite3; then
+        echo "sqlite founds"
+        return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Sorry sqlite3 installation on Windows not yet done"
+      return
+  fi
+  echo "sqlite installation"
+  brew install sqlite
+  echo "sqlite installation done"
+
+}
+
 # https://taskfile.dev/installation/
 install_go_task(){
 
@@ -1137,6 +1177,9 @@ main(){
 
   # Install tidy
   install_html_tidy
+
+  # Install sqlite
+  install_sqlite
 
   # Install Vim Monokai
   install_vim_monokai
