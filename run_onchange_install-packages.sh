@@ -266,6 +266,23 @@ install_aider(){
 
 }
 
+# https://sdkman.io/install
+install_sdkman(){
+  # sdk man is a bash function let op!
+  if command_exists sdk; then
+        echo "sdkman founds"
+        return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Sorry sdkman installation on Windows not yet done"
+      return
+  fi
+  echo "sdkman installation"
+  curl -s "https://get.sdkman.io" | bash
+  echo "sdkman installation done"
+
+}
+
 # https://sqlite.org/download.html
 install_sqlite(){
 
@@ -1171,6 +1188,9 @@ main(){
 
   # Install xq
   install_xml_xq
+
+  # Install sdkman
+  install_sdkman
 
   # Install xsltproc
   install_xml_xsltproc
