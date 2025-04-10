@@ -269,9 +269,9 @@ install_aider(){
 # https://sdkman.io/install
 install_sdkman(){
   # sdk man is a bash function let op!
-  if command_exists sdk; then
-        echo "sdkman founds"
-        return
+  if sdk --help >/dev/null; then
+      echo "sdkman founds"
+      return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
       echo "Sorry sdkman installation on Windows not yet done"
@@ -365,6 +365,24 @@ install_xml_xsltproc(){
   echo "xsltproc installed"
 }
 
+# https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
+# not that yq can query xml
+install_xml_xmllint(){
+  if command_exists xmllint; then
+      echo "xmllint founds"
+      return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "xmllint installation not yet done on Windows"
+    return 1
+  fi
+  echo "xmllint installation"
+  # https://formulae.brew.sh/formula/libxslt
+  # https://download.gnome.org/sources/libxslt/1.1/libxslt-1.1.43.tar.xz
+  brew install libxml2
+  echo "xmllint installed"
+}
+
 # https://www.html-tidy.org/
 # https://github.com/htacg/tidy-html5
 install_html_tidy(){
@@ -396,23 +414,6 @@ install_vim_monokai(){
 
 }
 
-
-# https://github.com/sibprogrammer/xq
-install_xml_xq(){
-
-  if command_exists xq; then
-      echo "xq founds"
-      return
-  fi
-  if [ "$CHEZMOI_OS" == "windows" ]; then
-    echo "Xq installation not yet done on Windows"
-    return 1
-  fi
-  echo "Xq installation"
-  brew install xq
-  echo "Xq installed"
-
-}
 
 # https://maven.apache.org/install.html
 install_maven(){
@@ -1186,14 +1187,14 @@ main(){
   # Install nix
   install_nix
 
-  # Install xq
-  install_xml_xq
-
   # Install sdkman
   install_sdkman
 
   # Install xsltproc
   install_xml_xsltproc
+
+  # Install xmllint (libxml2)
+  install_xml_xmllint
 
   # Install tidy
   install_html_tidy
