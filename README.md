@@ -1,9 +1,8 @@
-# Dotfiles managed by ChezMoi
+# Dotfiles
 
 
+`dotfiles` managed by [ChezMoi](https://www.chezmoi.io/)
 
-## bin
 
-Bin contains cli tools.
+Chief House Officer of [Eraldy](https://eraldy.com)
 
-See also: https://it-tools.tech/
