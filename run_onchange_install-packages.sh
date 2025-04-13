@@ -1109,6 +1109,23 @@ install_ssh_askpass(){
   sudo apt install -y ssh-askpass
 }
 
+install_openoffice(){
+
+  if command_exists scalc; then
+    echo "OpenOffice installed"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Windows OpenOffice Installation"
+    winget install -e --id Apache.OpenOffice
+    return
+  fi
+
+  echo "Linux OpenOffice Installation not needed"
+
+}
+
 install_mail_utils(){
   # https://mailutils.org
   if command_exists mail; then
@@ -1183,6 +1200,9 @@ main(){
 
   # Install node
   install_nodejs
+
+  # Install openoffice
+  install_openoffice
 
   # Install nix
   install_nix
