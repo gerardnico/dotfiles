@@ -9,8 +9,8 @@ if [[ ! "$KERNEL" =~ "WSL" ]]; then
 fi
 
 MODE=$(wslinfo --networking-mode)
-if [ "$MODE" != "networking" ]; then
+if [ "$MODE" != "mirrored" ]; then
   echo "!!!!!!!!!!!!!!!!!"
-  echo "WSL Error : Networking mode should be networking"
+  echo "WSL Error : Networking mode is $MODE and not mirrored"
   echo "!!!!!!!!!!!!!!!!!"
 fi
