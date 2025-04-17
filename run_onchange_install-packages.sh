@@ -1069,6 +1069,24 @@ install_nmap(){
   brew install nmap
 }
 
+
+install_netstat(){
+
+  if command_exists netstat; then
+    echo "netstat found"
+    return;
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "netstat on Windows should be installe ???"
+      return
+  fi
+
+  # https://formulae.brew.sh/formula/net-tools
+  brew install net-tools
+
+}
+
 # https://sectools.org/tool/netcat/
 # https://netcat.sourceforge.net/
 install_netcat(){
@@ -1092,7 +1110,7 @@ install_netcat(){
 
 # List open files on Linux/Darwin
 # https://github.com/lsof-org/lsof
-install_lsof(){
+install_net_lsof(){
 
   if command_exists lsof; then
     echo "lsof installed"
@@ -1251,7 +1269,10 @@ main(){
   install_nodejs_commitlint
 
   # Install lsof
-  install_lsof
+  install_net_lsof
+
+  # Install netstat
+  install_netstat
 
   # Docker dive
   install_docker_dive
