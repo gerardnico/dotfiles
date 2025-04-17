@@ -1090,6 +1090,25 @@ install_netcat(){
 
 }
 
+# List open files on Linux/Darwin
+# https://github.com/lsof-org/lsof
+install_lsof(){
+
+  if command_exists lsof; then
+    echo "lsof installed"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "lsof is not a windows app"
+    return
+  fi
+  echo "Installing lsof"
+  brew install lsof
+  echo "lsof installed"
+
+}
+
 # ? A ssh askpass gui prompt
 # https://packages.debian.org/bookworm/ssh-askpass
 # Orphaned: https://tracker.debian.org/pkg/ssh-askpass
@@ -1230,6 +1249,9 @@ main(){
 
   # Install commitlint
   install_nodejs_commitlint
+
+  # Install lsof
+  install_lsof
 
   # Docker dive
   install_docker_dive
