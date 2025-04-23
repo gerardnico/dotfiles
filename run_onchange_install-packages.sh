@@ -268,8 +268,9 @@ install_aider(){
 
 # https://sdkman.io/install
 install_sdkman(){
-  # sdk man is a bash function let op!
-  if sdk --help >/dev/null; then
+  # sdk man is a bash function and is not yet loaded
+  # we check with the install directory
+  if [ -d "$HOME/.sdkman" ]; then
       echo "sdkman founds"
       return
   fi
@@ -1199,6 +1200,37 @@ install_pre_commit(){
 
 }
 
+install_tpcds(){
+  if command_exists dsqgen; then
+    echo "tpcds installed"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Tpcds Windows Installation not yet scripted"
+      return
+  fi
+
+  local TPC_TOOLS_HOME="$HOME/code/tpcds-kit/tools"
+  if [ -f "$TPC_TOOLS_HOME/dsqgen" ]; then
+    echo "tpcds installed"
+    echo "TPC_TOOLS_HOME ($TPC_TOOLS_HOME) should be added to the PATH"
+    return
+  fi
+
+  if [ ! -d "$TPC_TOOLS_HOME" ]; then
+    sudo apt-get install gcc make flex bison byacc git
+    (
+      cd "$HOME/code";
+      git clone https://github.com/databricks/tpcds-kit
+      cd tpcds-kit/tools
+      make OS=LINUX
+      chmod +x dsqgen
+      chmod +x dsdgen
+    )
+  fi
+
+}
+
 # https://github.com/Foundry376/Mailspring/tree/master
 install_mail_spring_gui(){
 
@@ -1255,6 +1287,9 @@ main(){
 
   # Install tidy
   install_html_tidy
+
+  # Install tpcds
+  install_tpcds
 
   # Install sqlite
   install_sqlite
