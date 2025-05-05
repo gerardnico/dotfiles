@@ -46,12 +46,14 @@ cat << EOF | sudo tee "$WSL_CONFIG"
 # You can check by running in Debian: <wslinfo --networking-mode>
 # It will then not create the <vEthernet (WSL)> interface
 # https://github.com/microsoft/WSL/issues/7267
-networkingMode=mirrored
+# Not mirrored because we get
+# * bind error: java.net.BindException: Address already in use (Bind failed) without any process listening
+# * debug disconnection in Idea
+# networkingMode=mirrored
 # https://stackoverflow.com/questions/69926941/localhost-refused-to-connect-on-wsl2-when-accessed-via-https-localhost8000-b
 # kernelCommandLine=ipv6.disable=1
-
 [experimental]
-hostAddressLoopback=true
+# hostAddressLoopback=true
 
 
 EOF
