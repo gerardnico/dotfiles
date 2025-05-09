@@ -9,8 +9,9 @@ if [[ ! "$KERNEL" =~ "WSL" ]]; then
 fi
 
 MODE=$(wslinfo --networking-mode)
-if [ "$MODE" != "mirrored" ]; then
+# mirrored does not work with IDEA
+if [ "$MODE" == "mirrored" ]; then
   echo "!!!!!!!!!!!!!!!!!"
-  echo "WSL Error : Networking mode is $MODE and not mirrored"
+  echo "WSL Error : Networking mode is mirrored"
   echo "!!!!!!!!!!!!!!!!!"
 fi
