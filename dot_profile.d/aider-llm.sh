@@ -17,15 +17,35 @@ function aider(){
     echo "Aider path not found"
     return 1
   fi
+
   case "${LLM:-}" in
     "openai")
-      OPENAI_API_KEY=$(pass "openai/${PROJECT_NAME}-project") "$AIDER_PATH" "$@"
+      ENV_NAME="OPENAI_API_KEY"
+      PROJECT_NAME="${PROJECT_NAME}-project"
+      PROVIDER="openai"
       ;;
     "claude")
-      ANTHROPIC_API_KEY=$(pass "anthropic/${PROJECT_NAME}") "$AIDER_PATH" "$@"
+      ENV_NAME="ANTHROPIC_API_KEY"
+      PROVIDER="anthropic"
+      ;;
+    "openrouter")
+      # 5% + .35 fee
+      # use lite.llm
+      ENV_NAME="OPENROUTER_API_KEY"
+      PROVIDER="openrouter"
       ;;
     *)
       echo "LLM ${LLM:-} is unknown"
+      exit 1
   esac
+
+
+  LLM_KEY_PATH="${PROVIDER}/${PROJECT_NAME}"
+  if ! LLM_KEY=$(pass "$LLM_KEY_PATH"); then
+    echo "${LLM:-} Api Key Not Found for project ${PROJECT_NAME} at $LLM_KEY_PATH"
+    exit 1
+  fi
+
+  eval "$ENV_NAME=$LLM_KEY $AIDER_PATH $*"
 
 }

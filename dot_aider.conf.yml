@@ -1,4 +1,9 @@
 dark-mode: true
-# No commit please
-auto-commits: false
-dirty-commits: false
+# Commit all the way
+auto-commits: true
+dirty-commits: true
+attribute-author: Nico Aider
+attribute-committer: Nico Aider
+
+# 1024
+map-tokens: 1024
