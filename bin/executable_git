@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-
+# Used and set in Idea
+#
+# Idea call git with the wsl cli from windows (ie Intellij)
+# ie wsl git
+#
 # Wrapper to set the agent environment
 # as this is stored as a file on WSL
 # we can't pass it via Windows Env
-
-# Used when git is called
-# with the wsl cli from windows (ie Intellij)
-# ie wsl git
 
 if [ -d "$HOME/.profile.d" ]; then
   # All file loaded in a directory should have a sh extension

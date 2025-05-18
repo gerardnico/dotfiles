@@ -50,7 +50,7 @@ Host github.com
     # %n : The original remote hostname
     # %p : The remote port
     # %r : The remote username
-    ProxyCommand env BASHLIB_LIBRARY_PATH=~/code/bash-lib/lib SSH_X_CALLERS_LOG=/tmp/ssh-x-auth-proxy-callers.log ~/code/ssh-x/bin/ssh-x-auth-proxy-command %h %n %p %r
+    ProxyCommand env BASHLIB_LIBRARY_PATH=~/code/bash-lib/lib SSH_X_CALLERS_LOG=/tmp/ssh-x-auth-proxy-callers.log BASHLIB_ECHO_LEVEL=4 ~/code/ssh-x/bin/ssh-x-auth-proxy-command %h %n %p %r
 
 
 # Global conf
