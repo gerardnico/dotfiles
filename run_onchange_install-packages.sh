@@ -266,6 +266,32 @@ install_aider(){
 
 }
 
+# https://formulae.brew.sh/formula/composer
+install_php_composer(){
+
+  if command_exists composer; then
+        echo "composer founds"
+        return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Sorry composer installation on Windows not yet done"
+      return
+  fi
+  echo "composer installation"
+  # Installing dependencies for composer:
+  # sqlite, apr, openssl@3, mawk, m4, libtool, unixodbc,
+  # expat, apr-util, argon2, gdbm, perl, autoconf, xz,
+  # curl, freetds, libpng, highway, imath, libdeflate,
+  # openexr, webp, mpdecimal, libffi, python@3.13,
+  # jpeg-xl, libvmaf, aom, libavif, gd, gettext,
+  # libpq, libsodium, libzip, net-snmp, oniguruma,
+  # libgpg-error, libgcrypt and php
+  # Boum
+  # Error: Too many open files @ rb_sysopen - /home/linuxbrew/.linuxbrew/Cellar/util-linux/2.40.4/lib/libfdisk.so.1
+  brew install composer
+  echo "composer installation done"
+
+}
 # https://sdkman.io/install
 install_sdkman(){
   # sdk man is a bash function and is not yet loaded
@@ -1290,6 +1316,9 @@ main(){
 
   # Install tpcds
   install_tpcds
+
+  # Install composer
+  install_php_composer
 
   # Install sqlite
   install_sqlite

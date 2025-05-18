@@ -1,6 +1,10 @@
 #!/bin/bash
 # Print information about the current shell environment.
-
+# Run it with minimal
+# bash -c "$HOME/bin/bash-env"
+# env -i bash -c "$HOME/bin/bash-env"
 
 echo "Is the shell run interactively ? $( [[ "$-" != *i* ]] && echo "true" || echo "false" )"
 echo "Is a login shell ? $( shopt -q login_shell && echo "true" || echo "false" )"
+# Print all environment variables
+env | sort

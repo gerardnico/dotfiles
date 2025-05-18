@@ -23,11 +23,14 @@ fi
 
 
 # Overwriting wsl
-GIT_WSL_PATH=/usr/local/sbin/git
-echo "$SCRIPT_NAME - Creating a git wrapper at $GIT_WSL_PATH"
+GIT_WRAPPER_TARGET_PATH=/usr/local/sbin/git
+
+
+echo "$SCRIPT_NAME - Creating a git wrapper at $GIT_WRAPPER_TARGET_PATH"
 # We use `tee` to be able to use sudo
 # We could use `> /dev/null` to not see the output on the terminal
-cat << EOF | sudo tee $GIT_WSL_PATH
+
+cat << EOF | sudo tee $GIT_WRAPPER_TARGET_PATH
 #!/usr/bin/env bash
 
 # Wrapper to set the agent environment
@@ -48,10 +51,17 @@ if [ -d "$HOME/.profile.d" ]; then
   unset file
 fi
 
-/usr/bin/git "\$@"
+# Which git is wrapped (os or Brew)
+GIT_WRAPPED=/usr/bin/git
+GIT_BREW=/home/linuxbrew/.linuxbrew/bin/git
+if [ -f "$GIT_BREW" ]; then
+  GIT_WRAPPED=\$GIT_BREW
+fi
+
+\$GIT_WRAPPED "\$@"
 EOF
 
-sudo chmod +x $GIT_WSL_PATH
+sudo chmod +x $GIT_WRAPPER_TARGET_PATH
 
 
 

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# Wrapper to set the agent environment
+# as this is stored as a file on WSL
+# we can't pass it via Windows Env
+
+# Used when git is called
+# with the wsl cli from windows (ie Intellij)
+# ie wsl git
+
+if [ -d "$HOME/.profile.d" ]; then
+  # All file loaded in a directory should have a sh extension
+  # This is how /etc/profile also work
+  for file in "$HOME"/.profile.d/*.sh; do
+    # shellcheck disable=SC1090
+    [ -r "$file" ] && source "$file"
+  done
+  unset file
+fi
+
+# Which git is wrapped (os or Brew)
+GIT_WRAPPED=/usr/bin/git
+GIT_BREW=/home/linuxbrew/.linuxbrew/bin/git
+if [ -f "$GIT_BREW" ]; then
+  GIT_WRAPPED=$GIT_BREW
+fi
+
+$GIT_WRAPPED "$@"
