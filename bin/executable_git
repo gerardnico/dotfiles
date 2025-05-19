@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-# Used and set in Idea
+# Git wrapper to be called by Idea to get the environment to have
+# * ssh key working (ssh agent)
+# * all git hook working such as `commitlint`
 #
-# Idea call git with the wsl cli from windows (ie Intellij)
+# By default, Idea call git with the wsl cli from windows (ie Intellij)
 # ie wsl git
 #
-# Wrapper to set the agent environment
-# as this is stored as a file on WSL
-# we can't pass it via Windows Env
+# In settings, you can change that
+#
 
 if [ -d "$HOME/.profile.d" ]; then
   # All file loaded in a directory should have a sh extension
