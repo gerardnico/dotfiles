@@ -800,15 +800,15 @@ install_git(){
     return
   fi
 
-
   if [ "$CHEZMOI_OS" == "windows" ]; then
     echo "Winget Installing Git"
     winget install -e --id Git.Git
     return
   fi
 
-  echo "Brew Installing Git"
-  brew install git
+  echo "Apt Installing Git"
+  # and not brew as it's needed to clone the dotfiles repo
+  apt install git
 
 }
 
@@ -912,6 +912,30 @@ install_nix(){
   fi
 
   echo "Nix is already installed"
+
+}
+
+install_brew(){
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Brew does not support windows - Skipping"
+    return
+  fi
+  if command_exists "brew"; then
+    echo "Brew is already installed"
+    return
+  fi
+
+  echo "Installing Brew"
+  # build tools
+  sudo apt-get install -y build-essential procps curl file git
+  # when opening a repo with Jetbrains from windows
+  # the cache directory is already created with root ownership
+  # fixing that
+  sudo chown $USER:$USER ~/.cache
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  echo "Brew installation done"
 
 }
 
@@ -1280,9 +1304,33 @@ install_mail_spring_gui(){
 }
 
 
+install_python(){
+
+  if command_exists python3; then
+    echo "Python installed"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Python Windows not yet done"
+      return
+  fi
+
+  echo "Installing Python"
+  apt-get install python3 python3-venv
+  echo "Python Installation done"
+
+}
+
+
 ## Installation
 main(){
 
+  # install brew
+  install_brew
+
+  # Install Python
+  install_python
   # For python installation, the venv should be configured
   local PYTHON_CONF="$HOME/.bashrc.d/python.sh"
   if [ ! -f "$PYTHON_CONF" ]; then
