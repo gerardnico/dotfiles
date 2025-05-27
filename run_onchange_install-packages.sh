@@ -1181,6 +1181,22 @@ install_net_lsof(){
 # Install repos
 install_git_repos(){
 
+  # the doc
+  if [ ! -d "$HOME/code/nico" ]; then
+    echo "Install Nico repo"
+    git clone git@github.com:gerardnico/nico.git "$HOME/code/nico"
+  else
+    echo "Repo Nico present"
+  fi
+
+  # the bash lib (ssh-x depend on it)
+  if [ ! -d "$HOME/code/bash-lib" ]; then
+    echo "Install Bash Lib"
+    git clone git@github.com:gerardnico/bash-lib.git "$HOME/code/bash-lib"
+  else
+    echo "Repo Bash Lib present"
+  fi
+
   # Git ssh is needed to get the ssh bash script
   if [ ! -d "$HOME/code/ssh-x" ]; then
     echo "Install ssh-x"
