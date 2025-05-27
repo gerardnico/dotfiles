@@ -1,6 +1,12 @@
 
 # https://man.archlinux.org/man/extra/pass/pass.1.en#ENVIRONMENT_VARIABLES
-export PASSWORD_STORE_DIR=$HOME/code/passpartout
+PASSWORD_STORE_DIR="$HOME/code/passpartout"
+if [ ! -d "$PASSWORD_STORE_DIR" ]; then
+  return
+fi
+
+export PASSWORD_STORE_DIR
+
 
 # when third party library don't pass env
 # the default is HOME/password

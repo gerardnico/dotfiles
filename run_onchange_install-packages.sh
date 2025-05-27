@@ -1178,6 +1178,25 @@ install_net_lsof(){
 
 }
 
+# Install repos
+install_git_repos(){
+
+  # Git ssh is needed to get the ssh bash script
+  if [ ! -d "$HOME/code/ssh-x" ]; then
+    echo "Install ssh-x"
+    git clone git@github.com:gerardnico/ssh-x.git "$HOME/code/ssh-x"
+  else
+    echo "Repo ssh-x present"
+  fi
+
+  # Passpartout
+  if [ ! -d "$HOME/code/passpartout" ]; then
+    git clone git@github.com:gerardnico/passpartout.git "$HOME/code/passpartout"
+  else
+    echo "Repo passpartout present"
+  fi
+
+}
 # ? A ssh askpass gui prompt
 # https://packages.debian.org/bookworm/ssh-askpass
 # Orphaned: https://tracker.debian.org/pkg/ssh-askpass
@@ -1326,6 +1345,12 @@ install_python(){
 ## Installation
 main(){
 
+  # Git (already installed normally as we store this repo in git)
+  install_git
+
+  # install git repo (ssh repo)
+  install_git_repos
+
   # install brew
   install_brew
 
@@ -1422,8 +1447,6 @@ main(){
   # Pre-commit
   install_pre_commit
 
-  # Git
-  install_git
   # Zoxide cd
   install_zoxide_cd
   # Fuzzy finder
@@ -1481,3 +1504,4 @@ main(){
 }
 
 main
+}
