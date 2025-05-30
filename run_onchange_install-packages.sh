@@ -129,6 +129,23 @@ package_installed() {
     dpkg -l "$1" >/dev/null 2>&1
 }
 
+install_kubectl(){
+
+  if command_exists kubectl; then
+      echo "Kubectl found"
+      return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Kubectl on Windows not yet done"
+      return
+  fi
+  echo "Kubectl install"
+  brew install kubernetes-cli
+  echo "Kubectl installation done"
+
+}
+
 install_kubectl_oidc_login(){
 
   if command_exists kubectl oidc-login; then
@@ -624,6 +641,22 @@ install_jreleaser(){
 
 }
 
+install_go(){
+  if command_exists go; then
+    echo "Go founds"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Go installation on Windows Not done"
+      return
+  fi
+
+  echo "Go installation with brew"
+  brew install go
+  echo "Go installed"
+
+}
+
 # ko makes building Go container images easy
 # https://ko.build/install/
 install_go_tooling_ko(){
@@ -854,7 +887,7 @@ install_jsonnet_bundler_manager(){
   BINARY_NAME="jb-$(get_os_name)-$(get_cpu_arch_name)"
 
   # For Windows, add .exe extension
-  if [ "$OS" == "windows" ]; then
+  if [ "$CHEZMOI_OS" == "windows" ]; then
       BINARY_NAME="${BINARY_NAME}.exe"
   fi
 
@@ -952,8 +985,8 @@ install_nixfmt(){
     return
   fi
 
-  if command_exists "nix-env"; then
-      echo "nix should be installed"
+  if ! command_exists "nix-env"; then
+      echo "nix should be installed for nixfmt"
       return 1
   fi
 
@@ -1178,6 +1211,23 @@ install_net_lsof(){
 
 }
 
+install_direnv(){
+
+  if command_exists direnv; then
+    echo "direnv installed"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "direnv on windows not yet done"
+    return
+  fi
+  echo "Installing direnv"
+  brew install direnv
+  echo "direnv installed"
+
+}
+
 # Install repos
 install_git_repos(){
 
@@ -1211,6 +1261,14 @@ install_git_repos(){
   else
     echo "Repo passpartout present"
   fi
+
+  if [ ! -d "$HOME/code/kubee" ]; then
+      git clone git@github.com:EraldyHq/kubee.git "$HOME/code/kubee"
+  else
+      echo "Kubee Repo present"
+  fi
+
+
 
 }
 # ? A ssh askpass gui prompt
@@ -1391,6 +1449,9 @@ main(){
   # Install nix
   install_nix
 
+  # Install nixfmt
+  install_nixfmt
+
   # Install sdkman
   install_sdkman
 
@@ -1415,9 +1476,6 @@ main(){
   # Install Vim Monokai
   install_vim_monokai
 
-  # Install nixfmt
-  install_nixfmt
-
   # Install commitlint
   install_nodejs_commitlint
 
@@ -1430,6 +1488,9 @@ main(){
   # Docker dive
   install_docker_dive
 
+  # Direnv
+  install_direnv
+
   # Goreleaser
   install_goreleaser
 
@@ -1441,6 +1502,9 @@ main(){
 
   # JReleaser
   install_jreleaser
+
+  # go
+  install_go
 
   # ko
   install_go_tooling_ko
@@ -1512,6 +1576,7 @@ main(){
   install_helm_plugin 'schema' 'https://github.com/dadav/helm-schema'
   install_helm_plugin 'diff' 'https://github.com/databus23/helm-diff'
   # Install kubectl and oidc-login
+  install_kubectl
   install_kubectl_oidc_login
   # Install swaks email client
   install_mail_swaks
@@ -1520,4 +1585,3 @@ main(){
 }
 
 main
-}
