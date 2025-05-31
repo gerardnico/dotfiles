@@ -7,7 +7,7 @@ export LLM="claude"
 # by project
 function aider(){
 
-  # Projet name should be in a envrc
+  # Project name should be in a envrc
   PROJECT_NAME=${PROJECT_NAME:-}
   if [ "$PROJECT_NAME" == "" ]; then
     echo "Project Name is missing"

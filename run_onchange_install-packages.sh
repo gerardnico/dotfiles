@@ -264,10 +264,11 @@ install_flyctl(){
 # https://aider.chat/docs/install.html
 install_aider(){
 
-  if command_exists aider; then
+  if which aider > /dev/null; then
         echo "aider founds"
         return
   fi
+
   if [ "$CHEZMOI_OS" == "windows" ]; then
       echo "Sorry aider installation on Windows not yet done"
       return
@@ -1411,6 +1412,8 @@ install_python(){
 
   echo "Installing Python"
   apt-get install python3 python3-venv
+  # init venv
+  source "$HOME"/.bashrc.d/python.sh
   echo "Python Installation done"
 
 }
@@ -1436,6 +1439,9 @@ main(){
     echo "Python venv conf file was not found ($PYTHON_CONF)"
     return 1
   fi
+
+  # Install aider
+  install_aider
 
   # shellcheck disable=SC1090
   source "$PYTHON_CONF"
