@@ -12,3 +12,7 @@ edit:
     command: "C:\\Notepad++\\notepad++.exe"
     args: [ "-multiInst", "-notabbar", "-nosession", "-noPlugin"]
 {{ end }}
+
+# https://www.chezmoi.io/user-guide/advanced/install-your-password-manager-on-init/
+[hooks.read-source-state.pre]
+    command = "code/dotfiles/.install-password-manager.sh"

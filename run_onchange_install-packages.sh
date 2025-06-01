@@ -1263,15 +1263,48 @@ install_git_repos(){
     echo "Repo passpartout present"
   fi
 
+  # kubee
   if [ ! -d "$HOME/code/kubee" ]; then
       git clone git@github.com:EraldyHq/kubee.git "$HOME/code/kubee"
   else
       echo "Kubee Repo present"
   fi
 
+  # cluster
+  if [ ! -d "$HOME/code/kube-argocd" ]; then
+      git clone git@github.com:gerardnico/kube-argocd.git "$HOME/code/kube-argocd"
+  else
+      echo "Kube Argocd present"
+  fi
+
+  # Git utility
+  if [ ! -d "$HOME/code/git-x" ]; then
+    git clone git@github.com:gerardnico/git-x.git "$HOME/code/git-x"
+  else
+    echo "Git-x present"
+  fi
 
 
 }
+
+# * Linux: [pass](https://www.passwordstore.org/#download)
+install_pass(){
+
+  if command_exists pass; then
+    echo "pass installed"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "go pass on windows, not yet done"
+    return
+  fi
+
+  echo "Pass should have been already installed via .install-password-manager.sh"
+  exit 1
+
+}
+
 # ? A ssh askpass gui prompt
 # https://packages.debian.org/bookworm/ssh-askpass
 # Orphaned: https://tracker.debian.org/pkg/ssh-askpass
@@ -1418,6 +1451,26 @@ install_python(){
 
 }
 
+# deprecated: don't check for bad link
+# only for space and other constraint
+install_markdown_lint(){
+
+  if command_exists markdownlint-cli; then
+    echo "markdownlint-cli installed"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "markdownlint-cli not yet done"
+      return
+  fi
+
+  echo "Installing markdownlint-cli"
+  brew install markdownlint-cli
+  echo "markdownlint-cli Installation done"
+
+}
+
 
 ## Installation
 main(){
@@ -1430,6 +1483,9 @@ main(){
 
   # install brew
   install_brew
+
+  # install pass
+  install_pass
 
   # Install Python
   install_python

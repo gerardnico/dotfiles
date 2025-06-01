@@ -9,11 +9,18 @@ add_bin_dirs_from_code_repo() {
     # Use find to locate bin directories
     while IFS= read -r bin_dir; do
         # If this is a directory
-        if [ -d "$bin_dir" ]; then
-            if [[ ":$PATH:" != *":$bin_dir:"* ]]; then
-                export PATH="$bin_dir:$PATH"
-            fi
+        if [ ! -d "$bin_dir" ]; then
+          continue
         fi
+        # already in path
+        if [[ ":$PATH:" == *":$bin_dir:"* ]]; then
+          continue
+        fi
+        # don't add kubee
+        if [[ "$bin_dir" == *"kubee"* ]]; then
+          continue
+        fi
+        export PATH="$bin_dir:$PATH"
     done < <(find "$BASE_DIR" -maxdepth 2 -type d -name "bin")
 
 }
