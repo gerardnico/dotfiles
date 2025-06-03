@@ -1,4 +1,7 @@
 
-# Use tabli outside of the ide project
-export CLI_TABLI_HOME=/opt/tabulify
-export PATH=$CLI_TABLI_HOME/bin:$PATH
+# Use tabul outside of the ide project
+BIN_TABLI_HOME=/opt/tabulify/bin
+if [ -d "$BIN_TABLI_HOME" ]; then
+  export PATH=$BIN_TABLI_HOME:$PATH
+fi
+
