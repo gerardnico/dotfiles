@@ -3,7 +3,7 @@
 
 # pattern name or ip
 # Test conf with `ssh -G gerardnico@github.com -vvv`
-Host github.com
+Host githubi.com
     # HostName is only need if the git host name is not the DNS  hostname
     # Numeric IP addresses is permitted 
     # HostName github.com

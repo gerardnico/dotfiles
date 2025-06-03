@@ -2,9 +2,10 @@
 ##############################
 # Kube Utilities
 # https://github.com/gerardnico/kubee
+# We keep kube in the name because this is how we search for kube related repo
 ##############################
-export KUBEE_CHARTS_PATH="$HOME/code/argocd/charts"
-export KUBEE_CLUSTERS_PATH="$HOME/code/argocd/clusters"
+export KUBEE_CHARTS_PATH="$HOME/code/kube-argocd/charts"
+export KUBEE_CLUSTERS_PATH="$HOME/code/kube-argocd/clusters"
 export KUBEE_CLUSTER_NAME="beau"
 
 # kube env

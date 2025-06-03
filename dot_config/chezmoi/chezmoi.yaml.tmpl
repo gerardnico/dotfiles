@@ -1,25 +1,18 @@
-# Melissa 01
+sourceDir: {{ .chezmoi.homeDir }}/code/dotfiles
+
 {{ if eq .chezmoi.hostname "MELISSA01" }}
-sourceDir: C:/Users/hotitem/code/dotfiles
+# Melissa 01
 interpreters:
   sh:
     command: "bash"
 {{ end }}
 
-# Mini Nico
-{{ if eq .chezmoi.hostname "MINI-NICO" }}
-{{     if eq .chezmoi.os "linux" }}
-sourceDir: /home/admin/code/dotfiles
-{{     end }}
-{{     if eq .chezmoi.os "windows" }}
-sourceDir: C:/Users/ngera/code/dotfiles
-{{     end }}
-{{ end }}
-
-# All windows
 {{ if eq .chezmoi.os "windows" }}
 edit:
     command: "C:\\Notepad++\\notepad++.exe"
     args: [ "-multiInst", "-notabbar", "-nosession", "-noPlugin"]
 {{ end }}
 
+# https://www.chezmoi.io/user-guide/advanced/install-your-password-manager-on-init/
+[hooks.read-source-state.pre]
+    command = "code/dotfiles/.install-password-manager.sh"

@@ -129,6 +129,23 @@ package_installed() {
     dpkg -l "$1" >/dev/null 2>&1
 }
 
+install_kubectl(){
+
+  if command_exists kubectl; then
+      echo "Kubectl found"
+      return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Kubectl on Windows not yet done"
+      return
+  fi
+  echo "Kubectl install"
+  brew install kubernetes-cli
+  echo "Kubectl installation done"
+
+}
+
 install_kubectl_oidc_login(){
 
   if command_exists kubectl oidc-login; then
@@ -247,10 +264,11 @@ install_flyctl(){
 # https://aider.chat/docs/install.html
 install_aider(){
 
-  if command_exists aider; then
+  if which aider > /dev/null; then
         echo "aider founds"
         return
   fi
+
   if [ "$CHEZMOI_OS" == "windows" ]; then
       echo "Sorry aider installation on Windows not yet done"
       return
@@ -624,6 +642,22 @@ install_jreleaser(){
 
 }
 
+install_go(){
+  if command_exists go; then
+    echo "Go founds"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Go installation on Windows Not done"
+      return
+  fi
+
+  echo "Go installation with brew"
+  brew install go
+  echo "Go installed"
+
+}
+
 # ko makes building Go container images easy
 # https://ko.build/install/
 install_go_tooling_ko(){
@@ -800,15 +834,15 @@ install_git(){
     return
   fi
 
-
   if [ "$CHEZMOI_OS" == "windows" ]; then
     echo "Winget Installing Git"
     winget install -e --id Git.Git
     return
   fi
 
-  echo "Brew Installing Git"
-  brew install git
+  echo "Apt Installing Git"
+  # and not brew as it's needed to clone the dotfiles repo
+  apt install git
 
 }
 
@@ -854,7 +888,7 @@ install_jsonnet_bundler_manager(){
   BINARY_NAME="jb-$(get_os_name)-$(get_cpu_arch_name)"
 
   # For Windows, add .exe extension
-  if [ "$OS" == "windows" ]; then
+  if [ "$CHEZMOI_OS" == "windows" ]; then
       BINARY_NAME="${BINARY_NAME}.exe"
   fi
 
@@ -915,6 +949,30 @@ install_nix(){
 
 }
 
+install_brew(){
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Brew does not support windows - Skipping"
+    return
+  fi
+  if command_exists "brew"; then
+    echo "Brew is already installed"
+    return
+  fi
+
+  echo "Installing Brew"
+  # build tools
+  sudo apt-get install -y build-essential procps curl file git
+  # when opening a repo with Jetbrains from windows
+  # the cache directory is already created with root ownership
+  # fixing that
+  sudo chown $USER:$USER ~/.cache
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  echo "Brew installation done"
+
+}
+
 # https://github.com/NixOS/nixfmt?tab=readme-ov-file#from-the-repository
 install_nixfmt(){
 
@@ -928,8 +986,8 @@ install_nixfmt(){
     return
   fi
 
-  if command_exists "nix-env"; then
-      echo "nix should be installed"
+  if ! command_exists "nix-env"; then
+      echo "nix should be installed for nixfmt"
       return 1
   fi
 
@@ -1154,6 +1212,99 @@ install_net_lsof(){
 
 }
 
+install_direnv(){
+
+  if command_exists direnv; then
+    echo "direnv installed"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "direnv on windows not yet done"
+    return
+  fi
+  echo "Installing direnv"
+  brew install direnv
+  echo "direnv installed"
+
+}
+
+# Install repos
+install_git_repos(){
+
+  # the doc
+  if [ ! -d "$HOME/code/nico" ]; then
+    echo "Install Nico repo"
+    git clone git@github.com:gerardnico/nico.git "$HOME/code/nico"
+  else
+    echo "Repo Nico present"
+  fi
+
+  # the bash lib (ssh-x depend on it)
+  if [ ! -d "$HOME/code/bash-lib" ]; then
+    echo "Install Bash Lib"
+    git clone git@github.com:gerardnico/bash-lib.git "$HOME/code/bash-lib"
+  else
+    echo "Repo Bash Lib present"
+  fi
+
+  # Git ssh is needed to get the ssh bash script
+  if [ ! -d "$HOME/code/ssh-x" ]; then
+    echo "Install ssh-x"
+    git clone git@github.com:gerardnico/ssh-x.git "$HOME/code/ssh-x"
+  else
+    echo "Repo ssh-x present"
+  fi
+
+  # Passpartout
+  if [ ! -d "$HOME/code/passpartout" ]; then
+    git clone git@github.com:gerardnico/passpartout.git "$HOME/code/passpartout"
+  else
+    echo "Repo passpartout present"
+  fi
+
+  # kubee
+  if [ ! -d "$HOME/code/kubee" ]; then
+      git clone git@github.com:EraldyHq/kubee.git "$HOME/code/kubee"
+  else
+      echo "Kubee Repo present"
+  fi
+
+  # cluster
+  if [ ! -d "$HOME/code/kube-argocd" ]; then
+      git clone git@github.com:gerardnico/kube-argocd.git "$HOME/code/kube-argocd"
+  else
+      echo "Kube Argocd present"
+  fi
+
+  # Git utility
+  if [ ! -d "$HOME/code/git-x" ]; then
+    git clone git@github.com:gerardnico/git-x.git "$HOME/code/git-x"
+  else
+    echo "Git-x present"
+  fi
+
+
+}
+
+# * Linux: [pass](https://www.passwordstore.org/#download)
+install_pass(){
+
+  if command_exists pass; then
+    echo "pass installed"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "go pass on windows, not yet done"
+    return
+  fi
+
+  echo "Pass should have been already installed via .install-password-manager.sh"
+  exit 1
+
+}
+
 # ? A ssh askpass gui prompt
 # https://packages.debian.org/bookworm/ssh-askpass
 # Orphaned: https://tracker.debian.org/pkg/ssh-askpass
@@ -1280,15 +1431,73 @@ install_mail_spring_gui(){
 }
 
 
+install_python(){
+
+  if command_exists python3; then
+    echo "Python installed"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Python Windows not yet done"
+      return
+  fi
+
+  echo "Installing Python"
+  apt-get install python3 python3-venv
+  # init venv
+  source "$HOME"/.bashrc.d/python.sh
+  echo "Python Installation done"
+
+}
+
+# deprecated: don't check for bad link
+# only for space and other constraint
+install_markdown_lint(){
+
+  if command_exists markdownlint-cli; then
+    echo "markdownlint-cli installed"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "markdownlint-cli not yet done"
+      return
+  fi
+
+  echo "Installing markdownlint-cli"
+  brew install markdownlint-cli
+  echo "markdownlint-cli Installation done"
+
+}
+
+
 ## Installation
 main(){
 
+  # Git (already installed normally as we store this repo in git)
+  install_git
+
+  # install git repo (ssh repo)
+  install_git_repos
+
+  # install brew
+  install_brew
+
+  # install pass
+  install_pass
+
+  # Install Python
+  install_python
   # For python installation, the venv should be configured
   local PYTHON_CONF="$HOME/.bashrc.d/python.sh"
   if [ ! -f "$PYTHON_CONF" ]; then
     echo "Python venv conf file was not found ($PYTHON_CONF)"
     return 1
   fi
+
+  # Install aider
+  install_aider
 
   # shellcheck disable=SC1090
   source "$PYTHON_CONF"
@@ -1301,6 +1510,9 @@ main(){
 
   # Install nix
   install_nix
+
+  # Install nixfmt
+  install_nixfmt
 
   # Install sdkman
   install_sdkman
@@ -1326,9 +1538,6 @@ main(){
   # Install Vim Monokai
   install_vim_monokai
 
-  # Install nixfmt
-  install_nixfmt
-
   # Install commitlint
   install_nodejs_commitlint
 
@@ -1341,6 +1550,9 @@ main(){
   # Docker dive
   install_docker_dive
 
+  # Direnv
+  install_direnv
+
   # Goreleaser
   install_goreleaser
 
@@ -1352,6 +1564,9 @@ main(){
 
   # JReleaser
   install_jreleaser
+
+  # go
+  install_go
 
   # ko
   install_go_tooling_ko
@@ -1374,8 +1589,6 @@ main(){
   # Pre-commit
   install_pre_commit
 
-  # Git
-  install_git
   # Zoxide cd
   install_zoxide_cd
   # Fuzzy finder
@@ -1425,6 +1638,7 @@ main(){
   install_helm_plugin 'schema' 'https://github.com/dadav/helm-schema'
   install_helm_plugin 'diff' 'https://github.com/databus23/helm-diff'
   # Install kubectl and oidc-login
+  install_kubectl
   install_kubectl_oidc_login
   # Install swaks email client
   install_mail_swaks
