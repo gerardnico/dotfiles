@@ -827,6 +827,19 @@ install_cert_manager_cmctl(){
 
 }
 
+install_github(){
+
+  # public key installation for ssh
+  # see HOME/.ssh/config
+  GITHUB_PUBLIC_KEY=$HOME/.ssh/id_git_github.com.pub
+  if [ ! -f "$GITHUB_PUBLIC_KEY" ]; then
+    pass ssh-x/id_git_github.com.pub > "$GITHUB_PUBLIC_KEY"
+  else
+    echo "GitHub Public Key Found"
+  fi
+
+}
+
 install_git(){
 
   if command_exists git; then
@@ -1284,6 +1297,13 @@ install_git_repos(){
     echo "Git-x present"
   fi
 
+  # Homebrew
+  if [ ! -d "$HOME/code/homebrew-tap-eraldy" ]; then
+    git clone git@github.com:EraldyHq/homebrew-tap.git "$HOME/code/homebrew-tap-eraldy"
+  else
+    echo "homebrew-tap-eraldy present"
+  fi
+
 
 }
 
@@ -1478,14 +1498,20 @@ main(){
   # Git (already installed normally as we store this repo in git)
   install_git
 
-  # install git repo (ssh repo)
-  install_git_repos
 
   # install brew
   install_brew
 
   # install pass
   install_pass
+
+  # install github key
+  # dependency: pass
+  install_github
+
+  # install git repo (ssh repo)
+  # dependency: github
+  install_git_repos
 
   # Install Python
   install_python
