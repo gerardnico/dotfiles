@@ -129,6 +129,23 @@ package_installed() {
     dpkg -l "$1" >/dev/null 2>&1
 }
 
+install_nodejs_markdown_check(){
+
+  if command_exists markdown-link-check; then
+      echo "markdown-link-check found"
+      return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "markdown-link-check on Windows not yet done"
+      return
+  fi
+  echo "markdown-link-check install"
+  npm install -g markdown-link-check
+  echo "markdown-link-check installation done"
+
+}
+
 install_kubectl(){
 
   if command_exists kubectl; then
@@ -1530,6 +1547,9 @@ main(){
 
   # Install node
   install_nodejs
+
+  # Markdown check
+  install_nodejs_markdown_check
 
   # Install openoffice
   install_openoffice
