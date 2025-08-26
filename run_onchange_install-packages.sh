@@ -279,7 +279,7 @@ install_flyctl(){
 }
 
 # https://aider.chat/docs/install.html
-install_aider(){
+install_python_aider(){
 
   if which aider > /dev/null; then
         echo "aider founds"
@@ -1488,6 +1488,87 @@ install_python(){
 
 }
 
+install_cmake(){
+  if which whisper-cli > /dev/null; then
+      echo "cmake founds"
+      return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Sorry cmake installation on Windows not yet done"
+      return
+  fi
+
+  echo "cmake installation"
+  brew install cmake
+  echo "cmake installation done"
+
+}
+# https://github.com/ggml-org/whisper.cpp?tab=readme-ov-file#quick-start
+install_whisper_cpp_cli_cmake(){
+
+  if which whisper-cli > /dev/null; then
+      echo "whisper-cli founds"
+      return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Sorry whisper-cli installation on Windows not yet done"
+      return
+  fi
+  echo "whisper-cli installation"
+  pushd /tmp
+  if [ ! -d "whisper.cpp" ]; then
+    git clone https://github.com/ggml-org/whisper.cpp.git
+  fi
+  cd whisper.cpp
+  sh ./models/download-ggml-model.sh base.en
+  # build the project
+  cmake -B build
+  cmake --build build -j --config Release
+  popd
+  echo "whisper-cli installation done"
+
+}
+# https://github.com/yt-dlp/yt-dlp#installation
+install_python_youtube_downloader(){
+
+  if which yt-dlp > /dev/null; then
+      echo "yt-dlp founds"
+      return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Sorry yt-dlp installation on Windows not yet done"
+      return
+  fi
+  if ! command_exists python; then
+      echo "python is required to install yt-dlp"
+      return 1
+  fi
+  echo "yt-dlp installation"
+  python -m pip install yt-dlp
+  echo "yt-dlp installation done"
+
+}
+
+install_ffmpeg_brew(){
+  if command_exists ffmpeg; then
+    echo "ffmpeg installed"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "ffmpeg not yet done"
+      return
+  fi
+
+  echo "Installing ffmpeg"
+  brew install ffmpeg
+  echo "ffmpeg Installation done"
+
+}
+
 # deprecated: don't check for bad link
 # only for space and other constraint
 install_markdown_lint(){
@@ -1519,6 +1600,15 @@ main(){
   # install brew
   install_brew
 
+  # install ffmpeg
+  install_ffmpeg_brew
+
+  # install_cmake
+  install_cmake
+
+  # install whisper.cpp (whisper-cli)
+  install_whisper_cpp_cli_cmake
+
   # install pass
   install_pass
 
@@ -1538,12 +1628,15 @@ main(){
     echo "Python venv conf file was not found ($PYTHON_CONF)"
     return 1
   fi
-
-  # Install aider
-  install_aider
-
   # shellcheck disable=SC1090
   source "$PYTHON_CONF"
+
+  # Install aider
+  install_python_aider
+
+  # Install python downloader
+  install_python_youtube_downloader
+
 
   # Install node
   install_nodejs
