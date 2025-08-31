@@ -735,6 +735,7 @@ install_gpg(){
 
 }
 
+# sudo apt install pinentry-gnome3
 install_gpg_pinentry(){
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
@@ -776,6 +777,22 @@ install_yq(){
   fi
   echo "Installing yq"
   brew install yq
+}
+
+install_zenity_pinentry_apt(){
+  if command_exists zenity; then
+    echo "Zenity found"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Zenity Installation not supported skipping"
+    return
+  fi
+  echo "Installing Zenity"
+  # not with brew, we get error on path
+  # brew install zenity
+  sudo apt install zenity
+  echo "Zenity installed"
 }
 
 install_vagrant(){
@@ -857,7 +874,8 @@ install_github(){
 
 }
 
-install_git(){
+# Git is normally already installed as it's need to download this repo
+install_git_check(){
 
   if command_exists git; then
     echo "Git Installed"
@@ -873,6 +891,7 @@ install_git(){
   echo "Apt Installing Git"
   # and not brew as it's needed to clone the dotfiles repo
   apt install git
+  echo "Git installed"
 
 }
 
@@ -1325,7 +1344,7 @@ install_git_repos(){
 }
 
 # * Linux: [pass](https://www.passwordstore.org/#download)
-install_pass(){
+install_pass_check(){
 
   if command_exists pass; then
     echo "pass installed"
@@ -1488,7 +1507,7 @@ install_python(){
 
 }
 
-install_cmake(){
+install_cmake_brew(){
   if which whisper-cli > /dev/null; then
       echo "cmake founds"
       return
@@ -1504,6 +1523,26 @@ install_cmake(){
   echo "cmake installation done"
 
 }
+
+# https://formulae.brew.sh/formula/whisper-cpp !!
+install_whisper_cpp_brew(){
+  #  https://formulae.brew.sh/formula/whisper-cpp instead
+  if which whisper-cli > /dev/null; then
+      echo "whisper-cli founds"
+      return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Sorry whisper-cli installation on Windows not yet done"
+      return
+  fi
+
+  echo "whisper-cpp installation"
+  brew install whisper-cpp
+  echo "whisper-cpp installed"
+
+}
+
 # https://github.com/ggml-org/whisper.cpp?tab=readme-ov-file#quick-start
 install_whisper_cpp_cli_cmake(){
 
@@ -1516,6 +1555,7 @@ install_whisper_cpp_cli_cmake(){
       echo "Sorry whisper-cli installation on Windows not yet done"
       return
   fi
+
   echo "whisper-cli installation"
   pushd /tmp
   if [ ! -d "whisper.cpp" ]; then
@@ -1594,8 +1634,7 @@ install_markdown_lint(){
 main(){
 
   # Git (already installed normally as we store this repo in git)
-  install_git
-
+  install_git_check
 
   # install brew
   install_brew
@@ -1603,14 +1642,15 @@ main(){
   # install ffmpeg
   install_ffmpeg_brew
 
-  # install_cmake
-  install_cmake
+  # install Zenity
+  # the default for our ssh askpass program
+  install_zenity_pinentry_apt
 
   # install whisper.cpp (whisper-cli)
-  install_whisper_cpp_cli_cmake
+  install_whisper_cpp_brew
 
   # install pass
-  install_pass
+  install_pass_check
 
   # install github key
   # dependency: pass
