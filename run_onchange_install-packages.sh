@@ -731,10 +731,27 @@ install_gpg(){
   # https://packages.debian.org/bookworm/gpg
   # https://packages.debian.org/bookworm/gpg-agent
   echo "gpg command installation"
-  sudo apt -y install gnupg2 gnupg-agent
+  # sudo apt -y install gnupg2 gnupg-agent
+  # Note brew pass installation require gpg with brew
+  # so we get it already normally
+  brew install gpg
 
 }
 
+install_jq_brew(){
+
+  if command_exists jq; then
+    echo "Jq found"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    winget install -e --id stedolan.jq
+    return
+  fi
+  echo "Installing jq"
+  brew install jq
+
+}
 # sudo apt install pinentry-gnome3
 install_gpg_pinentry(){
 
@@ -1793,6 +1810,8 @@ main(){
   install_gpg_pinentry
   # Yq
   install_yq
+  # Jq
+  install_jq_brew
   # Vagrant
   # install_vagrant
   install_kind_kube_on_docker
