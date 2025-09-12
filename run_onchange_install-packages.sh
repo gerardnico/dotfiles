@@ -16,10 +16,67 @@ set -TCEeuo pipefail
 echo "$(basename "$0") - Install my Packages"
 
 # Function to check if a command exists
-command_exists() {
+util_command_exists() {
     # start to check subcommand such as `kubectl oidc-login`
     # does not work always for subcommand, you could just do `if command -help >/dev/null 2>1; then`
     command -v "$@" >/dev/null 2>&1
+}
+
+# Function to ensure Whisper model exists and download if missing
+# Wrapper around:
+# bash -c "$(curl -fsSL https://raw.githubusercontent.com/ggerganov/whisper.cpp/master/models/download-ggml-model.sh)" -- base.en
+# Done! Model 'base.en' saved in './ggml-base.en.bin'
+# curl -L -o models/ggml-base.en.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
+# Run with a model
+# whisper-cli --model models/ggml-base.en.bin --file jfk.opus
+util_whisper_model_download() {
+   local model_name="${1:-base.en}"  # Default to base.en if no model specified
+   local models_dir="${2:-./models}"  # Default to ./models directory
+   local model_file="${models_dir}/ggml-${model_name}.bin"
+
+   # Create models directory if it doesn't exist
+   if [ ! -d "$models_dir" ]; then
+       echo "Creating models directory: $models_dir"
+       mkdir -p "$models_dir"
+   fi
+
+   # Check if model file exists
+   if [ -f "$model_file" ]; then
+       echo "Model already exists: $model_file"
+       return 0
+   fi
+
+   echo "Model not found: $model_file"
+   echo "Downloading $model_name model..."
+
+   # Try using the official download script first
+   if command -v curl >/dev/null 2>&1; then
+       echo "Attempting download using official script..."
+       if bash -c "$(curl -fsSL https://raw.githubusercontent.com/ggerganov/whisper.cpp/master/models/download-ggml-model.sh)" -- "$model_name" 2>/dev/null; then
+           # Move the downloaded file to our specified directory if it's not already there
+           if [ -f "ggml-${model_name}.bin" ] && [ "$models_dir" != "." ]; then
+               mv "ggml-${model_name}.bin" "$model_file"
+           fi
+           echo "Successfully downloaded using official script!"
+           return 0
+       fi
+
+       echo "Official script failed, trying direct download..."
+
+       # Fallback to direct download from HuggingFace
+       local download_url="https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-${model_name}.bin"
+
+       if curl -L --fail --progress-bar -o "$model_file" "$download_url"; then
+           echo "Successfully downloaded $model_name model to $model_file"
+           return 0
+       else
+           echo "Error: Failed to download model from $download_url"
+           return 1
+       fi
+   else
+       echo "Error: curl is required but not installed"
+       return 1
+   fi
 }
 
 # sudo is not available on windows
@@ -131,7 +188,7 @@ package_installed() {
 
 install_nodejs_markdown_check(){
 
-  if command_exists markdown-link-check; then
+  if util_command_exists markdown-link-check; then
       echo "markdown-link-check found"
       return
   fi
@@ -148,7 +205,7 @@ install_nodejs_markdown_check(){
 
 install_kubectl(){
 
-  if command_exists kubectl; then
+  if util_command_exists kubectl; then
       echo "Kubectl found"
       return
   fi
@@ -165,12 +222,12 @@ install_kubectl(){
 
 install_kubectl_oidc_login(){
 
-  if command_exists kubectl oidc-login; then
+  if util_command_exists kubectl oidc-login; then
       echo "Kubectl oidc-login found"
       return
   fi
 
-  if ! command_exists kubectl; then
+  if ! util_command_exists kubectl; then
     echo "Kubectl was not found. oidc-login cannot be installed"
     return 1
   fi
@@ -184,7 +241,7 @@ install_helm_plugin(){
 
   local subcommand=$1
   local url=$2
-  if ! command_exists "helm"; then
+  if ! util_command_exists "helm"; then
     echo "Helm was not found. $subcommand plugin cannot be installed"
     return 1
   fi
@@ -211,7 +268,7 @@ install_helm_plugin(){
 # Postal Installation Helper
 # https://docs.postalserver.io/getting-started/prerequisites#git-installation-helper-repository
 install_postal(){
-  if command_exists postal; then
+  if util_command_exists postal; then
       echo "Postal founds"
       return
   fi
@@ -230,7 +287,7 @@ install_postal(){
 # https://www.libspf2.net/
 # https://github.com/shevek/libspf2/
 install_email_spfquery(){
-  if command_exists spfquery; then
+  if util_command_exists spfquery; then
       echo "SpfQuery founds"
       return
   fi
@@ -250,7 +307,7 @@ install_email_spfquery(){
 }
 # Return all data
 install_email_checkdmarc(){
-  if command_exists checkdmarc; then
+  if util_command_exists checkdmarc; then
       echo "checkdmarc founds"
       return
   fi
@@ -265,7 +322,7 @@ install_email_checkdmarc(){
 
 # https://fly.io/docs/flyctl/install/
 install_flyctl(){
-  if command_exists flyctl; then
+  if util_command_exists flyctl; then
         echo "flyctl founds"
         return
     fi
@@ -290,7 +347,7 @@ install_python_aider(){
       echo "Sorry aider installation on Windows not yet done"
       return
   fi
-  if ! command_exists python; then
+  if ! util_command_exists python; then
       echo "python is required to install aider"
       return 1
   fi
@@ -304,7 +361,7 @@ install_python_aider(){
 # https://formulae.brew.sh/formula/composer
 install_php_composer(){
 
-  if command_exists composer; then
+  if util_command_exists composer; then
         echo "composer founds"
         return
   fi
@@ -348,7 +405,7 @@ install_sdkman(){
 # https://sqlite.org/download.html
 install_sqlite(){
 
-  if command_exists sqlite3; then
+  if util_command_exists sqlite3; then
         echo "sqlite founds"
         return
   fi
@@ -365,7 +422,7 @@ install_sqlite(){
 # https://taskfile.dev/installation/
 install_go_task(){
 
-  if command_exists task; then
+  if util_command_exists task; then
         echo "Task founds"
         return
   fi
@@ -381,7 +438,7 @@ install_go_task(){
 }
 
 install_nodejs(){
-  if command_exists node; then
+  if util_command_exists node; then
     echo "nodejs founds"
     return
   fi
@@ -396,7 +453,7 @@ install_nodejs(){
 
 # https://goreleaser.com/install/
 install_goreleaser(){
-  if command_exists goreleaser; then
+  if util_command_exists goreleaser; then
     echo "goreleaser founds"
     return
   fi
@@ -412,7 +469,7 @@ install_goreleaser(){
 # https://github.com/GNOME/libxslt/tree/master
 # https://gnome.pages.gitlab.gnome.org/libxslt/xsltproc.html
 install_xml_xsltproc(){
-  if command_exists xsltproc; then
+  if util_command_exists xsltproc; then
       echo "xsltproc founds"
       return
   fi
@@ -430,7 +487,7 @@ install_xml_xsltproc(){
 # https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
 # not that yq can query xml
 install_xml_xmllint(){
-  if command_exists xmllint; then
+  if util_command_exists xmllint; then
       echo "xmllint founds"
       return
   fi
@@ -448,7 +505,7 @@ install_xml_xmllint(){
 # https://www.html-tidy.org/
 # https://github.com/htacg/tidy-html5
 install_html_tidy(){
-  if command_exists tidy; then
+  if util_command_exists tidy; then
       echo "tidy founds"
       return
   fi
@@ -479,7 +536,7 @@ install_vim_monokai(){
 
 # https://maven.apache.org/install.html
 install_maven(){
-  if command_exists mvn; then
+  if util_command_exists mvn; then
     echo "mvn founds"
     return
   fi
@@ -496,11 +553,11 @@ install_maven(){
 # https://commitlint.js.org/guides/getting-started.html
 install_nodejs_commitlint(){
 
-  if command_exists commitlint; then
+  if util_command_exists commitlint; then
     echo "commitlint founds"
     return
   fi
-  if ! command_exists npm; then
+  if ! util_command_exists npm; then
       echo "npm not founds !!! Install first node"
       return 1
   fi
@@ -520,7 +577,7 @@ install_nodejs_commitlint(){
 # https://jetmore.org/john/code/swaks/installation.html
 install_mail_swaks(){
 
-  if command_exists swaks; then
+  if util_command_exists swaks; then
       echo "Swaks founds"
       return
   fi
@@ -535,7 +592,7 @@ install_mail_swaks(){
 
 install_helm_readme_generator(){
 
-  if command_exists readme-generator-for-helm; then
+  if util_command_exists readme-generator-for-helm; then
       echo "readme-generator-for-helm founds"
       return
   fi
@@ -554,7 +611,7 @@ install_helm_readme_generator(){
 install_git_extras(){
   ## https://github.com/tj/git-extras/blob/main/Installation.md
   ## Only brew is maintained by the author
-  if command_exists git-standup; then
+  if util_command_exists git-standup; then
     echo "Git Extra founds"
     return
   fi
@@ -585,7 +642,7 @@ install_git_extras(){
 # https://github.com/norwoodj/helm-docs?tab=readme-ov-file#installation
 install_helm_docs(){
   # See get Helms section at https://helm.sh/
-  if command_exists helm-docs; then
+  if util_command_exists helm-docs; then
     echo "Helm Docs founds"
     return
   fi
@@ -606,7 +663,7 @@ install_helm_docs(){
 # https://git-cliff.org/docs/installation/
 install_git_cliff(){
 
-  if command_exists git-cliff; then
+  if util_command_exists git-cliff; then
     echo "Git-Cliff founds"
     return
   fi
@@ -625,7 +682,7 @@ install_git_cliff(){
 # https://github.com/wagoodman/dive
 install_docker_dive(){
 
-  if command_exists dive; then
+  if util_command_exists dive; then
     echo "Dive founds"
     return
   fi
@@ -643,7 +700,7 @@ install_docker_dive(){
 
 # https://jreleaser.org/guide/latest/install.html
 install_jreleaser(){
-  if command_exists jreleaser; then
+  if util_command_exists jreleaser; then
     echo "jreleaser founds"
     return
   fi
@@ -660,7 +717,7 @@ install_jreleaser(){
 }
 
 install_go(){
-  if command_exists go; then
+  if util_command_exists go; then
     echo "Go founds"
     return
   fi
@@ -678,7 +735,7 @@ install_go(){
 # ko makes building Go container images easy
 # https://ko.build/install/
 install_go_tooling_ko(){
-  if command_exists ko; then
+  if util_command_exists ko; then
     echo "ko founds"
     return
   fi
@@ -697,7 +754,7 @@ install_go_tooling_ko(){
 install_helm(){
 
   # See get Helms section at https://helm.sh/
-  if command_exists helm; then
+  if util_command_exists helm; then
     echo "Helm founds"
     return
   fi
@@ -716,7 +773,7 @@ install_helm(){
 
 install_gpg(){
 
-  if  command_exists gpg; then
+  if  util_command_exists gpg; then
       echo "gpg command found"
       return
   fi
@@ -740,7 +797,7 @@ install_gpg(){
 
 install_jq_brew(){
 
-  if command_exists jq; then
+  if util_command_exists jq; then
     echo "Jq found"
     return
   fi
@@ -760,7 +817,7 @@ install_gpg_pinentry(){
       return
   fi
 
-  if ! command_exists pinentry-qt; then
+  if ! util_command_exists pinentry-qt; then
         echo "Installing pinentry-qt"
         sudo apt -y install pinentry-qt
         echo "Installed pinentry-qt"
@@ -768,7 +825,7 @@ install_gpg_pinentry(){
     echo "pinentry-qt command found"
   fi
 
-  if ! command_exists info; then
+  if ! util_command_exists info; then
     # info is needed to get the pinentry doc
     # with `info pinentry`
     sudo apt install -y info
@@ -784,7 +841,7 @@ install_gpg_pinentry(){
 }
 
 install_yq(){
-  if command_exists yq; then
+  if util_command_exists yq; then
     echo "Yq found"
     return
   fi
@@ -797,7 +854,7 @@ install_yq(){
 }
 
 install_zenity_pinentry_apt(){
-  if command_exists zenity; then
+  if util_command_exists zenity; then
     echo "Zenity found"
     return
   fi
@@ -813,7 +870,7 @@ install_zenity_pinentry_apt(){
 }
 
 install_vagrant(){
-  if command_exists vagrant; then
+  if util_command_exists vagrant; then
     echo "Vagrant Found"
     return
   fi
@@ -830,7 +887,7 @@ install_vagrant(){
 install_kind_kube_on_docker(){
   # Installation possibility is on quick start
   # https://kind.sigs.k8s.io/docs/user/quick-start
-  if command_exists kind; then
+  if util_command_exists kind; then
     echo "Kind installed"
     return
   fi
@@ -846,7 +903,7 @@ install_kind_kube_on_docker(){
 
 install_mkcert(){
 
-  if command_exists mkcert; then
+  if util_command_exists mkcert; then
     echo "mkcert installed"
     return
   fi
@@ -868,7 +925,7 @@ install_cert_manager_cmctl(){
       return
   fi
   ## https://cert-manager.io/docs/reference/cmctl/#installation
-  if command_exists cmctl; then
+  if util_command_exists cmctl; then
     echo "cmctl installed"
     return
   fi
@@ -894,7 +951,7 @@ install_github(){
 # Git is normally already installed as it's need to download this repo
 install_git_check(){
 
-  if command_exists git; then
+  if util_command_exists git; then
     echo "Git Installed"
     return
   fi
@@ -944,7 +1001,7 @@ get_cpu_arch_name(){
 
 install_jsonnet_bundler_manager(){
 
-  if  command_exists jb; then
+  if  util_command_exists jb; then
     echo "jsonnet-bundler is installed (jsonnet package manager)"
     return
   fi
@@ -969,7 +1026,7 @@ install_go_json_to_yaml(){
 
   local BINARY="gojsontoyaml"
 
-  if command_exists "$BINARY"; then
+  if util_command_exists "$BINARY"; then
     echo "$BINARY is already installed"
     return
   fi
@@ -982,7 +1039,7 @@ install_go_json_to_yaml(){
 install_jsonnet(){
 
   local FINAL_BINARY="jsonnet"
-  if command_exists "$FINAL_BINARY"; then
+  if util_command_exists "$FINAL_BINARY"; then
     echo "Jsonnet is already installed"
     return
   fi
@@ -1006,7 +1063,7 @@ install_nix(){
     echo "Nix does not support windows - Skipping"
     return
   fi
-  if ! command_exists "nix-shell"; then
+  if ! util_command_exists "nix-shell"; then
       echo "Installing Nix"
       bash <(curl -L https://nixos.org/nix/install) --no-daemon
   fi
@@ -1021,7 +1078,7 @@ install_brew(){
     echo "Brew does not support windows - Skipping"
     return
   fi
-  if command_exists "brew"; then
+  if util_command_exists "brew"; then
     echo "Brew is already installed"
     return
   fi
@@ -1042,7 +1099,7 @@ install_brew(){
 # https://github.com/NixOS/nixfmt?tab=readme-ov-file#from-the-repository
 install_nixfmt(){
 
-  if command_exists "nixfmt"; then
+  if util_command_exists "nixfmt"; then
       echo "Nixfmt found"
       return
   fi
@@ -1052,7 +1109,7 @@ install_nixfmt(){
     return
   fi
 
-  if ! command_exists "nix-env"; then
+  if ! util_command_exists "nix-env"; then
       echo "nix should be installed for nixfmt"
       return 1
   fi
@@ -1065,7 +1122,7 @@ install_nixfmt(){
 
 install_zoxide_cd(){
   # cd on
-  if command_exists zoxide; then
+  if util_command_exists zoxide; then
     echo "Zoxide Found"
     return
   fi
@@ -1081,7 +1138,7 @@ install_zoxide_cd(){
 
 install_lazy_git(){
 
-  if command_exists lazygit; then
+  if util_command_exists lazygit; then
     echo "LazyGit Found"
     return
   fi
@@ -1099,7 +1156,7 @@ install_lazy_git(){
 
 install_envsubst(){
 
-  if command_exists envsubst; then
+  if util_command_exists envsubst; then
     echo "GetText envsubst installed"
     return
   fi
@@ -1115,7 +1172,7 @@ install_envsubst(){
 
 # fuzzy finder
 install_fzf(){
-  if command_exists fzf; then
+  if util_command_exists fzf; then
     echo "Fzf Found"
     return
   fi
@@ -1130,7 +1187,7 @@ install_fzf(){
 }
 
 install_telnet(){
-  if command_exists telnet; then
+  if util_command_exists telnet; then
     echo "Telnet installed"
     return
   fi
@@ -1154,7 +1211,7 @@ install_telnet(){
 install_rsync(){
 
   # rsync
-  if command_exists rsync; then
+  if util_command_exists rsync; then
     echo "Rsync Found"
     return
   fi
@@ -1168,7 +1225,7 @@ install_rsync(){
 }
 
 install_tmux(){
-  if command_exists tmux; then
+  if util_command_exists tmux; then
     echo "Tmux Found"
     return
   fi
@@ -1192,12 +1249,12 @@ install_tmux(){
 install_go_tooling_cobra_cli(){
 
 
-  if command_exists cobra-cli; then
+  if util_command_exists cobra-cli; then
         echo "cobra-cli found"
         return;
   fi
   
-  if ! command_exists go; then
+  if ! util_command_exists go; then
     echo "Error: go not found"
     return 2;
   fi
@@ -1208,7 +1265,7 @@ install_go_tooling_cobra_cli(){
 
 }
 install_nmap(){
-  if command_exists nmap; then
+  if util_command_exists nmap; then
       echo "Nmap found"
       return;
   fi
@@ -1223,7 +1280,7 @@ install_nmap(){
 
 install_netstat(){
 
-  if command_exists netstat; then
+  if util_command_exists netstat; then
     echo "netstat found"
     return;
   fi
@@ -1241,7 +1298,7 @@ install_netstat(){
 # https://sectools.org/tool/netcat/
 # https://netcat.sourceforge.net/
 install_netcat(){
-  if command_exists nc; then
+  if util_command_exists nc; then
     echo "Netcat found"
     return;
   fi
@@ -1263,7 +1320,7 @@ install_netcat(){
 # https://github.com/lsof-org/lsof
 install_net_lsof(){
 
-  if command_exists lsof; then
+  if util_command_exists lsof; then
     echo "lsof installed"
     return
   fi
@@ -1280,7 +1337,7 @@ install_net_lsof(){
 
 install_direnv(){
 
-  if command_exists direnv; then
+  if util_command_exists direnv; then
     echo "direnv installed"
     return
   fi
@@ -1363,7 +1420,7 @@ install_git_repos(){
 # * Linux: [pass](https://www.passwordstore.org/#download)
 install_pass_check(){
 
-  if command_exists pass; then
+  if util_command_exists pass; then
     echo "pass installed"
     return
   fi
@@ -1384,7 +1441,7 @@ install_pass_check(){
 # Do we really need that? Uses nix instead
 install_ssh_askpass(){
   # Needed with ssh
-  if command_exists ssh-askpass; then
+  if util_command_exists ssh-askpass; then
     echo "ssh-askpass installed"
     return
   fi
@@ -1399,7 +1456,7 @@ install_ssh_askpass(){
 
 install_openoffice(){
 
-  if command_exists scalc; then
+  if util_command_exists scalc; then
     echo "OpenOffice installed"
     return
   fi
@@ -1416,7 +1473,7 @@ install_openoffice(){
 
 install_mail_utils(){
   # https://mailutils.org
-  if command_exists mail; then
+  if util_command_exists mail; then
     echo "Mailutils installed"
     return
   fi
@@ -1439,7 +1496,7 @@ install_mail_utils(){
 # Pre-commit
 # https://pre-commit.com/#installation
 install_pre_commit(){
-  if command_exists pre-commit; then
+  if util_command_exists pre-commit; then
      echo "Pre-commit already installed"
      return
   fi
@@ -1451,7 +1508,7 @@ install_pre_commit(){
 }
 
 install_tpcds(){
-  if command_exists dsqgen; then
+  if util_command_exists dsqgen; then
     echo "tpcds installed"
     return
   fi
@@ -1484,7 +1541,7 @@ install_tpcds(){
 # https://github.com/Foundry376/Mailspring/tree/master
 install_mail_spring_gui(){
 
-  if command_exists mailspring; then
+  if util_command_exists mailspring; then
     echo "Mail spring installed"
     return
   fi
@@ -1506,7 +1563,7 @@ install_mail_spring_gui(){
 
 install_python(){
 
-  if command_exists python3; then
+  if util_command_exists python3; then
     echo "Python installed"
     return
   fi
@@ -1538,6 +1595,13 @@ install_cmake_brew(){
   echo "cmake installation"
   brew install cmake
   echo "cmake installation done"
+
+}
+
+# https://formulae.brew.sh/formula/whisper-cpp !!
+install_whisper_base_model_brew(){
+
+  util_whisper_model_download "base.en" "$(brew --prefix whisper-cpp)/models"
 
 }
 
@@ -1599,7 +1663,7 @@ install_python_youtube_downloader(){
       echo "Sorry yt-dlp installation on Windows not yet done"
       return
   fi
-  if ! command_exists python; then
+  if ! util_command_exists python; then
       echo "python is required to install yt-dlp"
       return 1
   fi
@@ -1610,7 +1674,7 @@ install_python_youtube_downloader(){
 }
 
 install_ffmpeg_brew(){
-  if command_exists ffmpeg; then
+  if util_command_exists ffmpeg; then
     echo "ffmpeg installed"
     return
   fi
@@ -1630,7 +1694,7 @@ install_ffmpeg_brew(){
 # only for space and other constraint
 install_markdown_lint(){
 
-  if command_exists markdownlint-cli; then
+  if util_command_exists markdownlint-cli; then
     echo "markdownlint-cli installed"
     return
   fi
@@ -1666,6 +1730,7 @@ main(){
   # install whisper.cpp (whisper-cli)
   # install_whisper_cpp_cli_cmake
   install_whisper_cpp_brew
+  install_whisper_base_model_brew
 
   # install pass
   install_pass_check
