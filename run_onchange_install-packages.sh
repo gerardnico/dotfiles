@@ -1664,6 +1664,7 @@ main(){
   install_zenity_pinentry_apt
 
   # install whisper.cpp (whisper-cli)
+  # install_whisper_cpp_cli_cmake
   install_whisper_cpp_brew
 
   # install pass
