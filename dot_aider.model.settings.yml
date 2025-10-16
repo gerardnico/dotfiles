@@ -1,0 +1,46 @@
+# https://aider.chat/docs/config/adv-model-settings.html#model-settings
+# Copy of the settings in https://raw.githubusercontent.com/Aider-AI/aider/refs/tags/v0.86.1/aider/resources/model-settings.yml
+# Default value can be seen here: https://aider.chat/docs/config/adv-model-settings.html#default-model-settings
+- name: anthropic/claude-sonnet-4-20250514
+  weak_model_name: anthropic/claude-3-5-haiku-20241022
+  editor_model_name: claude-haiku-4-5-20251001
+  # examples_as_sys_msg
+  # When examples_as_sys_msg is set to true (or enabled), aider packs these crucial editing examples into the System Message (or system prompt).
+  # When it's set to false (or disabled), the examples are typically sent as part of the User/Assistant chat history, usually in a simulated turn before the user's actual request.
+  # Why it Matters (Model Performance): Some modern LLMs, particularly those from OpenAI (like GPT-4o) and Anthropic, are designed to give more weight and attention to instructions placed in the System Message.
+  examples_as_sys_msg: false # default value
+  # controls whether a specific model should be sent a prompt to undo its previous file changes.
+  # If true, when you use the /undo command in Aider,
+  # it sends an extra message to the LLM (Large Language Model) essentially saying, "Hey, the last changes you made were undone, please try again/correct it."
+  send_undo_reply: false # default value
+  # Lazy: use the concept of "laziness" to describe models that do not complete tasks thoroughly.
+  # indicates that the model is prone to "lazy coding", where instead of providing the complete, finished code, it leaves incomplete sections or "homework assignments" for the user in the form of comments like "implement method here", "add logic here...", or "rest of code..."
+  # Generally, models that score poorly on Aider's "laziness benchmark" would have this flag set to true
+  lazy: false # default value
+  # The reminder is a persistent piece of text (a "guardrail")
+  # that aider sends to the LLM with every message to ensure the model remembers to use the correct formatting for file edits (e.g., the diff format).
+  # 2 values: user and sys (or system)
+  # They refer to the role in the chat history that aider uses to send certain repetitive or critical prompts to the model.
+  # reminder: sys (or system)
+  #    * Would send reminders messages using the system role (the system message sets the overarching instructions and behavior for the model for the entire conversation)
+  #    * Models that use reminder sys (like GPT-4 models) are often trained to respect a dedicated, single System prompt, which is efficient as it doesn't add to the size of every subsequent user message.
+  # reminder: user: Send the reminders using the user role.
+  #    * By including the reminder as part of the human's input, it effectively "re-injects" the critical instruction every time, making it harder for the model to forget its required behavior.
+  #    * Some models and providers (especially those that follow the "chat" format) are highly sensitive to the last message, which comes from the user. Using the user role for the reminder ensures the instructions are always in the most recent and highest-priority part of the prompt, instructing the model on the correct response format.
+  reminder: user # default
+  #
+  caches_by_default: false # the default
+  #
+  use_system_prompt: true # the default
+  use_temperature: true # the default
+  streaming: true # the default
+  # Value from https://raw.githubusercontent.com/Aider-AI/aider/refs/tags/v0.86.1/aider/resources/model-settings.yml
+  edit_format: diff
+  use_repo_map: true
+  extra_params:
+    extra_headers:
+      anthropic-beta: prompt-caching-2024-07-31,pdfs-2024-09-25,output-128k-2025-02-19
+    max_tokens: 64000
+  cache_control: true
+  editor_edit_format: editor-diff
+  accepts_settings: [ "thinking_tokens" ]
