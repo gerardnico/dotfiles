@@ -121,12 +121,13 @@
 
 #################
 # Cache settings:
+# https://aider.chat/docs/config/options.html#cache-settings
 
 ## Enable caching of prompts (default: False)
-#cache-prompts: false
+cache-prompts: true
 
 ## Number of times to ping at 5min intervals to keep prompt cache warm (default: 0)
-#cache-keepalive-pings: false
+cache-keepalive-pings: 1
 
 ###################
 # Repomap settings:
@@ -168,7 +169,9 @@ dark-mode: true
 #pretty: true
 
 ## Enable/disable streaming responses (default: True)
-#stream: true
+## Needed for caching
+## https://aider.chat/docs/usage/caching.html
+stream: false
 
 ## Set the color for user input (default: #00cc00)
 #user-input-color: "#00cc00"
@@ -219,10 +222,10 @@ dark-mode: true
 #aiderignore: .aiderignore
 
 ## Only consider files in the current subtree of the git repository
-#subtree-only: false
+subtree-only: true
 
 ## Enable/disable auto commit of LLM changes (default: True)
-auto-commits: true
+auto-commits: false
 
 ## Enable/disable commits when repo is found dirty (default: True)
 dirty-commits: true
@@ -258,7 +261,7 @@ dirty-commits: true
 #skip-sanity-check-repo: false
 
 ## Enable/disable watching files for ai coding comments (default: False)
-#watch-files: false
+watch-files: true
 
 ########################
 # Fixing and committing:
@@ -426,7 +429,9 @@ dirty-commits: true
 #fancy-input: true
 
 ## Enable/disable multi-line input mode with Meta-Enter to submit (default: False)
-#multiline: false
+## Swaps the function of Meta-Enter and Enter, so that Enter inserts a newline, and Meta-Enter submits your command.
+## https://aider.chat/docs/usage/tips.html#interrupting--inputting
+multiline: true
 
 ## Enable/disable terminal bell notifications when LLM responses are ready (default: False)
 #notifications: false

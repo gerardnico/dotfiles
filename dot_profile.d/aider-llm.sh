@@ -10,7 +10,7 @@ function aider(){
   # Project name should be in a envrc
   PROJECT_NAME=${PROJECT_NAME:-}
   if [ "$PROJECT_NAME" == "" ]; then
-    echo "Project Name is missing"
+    echo "Project Name env (PROJECT_NAME) is missing"
     return 1
   fi
   if ! AIDER_PATH="$(which aider)"; then
@@ -36,14 +36,14 @@ function aider(){
       ;;
     *)
       echo "LLM ${LLM:-} is unknown"
-      exit 1
+      return 1
   esac
 
 
   LLM_KEY_PATH="${PROVIDER}/${PROJECT_NAME}"
   if ! LLM_KEY=$(pass "$LLM_KEY_PATH"); then
     echo "${LLM:-} Api Key Not Found for project ${PROJECT_NAME} at $LLM_KEY_PATH"
-    exit 1
+    return 1
   fi
 
   eval "$ENV_NAME=$LLM_KEY $AIDER_PATH $*"
