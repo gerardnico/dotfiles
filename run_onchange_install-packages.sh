@@ -1601,7 +1601,10 @@ install_cmake_brew(){
 # https://formulae.brew.sh/formula/whisper-cpp !!
 install_whisper_base_model_brew(){
 
+  # English only
   util_whisper_model_download "base.en" "$(brew --prefix whisper-cpp)/models"
+  # Multi language
+  util_whisper_model_download "base" "$(brew --prefix whisper-cpp)/models"
 
 }
 
