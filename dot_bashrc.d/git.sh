@@ -67,10 +67,10 @@ alias glog='git log'
 alias glogp='git log --pretty=format:"%h %s" --graph'
 
 
-# Taken as default by Git
-export GIT_AUTHOR_NAME="Nicolas GERARD"
-export GIT_AUTHOR_EMAIL="gerardnico@gmail.com"
-# GIT_AUTHOR_DATE
+# No GIT_AUTHOR env
+# Why? Because it has the higher priority than the repository config
+# Deprecated: export GIT_AUTHOR_NAME="Nicolas GERARD"
+# Deprecated: export GIT_AUTHOR_EMAIL="gerardnico@gmail.com"
 
 # Gitx
 # Where all repo are
