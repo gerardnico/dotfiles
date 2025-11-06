@@ -1608,6 +1608,28 @@ install_whisper_base_model_brew(){
 
 }
 
+install_github_cli_brew_winget(){
+
+  if which gh > /dev/null; then
+        echo "gh founds (github cli)"
+        return
+  fi
+
+  # https://github.com/cli/cli/blob/trunk/docs/install_windows.md
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "gh installation"
+      winget install --id GitHub.cli
+      echo "gh installed"
+      return
+  fi
+
+  echo "gh installation"
+  # https://github.com/cli/cli/blob/trunk/docs/install_macos.md#homebrew
+  brew install gh
+  echo "gh installation done"
+
+}
+
 # https://formulae.brew.sh/formula/whisper-cpp !!
 install_whisper_cpp_brew(){
   #  https://formulae.brew.sh/formula/whisper-cpp instead
@@ -1734,6 +1756,9 @@ main(){
   # install_whisper_cpp_cli_cmake
   install_whisper_cpp_brew
   install_whisper_base_model_brew
+
+  # install github cli
+  install_github_cli_brew_winget
 
   # install pass
   install_pass_check
