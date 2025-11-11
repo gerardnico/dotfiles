@@ -1,5 +1,6 @@
 
 # Git conf for combostrap project
-export COMBOSTRAP_GIT_EMAIL="nico@combostrap.com"
+# We start with git so that we see that it's a git config
+export GIT_COMBOSTRAP_EMAIL="nico@combostrap.com"
 # Long format
-export COMBOSTRAP_GIT_SIGNING_KEY="21B4F6A5CE5BA34E"
+export GIT_COMBOSTRAP_SIGNING_KEY="21B4F6A5CE5BA34E"
