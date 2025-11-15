@@ -74,7 +74,7 @@ alias glogp='git log --pretty=format:"%h %s" --graph'
 
 # Gitx
 # Where all repo are
-export GIT_X_REPOS_DIR="$HOME/code"
+export GIT_X_REPOS_DIRS="$HOME/code/combostrap:$HOME/code"
 
 # Loss repo in the wild where the path is rigid
 # Brew Tap
