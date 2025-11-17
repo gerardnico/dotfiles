@@ -305,6 +305,23 @@ install_email_spfquery(){
 
 
 }
+
+# https://copier.readthedocs.io/en/stable/#installation
+install_python_copier(){
+
+  if util_command_exists copier; then
+      echo "Copier founds"
+      return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Sorry copier installation on Windows not yet done"
+      return
+  fi
+  echo "Copier installation"
+  pipx install copier
+  echo "Copier installation done"
+
+}
 # Return all data
 install_email_checkdmarc(){
   if util_command_exists checkdmarc; then
@@ -1784,6 +1801,9 @@ main(){
 
   # Install aider
   install_python_aider
+
+  # install copier
+  install_python_copier
 
   # Install python downloader
   install_python_youtube_downloader
