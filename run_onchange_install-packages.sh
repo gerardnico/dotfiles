@@ -306,6 +306,7 @@ install_email_spfquery(){
 
 }
 
+
 # https://copier.readthedocs.io/en/stable/#installation
 install_python_copier(){
 
@@ -674,6 +675,27 @@ install_helm_docs(){
   echo "Brew Installing Helm Docs"
   brew install norwoodj/tap/helm-docs
   echo "Helm Docs Installed"
+
+}
+
+
+# https://formulae.brew.sh/formula/editorconfig-checker
+# https://github.com/editorconfig-checker/editorconfig-checker#installation
+# https://editorconfig-checker.github.io/
+install_editorconfig_checker_brew(){
+
+  if util_command_exists editorconfig-checker; then
+    echo "Editorconfig Checker founds"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+      echo "Editorconfig Checker installation on Windows not yet done"
+      return
+  fi
+
+  echo "Editorconfig Checker with brew"
+  brew install editorconfig-checker
+  echo "Editorconfig Checker installed"
 
 }
 
@@ -1777,6 +1799,9 @@ main(){
   # install github cli
   install_github_cli_brew_winget
 
+  # install editor config checker
+  install_editorconfig_checker_brew
+
   # install pass
   install_pass_check
 
@@ -1807,7 +1832,6 @@ main(){
 
   # Install python downloader
   install_python_youtube_downloader
-
 
   # Install node
   install_nodejs
