@@ -1,1 +1,7 @@
 .idea
+target
+build
+out
+
+# Backup file of editor (ie name.md~ file)
+*~
