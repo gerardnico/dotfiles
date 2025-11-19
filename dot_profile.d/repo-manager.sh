@@ -1,9 +1,9 @@
 
 # Git conf for combostrap project
 # We start with git so that we see that it's a git config
-export RM_COMBOSTRAP_EMAIL="nico@combostrap.com"
+export REPM_COMBOSTRAP_EMAIL="nico@combostrap.com"
 # Long format
-export RM_COMBOSTRAP_SIGNING_KEY="21B4F6A5CE5BA34E"
+export REPM_COMBOSTRAP_SIGNING_KEY="21B4F6A5CE5BA34E"
 
 
 # Git Conf for Tabulify Project
@@ -11,6 +11,6 @@ export RM_COMBOSTRAP_SIGNING_KEY="21B4F6A5CE5BA34E"
 # TABULIFY was conflicting with the env of the Tabulify cli
 
 # Git conf for tabulify projects
-export RM_TABULIFY_EMAIL="nico@tabulify.com"
+export REPM_TABULIFY_EMAIL="nico@tabulify.com"
 # Long format
-export RM_TABULIFY_SIGNING_KEY="21B4F6A5CE5BA34E"
+export REPM_TABULIFY_SIGNING_KEY="21B4F6A5CE5BA34E"
