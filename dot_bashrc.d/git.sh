@@ -1,5 +1,3 @@
-#!/bin/bash
-
 ##############################
 # Git
 ##############################
@@ -7,12 +5,12 @@
 # https://git-scm.com/book/en/v2/Appendix-A%3A-Git-in-Other-Environments-Git-in-Bash
 GIT_COMPLETION_SCRIPT=$HOME/git-completion.bash
 if [[ ! -f $GIT_COMPLETION_SCRIPT ]]; then
-	echo "Download Git Completion Script ($GIT_COMPLETION_SCRIPT)"
-	if [[ $(uname -a) =~ "CYGWIN" ]]; then
-      GIT_COMPLETION_SCRIPT=$(cygpath -w "$GIT_COMPLETION_SCRIPT")
-	    echo "Cygwin detected. Download at: ($GIT_COMPLETION_SCRIPT)"
-    fi
-	curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o "$GIT_COMPLETION_SCRIPT"
+  echo "Download Git Completion Script ($GIT_COMPLETION_SCRIPT)"
+  if [[ $(uname -a) =~ "CYGWIN" ]]; then
+    GIT_COMPLETION_SCRIPT=$(cygpath -w "$GIT_COMPLETION_SCRIPT")
+    echo "Cygwin detected. Download at: ($GIT_COMPLETION_SCRIPT)"
+  fi
+  curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o "$GIT_COMPLETION_SCRIPT"
 fi
 if [ -f "$GIT_COMPLETION_SCRIPT" ]; then
   # shellcheck disable=SC1090
@@ -27,11 +25,12 @@ if [[ ! -f "$GIT_PROMPT_SCRIPT" ]]; then
     GIT_PROMPT_SCRIPT=$(cygpath -w "$GIT_PROMPT_SCRIPT")
     echo "Cygwin detected. Download at: ($GIT_PROMPT_SCRIPT)"
   fi
-	curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh -o "$GIT_PROMPT_SCRIPT"
+  curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh -o "$GIT_PROMPT_SCRIPT"
 fi
 if [ -f "$GIT_PROMPT_SCRIPT" ]; then
   # shellcheck disable=SC1090
   export GIT_PS1_SHOWDIRTYSTATE=1
+  # shellcheck disable=SC1090
   source "$GIT_PROMPT_SCRIPT"
   # PS1:
   # This is the default PS1 where we have added the __git_ps1 function just before the dollar character
@@ -46,26 +45,23 @@ if [ -f "$GIT_PROMPT_SCRIPT" ]; then
   #export PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
 fi
 
-
 # Alias
 # See also gitconfig alias
 # `call` is a git alias to add, commit, and push and accepts the message
+alias gk='git-backup'
+alias gc='git-commit'
+alias gf='git branch --all' # list remote and local branch
+alias gfc='git checkout'    # s for switch
+alias gfl='git-feature-log'
+alias gfm='git-feature-merge'
+alias gfn='git checkout -b'
+alias gl='git log --pretty=format:"%h %s" --graph'
+alias gll='git log -1' # last commit
+alias gp='git-prepare'
+alias gs='git status'
 alias gx='git-exec' # and not git exec if you are working with Cygwin otherwise there is a path problem
 alias gxs='git-exec st'
-alias gxac='git-exec auto-commit'
 alias gd='git diff | nvim'
-alias gan='git add --renormalize .'
-alias gau='git add --update'
-alias gc='git commit -v'
-alias gb='git branch'
-alias gba='git branch -a'
-alias gco='git checkout'
-alias gcob='git checkout -b'
-alias gcot='git checkout -t'
-alias gcotb='git checkout --track -b'
-alias glog='git log'
-alias glogp='git log --pretty=format:"%h %s" --graph'
-
 
 # No GIT_AUTHOR env
 # Why? Because it has the higher priority than the repository config
