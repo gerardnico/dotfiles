@@ -50,11 +50,10 @@ fi
 # `call` is a git alias to add, commit, and push and accepts the message
 alias gk='git-backup'
 alias gc='git-commit'
-alias gf='git branch --all' # list remote and local branch
-alias gfc='git checkout'    # s for switch
+alias gb='git branch --all' # list remote and local branch
+alias gbc='git-branch-checkout'    # s for switch
 alias gfl='git-feature-log'
 alias gfm='git-feature-merge'
-alias gfn='git checkout -b'
 alias gl='git log --pretty=format:"%h %s" --graph'
 alias gll='git log -1' # last commit
 alias gp='git-prepare'
