@@ -54,7 +54,7 @@
     # This feature means that it will push with LF and check out with CRLF
     # We don't want that on WSL
     # Idea gives a warning, ignore it
-	autocrlf = false
+    autocrlf = false
     # a ~/.gitignore file with global values.
     # note that Git will already look for global ignore values in the following two places: ~/git/ignore and ~/.config/git/ignore
     excludesfile = ~/.gitignore
@@ -82,7 +82,7 @@
 
 [init]
     # New default repo branch is named main
-	defaultBranch = main
+    defaultBranch = main
 
 [help]
     # guess what you meant and try to run it.
@@ -97,7 +97,7 @@
 
 [pull]
     # make git pull --rebase, default
-	rebase = true
+    rebase = true
 
 [push]
     # simple default is built more or less for centralized workflows and by default pushes the current branch to the same name on the remote.
@@ -130,5 +130,5 @@
     sort = version:refname
 
 [user]
-	name = Nicolas GERARD
-	email = gerardnico@gmail.com
+    name = Nicolas GERARD
+    email = gerardnico@gmail.com
