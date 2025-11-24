@@ -48,18 +48,21 @@ fi
 # Alias
 # See also gitconfig alias
 # `call` is a git alias to add, commit, and push and accepts the message
-alias gk='git-backup'
-alias gc='git-commit'
+alias ga='git-amend'
 alias gb="git-branch"
-alias gbc='git-branch-checkout'   # s for switch
+alias gbd='git-branch-delete'
+alias gc='git-commit'
+alias gu='git-undo'
 alias gfl='git-feature-log'
 alias gfm='git-feature-merge'
-alias gl='git-last' # last commit
+alias gl='git-log-last' # last commit
 alias gll='git log --pretty=format:"%h %s" --graph'
 alias gp='git-prepare'
-alias gs='git-status'
+alias gr='git-reset'
+alias gs='git status'
 alias gx='git-exec' # and not git exec if you are working with Cygwin otherwise there is a path problem
-alias gxs='git-exec st' # st is a git alias that you can find in .gitconfig
+alias gxs='git-exec status --short'
+
 alias gd='git diff | nvim'
 
 # No GIT_AUTHOR env
