@@ -55,7 +55,7 @@ alias gc='git-commit'
 alias gu='git-undo'
 alias gfl='git-feature-log'
 alias gfm='git-feature-merge'
-alias gl='git-log-last' # last commit
+alias gl='git-log'
 alias gll='git log --pretty=format:"%h %s" --graph'
 alias gp='git-prepare'
 alias gr='git-reset'
