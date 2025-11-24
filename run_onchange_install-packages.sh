@@ -17,9 +17,9 @@ echo "$(basename "$0") - Install my Packages"
 
 # Function to check if a command exists
 util_command_exists() {
-    # start to check subcommand such as `kubectl oidc-login`
-    # does not work always for subcommand, you could just do `if command -help >/dev/null 2>1; then`
-    command -v "$@" >/dev/null 2>&1
+  # start to check subcommand such as `kubectl oidc-login`
+  # does not work always for subcommand, you could just do `if command -help >/dev/null 2>1; then`
+  command -v "$@" >/dev/null 2>&1
 }
 
 # Function to ensure Whisper model exists and download if missing
@@ -30,58 +30,58 @@ util_command_exists() {
 # Run with a model
 # whisper-cli --model models/ggml-base.en.bin --file jfk.opus
 util_whisper_model_download() {
-   local model_name="${1:-base.en}"  # Default to base.en if no model specified
-   local models_dir="${2:-./models}"  # Default to ./models directory
-   local model_file="${models_dir}/ggml-${model_name}.bin"
+  local model_name="${1:-base.en}"  # Default to base.en if no model specified
+  local models_dir="${2:-./models}" # Default to ./models directory
+  local model_file="${models_dir}/ggml-${model_name}.bin"
 
-   # Create models directory if it doesn't exist
-   if [ ! -d "$models_dir" ]; then
-       echo "Creating models directory: $models_dir"
-       mkdir -p "$models_dir"
-   fi
+  # Create models directory if it doesn't exist
+  if [ ! -d "$models_dir" ]; then
+    echo "Creating models directory: $models_dir"
+    mkdir -p "$models_dir"
+  fi
 
-   # Check if model file exists
-   if [ -f "$model_file" ]; then
-       echo "Model already exists: $model_file"
-       return 0
-   fi
+  # Check if model file exists
+  if [ -f "$model_file" ]; then
+    echo "Model already exists: $model_file"
+    return 0
+  fi
 
-   echo "Model not found: $model_file"
-   echo "Downloading $model_name model..."
+  echo "Model not found: $model_file"
+  echo "Downloading $model_name model..."
 
-   # Try using the official download script first
-   if command -v curl >/dev/null 2>&1; then
-       echo "Attempting download using official script..."
-       if bash -c "$(curl -fsSL https://raw.githubusercontent.com/ggerganov/whisper.cpp/master/models/download-ggml-model.sh)" -- "$model_name" 2>/dev/null; then
-           # Move the downloaded file to our specified directory if it's not already there
-           if [ -f "ggml-${model_name}.bin" ] && [ "$models_dir" != "." ]; then
-               mv "ggml-${model_name}.bin" "$model_file"
-           fi
-           echo "Successfully downloaded using official script!"
-           return 0
-       fi
+  # Try using the official download script first
+  if command -v curl >/dev/null 2>&1; then
+    echo "Attempting download using official script..."
+    if bash -c "$(curl -fsSL https://raw.githubusercontent.com/ggerganov/whisper.cpp/master/models/download-ggml-model.sh)" -- "$model_name" 2>/dev/null; then
+      # Move the downloaded file to our specified directory if it's not already there
+      if [ -f "ggml-${model_name}.bin" ] && [ "$models_dir" != "." ]; then
+        mv "ggml-${model_name}.bin" "$model_file"
+      fi
+      echo "Successfully downloaded using official script!"
+      return 0
+    fi
 
-       echo "Official script failed, trying direct download..."
+    echo "Official script failed, trying direct download..."
 
-       # Fallback to direct download from HuggingFace
-       local download_url="https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-${model_name}.bin"
+    # Fallback to direct download from HuggingFace
+    local download_url="https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-${model_name}.bin"
 
-       if curl -L --fail --progress-bar -o "$model_file" "$download_url"; then
-           echo "Successfully downloaded $model_name model to $model_file"
-           return 0
-       else
-           echo "Error: Failed to download model from $download_url"
-           return 1
-       fi
-   else
-       echo "Error: curl is required but not installed"
-       return 1
-   fi
+    if curl -L --fail --progress-bar -o "$model_file" "$download_url"; then
+      echo "Successfully downloaded $model_name model to $model_file"
+      return 0
+    else
+      echo "Error: Failed to download model from $download_url"
+      return 1
+    fi
+  else
+    echo "Error: curl is required but not installed"
+    return 1
+  fi
 }
 
 # sudo is not available on windows
 # This function executes it only if found
-sudo_safe(){
+sudo_safe() {
   echo "Executing $*"
   if command -v sudo; then
     sudo "$@"
@@ -93,13 +93,13 @@ sudo_safe(){
 # Winget modify the PATH of windows
 # If we are working in a IDE, the path is not up to date
 # We use this function to check if the package is already installed
-winget_package_play(){
+winget_package_play() {
 
   local package_id="$1"
   # Check if the package is installed
-  if winget list --id "$package_id" &> /dev/null; then
-      echo "Package '$package_id' is installed."
-      return
+  if winget list --id "$package_id" &>/dev/null; then
+    echo "Package '$package_id' is installed."
+    return
   fi
 
   echo "Winget installing '$package_id'"
@@ -107,95 +107,90 @@ winget_package_play(){
 
 }
 
-
-
-
 # Install from a standard go release in github
 # Binary
 # Version
 # Base
-install_from_github_go_release(){
+install_from_github_go_release() {
 
-    local REPO="$1"
-    local BINARY="$2" # The project
-    local VERSION="$3"
-    local FINAL_BINARY="${4:-$BINARY}"
-    echo "Installing $BINARY version $VERSION"
+  local REPO="$1"
+  local BINARY="$2" # The project
+  local VERSION="$3"
+  local FINAL_BINARY="${4:-$BINARY}"
+  echo "Installing $BINARY version $VERSION"
 
-    # Download URL
-    ARCHIVE_NAME="${BINARY}_${VERSION}_$(get_os_name)_$(get_cpu_arch_name).tar.gz"
-    DOWNLOAD_URL="https://github.com/$REPO/releases/download/v${VERSION}/$ARCHIVE_NAME"
-    echo "Downloading $ARCHIVE_NAME..."
-    # Temporary directory for extraction
-    TEMP_DIR=$(mktemp -d)
-    curl -L -o "$TEMP_DIR/$ARCHIVE_NAME" "$DOWNLOAD_URL"
+  # Download URL
+  ARCHIVE_NAME="${BINARY}_${VERSION}_$(get_os_name)_$(get_cpu_arch_name).tar.gz"
+  DOWNLOAD_URL="https://github.com/$REPO/releases/download/v${VERSION}/$ARCHIVE_NAME"
+  echo "Downloading $ARCHIVE_NAME..."
+  # Temporary directory for extraction
+  TEMP_DIR=$(mktemp -d)
+  curl -L -o "$TEMP_DIR/$ARCHIVE_NAME" "$DOWNLOAD_URL"
 
-    echo "Extracting archive..."
-    tar -xzf "$TEMP_DIR/$ARCHIVE_NAME" -C "$TEMP_DIR"
-    # Find the binary in the extracted files
-    BINARY_PATH=$(find "$TEMP_DIR" -name "${FINAL_BINARY}" -type f)
-    # Check if binary was found
-    if [ -z "$BINARY_PATH" ]; then
-        echo "Error: Could not find '${FINAL_BINARY}' binary in the archive"
-        rm -rf "$TEMP_DIR"
-        exit 1
-    fi
-    # Installation directory
-    INSTALL_DIR="/usr/local/bin"
-    echo "Installing to $INSTALL_DIR/$FINAL_BINARY..."
-    sudo cp "$BINARY_PATH" "$INSTALL_DIR/$FINAL_BINARY"
-    sudo chmod +x "$INSTALL_DIR/$FINAL_BINARY"
-    # Clean up temporary files
+  echo "Extracting archive..."
+  tar -xzf "$TEMP_DIR/$ARCHIVE_NAME" -C "$TEMP_DIR"
+  # Find the binary in the extracted files
+  BINARY_PATH=$(find "$TEMP_DIR" -name "${FINAL_BINARY}" -type f)
+  # Check if binary was found
+  if [ -z "$BINARY_PATH" ]; then
+    echo "Error: Could not find '${FINAL_BINARY}' binary in the archive"
     rm -rf "$TEMP_DIR"
+    exit 1
+  fi
+  # Installation directory
+  INSTALL_DIR="/usr/local/bin"
+  echo "Installing to $INSTALL_DIR/$FINAL_BINARY..."
+  sudo cp "$BINARY_PATH" "$INSTALL_DIR/$FINAL_BINARY"
+  sudo chmod +x "$INSTALL_DIR/$FINAL_BINARY"
+  # Clean up temporary files
+  rm -rf "$TEMP_DIR"
 }
 
 # Install from a exe file
 # Not an archive
-install_from_github_binary(){
+install_from_github_binary() {
 
-    local REPO="$1"
-    local BINARY_NAME=$2 # the target name example: jb
-    local version="$3"
-    local downloadFileName="${4:-$2}" # the file to download. ex: jb-win.exe
-    # Base URL for downloads
-    local BASE_URL="https://github.com/$REPO/releases/download/$version/"
+  local REPO="$1"
+  local BINARY_NAME=$2 # the target name example: jb
+  local version="$3"
+  local downloadFileName="${4:-$2}" # the file to download. ex: jb-win.exe
+  # Base URL for downloads
+  local BASE_URL="https://github.com/$REPO/releases/download/$version/"
 
-    # Full download URL
-    local DOWNLOAD_URL="${BASE_URL}${downloadFileName}"
+  # Full download URL
+  local DOWNLOAD_URL="${BASE_URL}${downloadFileName}"
 
-    # Installation directory
-    local INSTALL_DIR="/usr/local/bin"
-    # Local bin is not created in a cygwin/git bash env
-    if [ ! -d "$INSTALL_DIR" ]; then
-      INSTALL_DIR="/usr/bin";
-    fi
+  # Installation directory
+  local INSTALL_DIR="/usr/local/bin"
+  # Local bin is not created in a cygwin/git bash env
+  if [ ! -d "$INSTALL_DIR" ]; then
+    INSTALL_DIR="/usr/bin"
+  fi
 
-    # Download the binary directly to the system bin directory
-    echo "Downloading $BINARY_NAME to $INSTALL_DIR/$BINARY_NAME..."
-    sudo_safe curl -L -o "$INSTALL_DIR/$BINARY_NAME" "$DOWNLOAD_URL"
+  # Download the binary directly to the system bin directory
+  echo "Downloading $BINARY_NAME to $INSTALL_DIR/$BINARY_NAME..."
+  sudo_safe curl -L -o "$INSTALL_DIR/$BINARY_NAME" "$DOWNLOAD_URL"
 
-
-    # Make the binary executable
-    sudo_safe chmod +x "$INSTALL_DIR/$BINARY_NAME"
-
+  # Make the binary executable
+  sudo_safe chmod +x "$INSTALL_DIR/$BINARY_NAME"
 
 }
 
 # Function to check if a package is installed
 package_installed() {
-    dpkg -l "$1" >/dev/null 2>&1
+  dpkg -l "$1" >/dev/null 2>&1
 }
 
-install_nodejs_markdown_check(){
+install_nodejs_markdown_check() {
 
   if util_command_exists markdown-link-check; then
-      echo "markdown-link-check found"
-      return
+    echo "markdown-link-check found"
+    return
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "markdown-link-check on Windows not yet done"
-      return
+    echo "markdown-link-check on Windows not yet done"
+    return
   fi
   echo "markdown-link-check install"
   npm install -g markdown-link-check
@@ -203,16 +198,16 @@ install_nodejs_markdown_check(){
 
 }
 
-install_kubectl(){
+install_kubectl() {
 
   if util_command_exists kubectl; then
-      echo "Kubectl found"
-      return
+    echo "Kubectl found"
+    return
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Kubectl on Windows not yet done"
-      return
+    echo "Kubectl on Windows not yet done"
+    return
   fi
   echo "Kubectl install"
   brew install kubernetes-cli
@@ -220,11 +215,11 @@ install_kubectl(){
 
 }
 
-install_kubectl_oidc_login(){
+install_kubectl_oidc_login() {
 
   if util_command_exists kubectl oidc-login; then
-      echo "Kubectl oidc-login found"
-      return
+    echo "Kubectl oidc-login found"
+    return
   fi
 
   if ! util_command_exists kubectl; then
@@ -237,7 +232,7 @@ install_kubectl_oidc_login(){
 
 }
 
-install_helm_plugin(){
+install_helm_plugin() {
 
   local subcommand=$1
   local url=$2
@@ -249,9 +244,9 @@ install_helm_plugin(){
   # The command exists does work with helm plugin ..
   # Testing the help option instead
   # shellcheck disable=SC2210
-  if helm "$subcommand" --help >/dev/null 2>&1 ; then
-      echo "Helm diff plugin founds"
-      return
+  if helm "$subcommand" --help >/dev/null 2>&1; then
+    echo "Helm diff plugin founds"
+    return
   fi
 
   # Windows, linux, ...
@@ -267,15 +262,15 @@ install_helm_plugin(){
 
 # Postal Installation Helper
 # https://docs.postalserver.io/getting-started/prerequisites#git-installation-helper-repository
-install_postal(){
+install_postal() {
   if util_command_exists postal; then
-      echo "Postal founds"
-      return
+    echo "Postal founds"
+    return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      # it's bash script, should work
-      echo "Sorry postal installation on Windows not yet done"
-      return
+    # it's bash script, should work
+    echo "Sorry postal installation on Windows not yet done"
+    return
   fi
   echo "Postal installation"
   sudo git clone https://github.com/postalserver/install /opt/postal/install
@@ -286,37 +281,35 @@ install_postal(){
 
 # https://www.libspf2.net/
 # https://github.com/shevek/libspf2/
-install_email_spfquery(){
+install_email_spfquery() {
   if util_command_exists spfquery; then
-      echo "SpfQuery founds"
-      return
+    echo "SpfQuery founds"
+    return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      # should work on windows
-      # https://www.libspf2.net/download.html
-      # libsrs2 uses GNU autoconf and is known to compile on BSD, Linux, Solaris, OS/X and Windows.
-      echo "Sorry SpfQuery installation on Windows not yet done"
-      return
+    # should work on windows
+    # https://www.libspf2.net/download.html
+    # libsrs2 uses GNU autoconf and is known to compile on BSD, Linux, Solaris, OS/X and Windows.
+    echo "Sorry SpfQuery installation on Windows not yet done"
+    return
   fi
   echo "SpfQuery installation"
   # no brew package
   sudo apt install -y spfquery
   echo "SpfQuery installation done"
 
-
 }
 
-
 # https://copier.readthedocs.io/en/stable/#installation
-install_python_copier(){
+install_python_copier() {
 
   if util_command_exists copier; then
-      echo "Copier founds"
-      return
+    echo "Copier founds"
+    return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Sorry copier installation on Windows not yet done"
-      return
+    echo "Sorry copier installation on Windows not yet done"
+    return
   fi
   echo "Copier installation"
   pipx install copier
@@ -324,14 +317,14 @@ install_python_copier(){
 
 }
 # Return all data
-install_email_checkdmarc(){
+install_email_checkdmarc() {
   if util_command_exists checkdmarc; then
-      echo "checkdmarc founds"
-      return
+    echo "checkdmarc founds"
+    return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Sorry checkdmarc installation on Windows not yet done"
-      return
+    echo "Sorry checkdmarc installation on Windows not yet done"
+    return
   fi
   echo "Checkdmarc installation"
   brew install checkdmarc
@@ -339,35 +332,35 @@ install_email_checkdmarc(){
 }
 
 # https://fly.io/docs/flyctl/install/
-install_flyctl(){
+install_flyctl() {
   if util_command_exists flyctl; then
-        echo "flyctl founds"
-        return
-    fi
-    if [ "$CHEZMOI_OS" == "windows" ]; then
-        echo "Sorry flyctl installation on Windows not yet done"
-        return
-    fi
-    echo "flyctl installation"
-    brew install flyctl
-    echo "flyctl installation done"
+    echo "flyctl founds"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Sorry flyctl installation on Windows not yet done"
+    return
+  fi
+  echo "flyctl installation"
+  brew install flyctl
+  echo "flyctl installation done"
 }
 
 # https://aider.chat/docs/install.html
-install_python_aider(){
+install_python_aider() {
 
-  if which aider > /dev/null; then
-        echo "aider founds"
-        return
+  if which aider >/dev/null; then
+    echo "aider founds"
+    return
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Sorry aider installation on Windows not yet done"
-      return
+    echo "Sorry aider installation on Windows not yet done"
+    return
   fi
   if ! util_command_exists python; then
-      echo "python is required to install aider"
-      return 1
+    echo "python is required to install aider"
+    return 1
   fi
   echo "aider installation"
   python -m pip install aider-install
@@ -377,15 +370,15 @@ install_python_aider(){
 }
 
 # https://formulae.brew.sh/formula/composer
-install_php_composer(){
+install_php_composer() {
 
   if util_command_exists composer; then
-        echo "composer founds"
-        return
+    echo "composer founds"
+    return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Sorry composer installation on Windows not yet done"
-      return
+    echo "Sorry composer installation on Windows not yet done"
+    return
   fi
   echo "composer installation"
   # Installing dependencies for composer:
@@ -403,16 +396,16 @@ install_php_composer(){
 
 }
 # https://sdkman.io/install
-install_sdkman(){
+install_sdkman() {
   # sdk man is a bash function and is not yet loaded
   # we check with the install directory
   if [ -d "$HOME/.sdkman" ]; then
-      echo "sdkman founds"
-      return
+    echo "sdkman founds"
+    return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Sorry sdkman installation on Windows not yet done"
-      return
+    echo "Sorry sdkman installation on Windows not yet done"
+    return
   fi
   echo "sdkman installation"
   curl -s "https://get.sdkman.io" | bash
@@ -421,15 +414,15 @@ install_sdkman(){
 }
 
 # https://sqlite.org/download.html
-install_sqlite(){
+install_sqlite() {
 
   if util_command_exists sqlite3; then
-        echo "sqlite founds"
-        return
+    echo "sqlite founds"
+    return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Sorry sqlite3 installation on Windows not yet done"
-      return
+    echo "Sorry sqlite3 installation on Windows not yet done"
+    return
   fi
   echo "sqlite installation"
   brew install sqlite
@@ -438,16 +431,16 @@ install_sqlite(){
 }
 
 # https://taskfile.dev/installation/
-install_go_task(){
+install_go_task() {
 
   if util_command_exists task; then
-        echo "Task founds"
-        return
+    echo "Task founds"
+    return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Tasks installation on Windows"
-      winget install Task.Task
-      return
+    echo "Tasks installation on Windows"
+    winget install Task.Task
+    return
   fi
   echo "Installing brew task"
   brew install go-task/tap/go-task
@@ -455,7 +448,7 @@ install_go_task(){
 
 }
 
-install_nodejs(){
+install_nodejs() {
   if util_command_exists node; then
     echo "nodejs founds"
     return
@@ -470,7 +463,7 @@ install_nodejs(){
 }
 
 # https://goreleaser.com/install/
-install_goreleaser(){
+install_goreleaser() {
   if util_command_exists goreleaser; then
     echo "goreleaser founds"
     return
@@ -486,10 +479,10 @@ install_goreleaser(){
 
 # https://github.com/GNOME/libxslt/tree/master
 # https://gnome.pages.gitlab.gnome.org/libxslt/xsltproc.html
-install_xml_xsltproc(){
+install_xml_xsltproc() {
   if util_command_exists xsltproc; then
-      echo "xsltproc founds"
-      return
+    echo "xsltproc founds"
+    return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
     echo "Xsltproc installation not yet done on Windows"
@@ -504,10 +497,10 @@ install_xml_xsltproc(){
 
 # https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
 # not that yq can query xml
-install_xml_xmllint(){
+install_xml_xmllint() {
   if util_command_exists xmllint; then
-      echo "xmllint founds"
-      return
+    echo "xmllint founds"
+    return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
     echo "xmllint installation not yet done on Windows"
@@ -522,10 +515,10 @@ install_xml_xmllint(){
 
 # https://www.html-tidy.org/
 # https://github.com/htacg/tidy-html5
-install_html_tidy(){
+install_html_tidy() {
   if util_command_exists tidy; then
-      echo "tidy founds"
-      return
+    echo "tidy founds"
+    return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
     echo "tidy installation not yet done on Windows"
@@ -537,12 +530,12 @@ install_html_tidy(){
 }
 
 # https://github.com/ku1ik/vim-monokai/blob/master/colors/monokai.vim
-install_vim_monokai(){
+install_vim_monokai() {
 
   MONOKAI="$HOME/.vim/colors/monokai.vim"
   if [ -f "$MONOKAI" ]; then
-     echo "vim monokai founds"
-     return
+    echo "vim monokai founds"
+    return
   fi
   mkdir -p "$(dirname "$MONOKAI")"
   echo "Vim Monokai installation"
@@ -551,9 +544,8 @@ install_vim_monokai(){
 
 }
 
-
 # https://maven.apache.org/install.html
-install_maven(){
+install_maven() {
   if util_command_exists mvn; then
     echo "mvn founds"
     return
@@ -569,15 +561,15 @@ install_maven(){
 }
 
 # https://commitlint.js.org/guides/getting-started.html
-install_nodejs_commitlint(){
+install_nodejs_commitlint() {
 
   if util_command_exists commitlint; then
     echo "commitlint founds"
     return
   fi
   if ! util_command_exists npm; then
-      echo "npm not founds !!! Install first node"
-      return 1
+    echo "npm not founds !!! Install first node"
+    return 1
   fi
   echo "commitlint installation"
   # We don't do it with nix
@@ -593,31 +585,31 @@ install_nodejs_commitlint(){
 }
 
 # https://jetmore.org/john/code/swaks/installation.html
-install_mail_swaks(){
+install_mail_swaks() {
 
   if util_command_exists swaks; then
-      echo "Swaks founds"
-      return
+    echo "Swaks founds"
+    return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Swaks installation on Windows not supported"
-      return
+    echo "Swaks installation on Windows not supported"
+    return
   fi
   echo "Installing swaks"
   brew install swaks
   echo "Swaks installed"
 }
 
-install_helm_readme_generator(){
+install_helm_readme_generator() {
 
   if util_command_exists readme-generator-for-helm; then
-      echo "readme-generator-for-helm founds"
-      return
+    echo "readme-generator-for-helm founds"
+    return
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "readme-generator-for-helm Windows Installation not supported"
-      return
+    echo "readme-generator-for-helm Windows Installation not supported"
+    return
   fi
 
   # Nix script
@@ -626,7 +618,7 @@ install_helm_readme_generator(){
   echo "readme-generator-for-helm installed"
 
 }
-install_git_extras(){
+install_git_extras() {
   ## https://github.com/tj/git-extras/blob/main/Installation.md
   ## Only brew is maintained by the author
   if util_command_exists git-standup; then
@@ -635,21 +627,21 @@ install_git_extras(){
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      # https://github.com/tj/git-extras/blob/main/Installation.md#windows
-      # Subshell to not change the working directory
-     (
+    # https://github.com/tj/git-extras/blob/main/Installation.md#windows
+    # Subshell to not change the working directory
+    (
       local WORK_DIR
       WORK_DIR="${TMPDIR:-${TEMP:-${TMP:-/tmp}}}/git-extras"
       rm -rf "$WORK_DIR"
       mkdir -p "$WORK_DIR"
       git clone https://github.com/tj/git-extras.git "$WORK_DIR"
       # checkout the latest tag (optional)
-      cd "$WORK_DIR";
+      cd "$WORK_DIR"
       git checkout "$(git describe --tags "$(git rev-list --tags --max-count=1)")"
       chmod +x install.cmd
       ./install.cmd
-      )
-      return
+    )
+    return
   fi
 
   echo "Installing Git Extras"
@@ -658,7 +650,7 @@ install_git_extras(){
 }
 
 # https://github.com/norwoodj/helm-docs?tab=readme-ov-file#installation
-install_helm_docs(){
+install_helm_docs() {
   # See get Helms section at https://helm.sh/
   if util_command_exists helm-docs; then
     echo "Helm Docs founds"
@@ -666,10 +658,10 @@ install_helm_docs(){
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Helm docs Windows Installation not yet implemented"
-      # should be
-      # docker run --rm --volume "$(pwd):/helm-docs" -u $(id -u) jnorwood/helm-docs:latest
-      return
+    echo "Helm docs Windows Installation not yet implemented"
+    # should be
+    # docker run --rm --volume "$(pwd):/helm-docs" -u $(id -u) jnorwood/helm-docs:latest
+    return
   fi
 
   echo "Brew Installing Helm Docs"
@@ -678,19 +670,18 @@ install_helm_docs(){
 
 }
 
-
 # https://formulae.brew.sh/formula/editorconfig-checker
 # https://github.com/editorconfig-checker/editorconfig-checker#installation
 # https://editorconfig-checker.github.io/
-install_editorconfig_checker_brew(){
+install_editorconfig_checker_brew() {
 
   if util_command_exists editorconfig-checker; then
     echo "Editorconfig Checker founds"
     return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Editorconfig Checker installation on Windows not yet done"
-      return
+    echo "Editorconfig Checker installation on Windows not yet done"
+    return
   fi
 
   echo "Editorconfig Checker with brew"
@@ -700,16 +691,16 @@ install_editorconfig_checker_brew(){
 }
 
 # https://git-cliff.org/docs/installation/
-install_git_cliff(){
+install_git_cliff() {
 
   if util_command_exists git-cliff; then
     echo "Git-Cliff founds"
     return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Git-Cliff installation on Windows"
-      winget install git-cliff
-      return
+    echo "Git-Cliff installation on Windows"
+    winget install git-cliff
+    return
   fi
 
   echo "Git-cliff installation with brew"
@@ -719,16 +710,16 @@ install_git_cliff(){
 }
 
 # https://github.com/wagoodman/dive
-install_docker_dive(){
+install_docker_dive() {
 
   if util_command_exists dive; then
     echo "Dive founds"
     return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Dive installation on Windows"
-      winget install git-cliff--id wagoodman.dive
-      return
+    echo "Dive installation on Windows"
+    winget install git-cliff--id wagoodman.dive
+    return
   fi
 
   echo "Dive installation with brew"
@@ -738,15 +729,15 @@ install_docker_dive(){
 }
 
 # https://jreleaser.org/guide/latest/install.html
-install_jreleaser(){
+install_jreleaser() {
   if util_command_exists jreleaser; then
     echo "jreleaser founds"
     return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Jreleaser installation on Windows"
-      winget install jreleaser
-      return
+    echo "Jreleaser installation on Windows"
+    winget install jreleaser
+    return
   fi
 
   echo "Jreleaser installation with brew"
@@ -755,14 +746,14 @@ install_jreleaser(){
 
 }
 
-install_go(){
+install_go() {
   if util_command_exists go; then
     echo "Go founds"
     return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Go installation on Windows Not done"
-      return
+    echo "Go installation on Windows Not done"
+    return
   fi
 
   echo "Go installation with brew"
@@ -773,15 +764,15 @@ install_go(){
 
 # ko makes building Go container images easy
 # https://ko.build/install/
-install_go_tooling_ko(){
+install_go_tooling_ko() {
   if util_command_exists ko; then
     echo "ko founds"
     return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Ko installation on Windows"
-      scoop install ko
-      return
+    echo "Ko installation on Windows"
+    scoop install ko
+    return
   fi
 
   echo "Ko installation with brew"
@@ -790,7 +781,7 @@ install_go_tooling_ko(){
 
 }
 
-install_helm(){
+install_helm() {
 
   # See get Helms section at https://helm.sh/
   if util_command_exists helm; then
@@ -799,10 +790,10 @@ install_helm(){
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Helm Windows Installation"
-      # https://helm.sh/docs/intro/install/#from-winget-windows
-      winget install Helm.Helm
-      return
+    echo "Helm Windows Installation"
+    # https://helm.sh/docs/intro/install/#from-winget-windows
+    winget install Helm.Helm
+    return
   fi
 
   echo "Brew Installing Helm"
@@ -810,11 +801,11 @@ install_helm(){
 
 }
 
-install_gpg(){
+install_gpg() {
 
-  if  util_command_exists gpg; then
-      echo "gpg command found"
-      return
+  if util_command_exists gpg; then
+    echo "gpg command found"
+    return
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
@@ -834,7 +825,7 @@ install_gpg(){
 
 }
 
-install_jq_brew(){
+install_jq_brew() {
 
   if util_command_exists jq; then
     echo "Jq found"
@@ -849,17 +840,17 @@ install_jq_brew(){
 
 }
 # sudo apt install pinentry-gnome3
-install_gpg_pinentry(){
+install_gpg_pinentry() {
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "gpg pinentry Windows Installation not supported skipping"
-      return
+    echo "gpg pinentry Windows Installation not supported skipping"
+    return
   fi
 
   if ! util_command_exists pinentry-qt; then
-        echo "Installing pinentry-qt"
-        sudo apt -y install pinentry-qt
-        echo "Installed pinentry-qt"
+    echo "Installing pinentry-qt"
+    sudo apt -y install pinentry-qt
+    echo "Installed pinentry-qt"
   else
     echo "pinentry-qt command found"
   fi
@@ -869,7 +860,7 @@ install_gpg_pinentry(){
     # with `info pinentry`
     sudo apt install -y info
   else
-      echo "Info command found"
+    echo "Info command found"
   fi
   # Doc for pinentry
   if ! package_installed pinentry-doc; then
@@ -879,7 +870,7 @@ install_gpg_pinentry(){
   fi
 }
 
-install_yq(){
+install_yq() {
   if util_command_exists yq; then
     echo "Yq found"
     return
@@ -892,7 +883,7 @@ install_yq(){
   brew install yq
 }
 
-install_zenity_pinentry_apt(){
+install_zenity_pinentry_apt() {
   if util_command_exists zenity; then
     echo "Zenity found"
     return
@@ -908,7 +899,7 @@ install_zenity_pinentry_apt(){
   echo "Zenity installed"
 }
 
-install_vagrant(){
+install_vagrant() {
   if util_command_exists vagrant; then
     echo "Vagrant Found"
     return
@@ -923,7 +914,7 @@ install_vagrant(){
   brew install hashicorp/tap/vagrant
 }
 
-install_kind_kube_on_docker(){
+install_kind_kube_on_docker() {
   # Installation possibility is on quick start
   # https://kind.sigs.k8s.io/docs/user/quick-start
   if util_command_exists kind; then
@@ -940,7 +931,7 @@ install_kind_kube_on_docker(){
 
 }
 
-install_mkcert(){
+install_mkcert() {
 
   if util_command_exists mkcert; then
     echo "mkcert installed"
@@ -958,10 +949,10 @@ install_mkcert(){
 
 }
 
-install_cert_manager_cmctl(){
+install_cert_manager_cmctl() {
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Cmctl Windows Installation Not done Skipping"
-      return
+    echo "Cmctl Windows Installation Not done Skipping"
+    return
   fi
   ## https://cert-manager.io/docs/reference/cmctl/#installation
   if util_command_exists cmctl; then
@@ -974,13 +965,13 @@ install_cert_manager_cmctl(){
 
 }
 
-install_github(){
+install_github() {
 
   # public key installation for ssh
   # see HOME/.ssh/config
   GITHUB_PUBLIC_KEY=$HOME/.ssh/id_git_github.com.pub
   if [ ! -f "$GITHUB_PUBLIC_KEY" ]; then
-    pass ssh-x/id_git_github.com.pub > "$GITHUB_PUBLIC_KEY"
+    pass ssh-x/id_git_github.com.pub >"$GITHUB_PUBLIC_KEY"
   else
     echo "GitHub Public Key Found"
   fi
@@ -988,7 +979,7 @@ install_github(){
 }
 
 # Git is normally already installed as it's need to download this repo
-install_git_check(){
+install_git_check() {
 
   if util_command_exists git; then
     echo "Git Installed"
@@ -1008,39 +999,39 @@ install_git_check(){
 
 }
 
-get_os_name(){
+get_os_name() {
   # Detect operating system
   uname -s | tr '[:upper:]' '[:lower:]'
 }
 
-get_cpu_arch_name(){
+get_cpu_arch_name() {
 
   # Detect CPU architecture
   ARCH=$(uname -m)
 
   # Map architecture to the binary names
   case "$ARCH" in
-      x86_64)
-          ARCH_NAME="amd64"
-          ;;
-      aarch64)
-          ARCH_NAME="arm64"
-          ;;
-      arm*)
-          ARCH_NAME="arm"
-          ;;
-      *)
-          echo "Unsupported architecture: $ARCH"
-          return 1
-          ;;
+  x86_64)
+    ARCH_NAME="amd64"
+    ;;
+  aarch64)
+    ARCH_NAME="arm64"
+    ;;
+  arm*)
+    ARCH_NAME="arm"
+    ;;
+  *)
+    echo "Unsupported architecture: $ARCH"
+    return 1
+    ;;
   esac
   echo $ARCH_NAME
 
 }
 
-install_jsonnet_bundler_manager(){
+install_jsonnet_bundler_manager() {
 
-  if  util_command_exists jb; then
+  if util_command_exists jb; then
     echo "jsonnet-bundler is installed (jsonnet package manager)"
     return
   fi
@@ -1051,17 +1042,16 @@ install_jsonnet_bundler_manager(){
 
   # For Windows, add .exe extension
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      BINARY_NAME="${BINARY_NAME}.exe"
+    BINARY_NAME="${BINARY_NAME}.exe"
   fi
 
   install_from_github_binary "jsonnet-bundler/jsonnet-bundler" "jb" "v0.6.0" "jb-windows-amd64.exe"
-
 
 }
 
 # gojsontoyaml app
 # https://github.com/brancz/gojsontoyaml/releases/tag/v0.1.0
-install_go_json_to_yaml(){
+install_go_json_to_yaml() {
 
   local BINARY="gojsontoyaml"
 
@@ -1075,7 +1065,7 @@ install_go_json_to_yaml(){
 }
 
 # https://github.com/google/go-jsonnet
-install_jsonnet(){
+install_jsonnet() {
 
   local FINAL_BINARY="jsonnet"
   if util_command_exists "$FINAL_BINARY"; then
@@ -1084,9 +1074,9 @@ install_jsonnet(){
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Jsonnet Windows Installation Not done Skipping"
-      install_from_github_go_release "google/go-jsonnet" "go-jsonnet" "0.21.0-rc1" "$FINAL_BINARY"
-      return
+    echo "Jsonnet Windows Installation Not done Skipping"
+    install_from_github_go_release "google/go-jsonnet" "go-jsonnet" "0.21.0-rc1" "$FINAL_BINARY"
+    return
   fi
 
   echo "brew jsonnet installation"
@@ -1096,22 +1086,22 @@ install_jsonnet(){
 }
 
 # https://nix.dev/manual/nix/2.24/installation/
-install_nix(){
+install_nix() {
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
     echo "Nix does not support windows - Skipping"
     return
   fi
   if ! util_command_exists "nix-shell"; then
-      echo "Installing Nix"
-      bash <(curl -L https://nixos.org/nix/install) --no-daemon
+    echo "Installing Nix"
+    bash <(curl -L https://nixos.org/nix/install) --no-daemon
   fi
 
   echo "Nix is already installed"
 
 }
 
-install_brew(){
+install_brew() {
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
     echo "Brew does not support windows - Skipping"
@@ -1136,11 +1126,11 @@ install_brew(){
 }
 
 # https://github.com/NixOS/nixfmt?tab=readme-ov-file#from-the-repository
-install_nixfmt(){
+install_nixfmt() {
 
   if util_command_exists "nixfmt"; then
-      echo "Nixfmt found"
-      return
+    echo "Nixfmt found"
+    return
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
@@ -1149,8 +1139,8 @@ install_nixfmt(){
   fi
 
   if ! util_command_exists "nix-env"; then
-      echo "nix should be installed for nixfmt"
-      return 1
+    echo "nix should be installed for nixfmt"
+    return 1
   fi
 
   echo "Installing Nixfmt"
@@ -1159,7 +1149,7 @@ install_nixfmt(){
 
 }
 
-install_zoxide_cd(){
+install_zoxide_cd() {
   # cd on
   if util_command_exists zoxide; then
     echo "Zoxide Found"
@@ -1175,7 +1165,7 @@ install_zoxide_cd(){
 
 }
 
-install_lazy_git(){
+install_lazy_git() {
 
   if util_command_exists lazygit; then
     echo "LazyGit Found"
@@ -1183,9 +1173,9 @@ install_lazy_git(){
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "LazyGit Windows Installation"
-      winget_package_play JesseDuffield.lazygit
-      return
+    echo "LazyGit Windows Installation"
+    winget_package_play JesseDuffield.lazygit
+    return
   fi
 
   echo "Brew Installing LazyGit"
@@ -1193,7 +1183,7 @@ install_lazy_git(){
 
 }
 
-install_envsubst(){
+install_envsubst() {
 
   if util_command_exists envsubst; then
     echo "GetText envsubst installed"
@@ -1210,44 +1200,44 @@ install_envsubst(){
 }
 
 # fuzzy finder
-install_fzf(){
+install_fzf() {
   if util_command_exists fzf; then
     echo "Fzf Found"
     return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      # https://github.com/junegunn/fzf#windows-packages
-      echo "Windows fzf Windows Installation"
-      winget_package_play "fzf"
-      return
+    # https://github.com/junegunn/fzf#windows-packages
+    echo "Windows fzf Windows Installation"
+    winget_package_play "fzf"
+    return
   fi
   echo "Brew Installing Fzf"
   brew install fzf
 }
 
-install_telnet(){
+install_telnet() {
   if util_command_exists telnet; then
     echo "Telnet installed"
     return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Telnet Windows Installation"
-      # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc771275(v=ws.10)
-      if ! net session; then
-        echo "To install telnet, you should be in a elevated terminal"
-        echo "Execute"
-        echo "pkgmgr /iu:\"TelnetClient\""
-        return 1
-      fi
-      pkgmgr /iu:"TelnetClient"
-      return
+    echo "Telnet Windows Installation"
+    # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc771275(v=ws.10)
+    if ! net session; then
+      echo "To install telnet, you should be in a elevated terminal"
+      echo "Execute"
+      echo "pkgmgr /iu:\"TelnetClient\""
+      return 1
+    fi
+    pkgmgr /iu:"TelnetClient"
+    return
   fi
   echo "Telnet Apt Installation"
   sudo apt install -y telnet
 }
 
 # https://rsync.samba.org/download.html
-install_rsync(){
+install_rsync() {
 
   # rsync
   if util_command_exists rsync; then
@@ -1263,7 +1253,7 @@ install_rsync(){
 
 }
 
-install_tmux(){
+install_tmux() {
   if util_command_exists tmux; then
     echo "Tmux Found"
     return
@@ -1271,8 +1261,8 @@ install_tmux(){
 
   # https://github.com/tmux/tmux/wiki/Installing
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Tmux is not supported on Windows"
-      return
+    echo "Tmux is not supported on Windows"
+    return
   fi
 
   echo "Installing Tmux"
@@ -1285,17 +1275,16 @@ install_tmux(){
 }
 
 # https://github.com/spf13/cobra-cli/blob/main/README.md
-install_go_tooling_cobra_cli(){
-
+install_go_tooling_cobra_cli() {
 
   if util_command_exists cobra-cli; then
-        echo "cobra-cli found"
-        return;
+    echo "cobra-cli found"
+    return
   fi
-  
+
   if ! util_command_exists go; then
     echo "Error: go not found"
-    return 2;
+    return 2
   fi
 
   echo "Installing cobra-cli"
@@ -1303,30 +1292,29 @@ install_go_tooling_cobra_cli(){
   echo "Cobra-cli installed"
 
 }
-install_nmap(){
+install_nmap() {
   if util_command_exists nmap; then
-      echo "Nmap found"
-      return;
+    echo "Nmap found"
+    return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Windows install nmap"
-      winget_package_play Insecure.Nmap
-      return
+    echo "Windows install nmap"
+    winget_package_play Insecure.Nmap
+    return
   fi
   brew install nmap
 }
 
-
-install_netstat(){
+install_netstat() {
 
   if util_command_exists netstat; then
     echo "netstat found"
-    return;
+    return
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "netstat on Windows should be installe ???"
-      return
+    echo "netstat on Windows should be installe ???"
+    return
   fi
 
   # https://formulae.brew.sh/formula/net-tools
@@ -1336,18 +1324,18 @@ install_netstat(){
 
 # https://sectools.org/tool/netcat/
 # https://netcat.sourceforge.net/
-install_netcat(){
+install_netcat() {
   if util_command_exists nc; then
     echo "Netcat found"
-    return;
+    return
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      # On windows, ncat from nmap
-      # https://nmap.org/ncat/
-      echo "Windows install ncat (via nmap)"
-      winget_package_play Insecure.Nmap
-      return
+    # On windows, ncat from nmap
+    # https://nmap.org/ncat/
+    echo "Windows install ncat (via nmap)"
+    winget_package_play Insecure.Nmap
+    return
   fi
 
   # https://formulae.brew.sh/formula/netcat
@@ -1357,7 +1345,7 @@ install_netcat(){
 
 # List open files on Linux/Darwin
 # https://github.com/lsof-org/lsof
-install_net_lsof(){
+install_net_lsof() {
 
   if util_command_exists lsof; then
     echo "lsof installed"
@@ -1374,7 +1362,7 @@ install_net_lsof(){
 
 }
 
-install_direnv(){
+install_direnv() {
 
   if util_command_exists direnv; then
     echo "direnv installed"
@@ -1392,7 +1380,7 @@ install_direnv(){
 }
 
 # Install repos
-install_git_repos(){
+install_git_repos() {
 
   # the doc
   if [ ! -d "$HOME/code/nico" ]; then
@@ -1427,16 +1415,16 @@ install_git_repos(){
 
   # kubee
   if [ ! -d "$HOME/code/kubee" ]; then
-      git clone git@github.com:EraldyHq/kubee.git "$HOME/code/kubee"
+    git clone git@github.com:EraldyHq/kubee.git "$HOME/code/kubee"
   else
-      echo "Kubee Repo present"
+    echo "Kubee Repo present"
   fi
 
   # cluster
   if [ ! -d "$HOME/code/kube-argocd" ]; then
-      git clone git@github.com:gerardnico/kube-argocd.git "$HOME/code/kube-argocd"
+    git clone git@github.com:gerardnico/kube-argocd.git "$HOME/code/kube-argocd"
   else
-      echo "Kube Argocd present"
+    echo "Kube Argocd present"
   fi
 
   # Git utility
@@ -1453,11 +1441,10 @@ install_git_repos(){
     echo "homebrew-tap-eraldy present"
   fi
 
-
 }
 
 # * Linux: [pass](https://www.passwordstore.org/#download)
-install_pass_check(){
+install_pass_check() {
 
   if util_command_exists pass; then
     echo "pass installed"
@@ -1478,7 +1465,7 @@ install_pass_check(){
 # https://packages.debian.org/bookworm/ssh-askpass
 # Orphaned: https://tracker.debian.org/pkg/ssh-askpass
 # Do we really need that? Uses nix instead
-install_ssh_askpass(){
+install_ssh_askpass() {
   # Needed with ssh
   if util_command_exists ssh-askpass; then
     echo "ssh-askpass installed"
@@ -1493,7 +1480,26 @@ install_ssh_askpass(){
   sudo apt install -y ssh-askpass
 }
 
-install_openoffice(){
+# Bash formatter
+# https://formulae.brew.sh/formula/shfmt
+# https://github.com/mvdan/sh/blob/master/cmd/shfmt/shfmt.1.scd#examples
+install_shfmt_brew() {
+  # Needed with ssh
+  if util_command_exists shfmt; then
+    echo "shfmt installed"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "shfmt not yet done on windows"
+    return
+  fi
+  echo "Installing shfmt"
+  brew install shfmt
+  echo "shfmt installed"
+}
+
+install_openoffice() {
 
   if util_command_exists scalc; then
     echo "OpenOffice installed"
@@ -1510,7 +1516,7 @@ install_openoffice(){
 
 }
 
-install_mail_utils(){
+install_mail_utils() {
   # https://mailutils.org
   if util_command_exists mail; then
     echo "Mailutils installed"
@@ -1534,10 +1540,10 @@ install_mail_utils(){
 
 # Pre-commit
 # https://pre-commit.com/#installation
-install_pre_commit(){
+install_pre_commit() {
   if util_command_exists pre-commit; then
-     echo "Pre-commit already installed"
-     return
+    echo "Pre-commit already installed"
+    return
   fi
 
   echo "Pre-commit installation"
@@ -1546,14 +1552,14 @@ install_pre_commit(){
 
 }
 
-install_tpcds(){
+install_tpcds() {
   if util_command_exists dsqgen; then
     echo "tpcds installed"
     return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Tpcds Windows Installation not yet scripted"
-      return
+    echo "Tpcds Windows Installation not yet scripted"
+    return
   fi
 
   local TPC_TOOLS_HOME="$HOME/code/tpcds-kit/tools"
@@ -1566,7 +1572,7 @@ install_tpcds(){
   if [ ! -d "$TPC_TOOLS_HOME" ]; then
     sudo apt-get install gcc make flex bison byacc git
     (
-      cd "$HOME/code";
+      cd "$HOME/code"
       git clone https://github.com/databricks/tpcds-kit
       cd tpcds-kit/tools
       make OS=LINUX
@@ -1578,7 +1584,7 @@ install_tpcds(){
 }
 
 # https://github.com/Foundry376/Mailspring/tree/master
-install_mail_spring_gui(){
+install_mail_spring_gui() {
 
   if util_command_exists mailspring; then
     echo "Mail spring installed"
@@ -1587,10 +1593,10 @@ install_mail_spring_gui(){
 
   # https://github.com/Foundry376/Mailspring/tree/master
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Mailspring Windows Installation"
-      # https://winget.run/pkg/Foundry376/Mailspring
-      winget install -e --id Foundry376.Mailspring
-      return
+    echo "Mailspring Windows Installation"
+    # https://winget.run/pkg/Foundry376/Mailspring
+    winget install -e --id Foundry376.Mailspring
+    return
   fi
 
   echo "Mailspring Brew Installation"
@@ -1599,8 +1605,7 @@ install_mail_spring_gui(){
 
 }
 
-
-install_python(){
+install_python() {
 
   if util_command_exists python3; then
     echo "Python installed"
@@ -1608,8 +1613,8 @@ install_python(){
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Python Windows not yet done"
-      return
+    echo "Python Windows not yet done"
+    return
   fi
 
   echo "Installing Python"
@@ -1620,15 +1625,15 @@ install_python(){
 
 }
 
-install_cmake_brew(){
-  if which whisper-cli > /dev/null; then
-      echo "cmake founds"
-      return
+install_cmake_brew() {
+  if which whisper-cli >/dev/null; then
+    echo "cmake founds"
+    return
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Sorry cmake installation on Windows not yet done"
-      return
+    echo "Sorry cmake installation on Windows not yet done"
+    return
   fi
 
   echo "cmake installation"
@@ -1638,7 +1643,7 @@ install_cmake_brew(){
 }
 
 # https://formulae.brew.sh/formula/whisper-cpp !!
-install_whisper_base_model_brew(){
+install_whisper_base_model_brew() {
 
   # English only
   util_whisper_model_download "base.en" "$(brew --prefix whisper-cpp)/models"
@@ -1647,19 +1652,19 @@ install_whisper_base_model_brew(){
 
 }
 
-install_github_cli_brew_winget(){
+install_github_cli_brew_winget() {
 
-  if which gh > /dev/null; then
-        echo "gh founds (github cli)"
-        return
+  if which gh >/dev/null; then
+    echo "gh founds (github cli)"
+    return
   fi
 
   # https://github.com/cli/cli/blob/trunk/docs/install_windows.md
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "gh installation"
-      winget install --id GitHub.cli
-      echo "gh installed"
-      return
+    echo "gh installation"
+    winget install --id GitHub.cli
+    echo "gh installed"
+    return
   fi
 
   echo "gh installation"
@@ -1670,16 +1675,16 @@ install_github_cli_brew_winget(){
 }
 
 # https://formulae.brew.sh/formula/whisper-cpp !!
-install_whisper_cpp_brew(){
+install_whisper_cpp_brew() {
   #  https://formulae.brew.sh/formula/whisper-cpp instead
-  if which whisper-cli > /dev/null; then
-      echo "whisper-cli founds"
-      return
+  if which whisper-cli >/dev/null; then
+    echo "whisper-cli founds"
+    return
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Sorry whisper-cli installation on Windows not yet done"
-      return
+    echo "Sorry whisper-cli installation on Windows not yet done"
+    return
   fi
 
   echo "whisper-cpp installation"
@@ -1689,16 +1694,16 @@ install_whisper_cpp_brew(){
 }
 
 # https://github.com/ggml-org/whisper.cpp?tab=readme-ov-file#quick-start
-install_whisper_cpp_cli_cmake(){
+install_whisper_cpp_cli_cmake() {
 
-  if which whisper-cli > /dev/null; then
-      echo "whisper-cli founds"
-      return
+  if which whisper-cli >/dev/null; then
+    echo "whisper-cli founds"
+    return
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Sorry whisper-cli installation on Windows not yet done"
-      return
+    echo "Sorry whisper-cli installation on Windows not yet done"
+    return
   fi
 
   echo "whisper-cli installation"
@@ -1716,20 +1721,20 @@ install_whisper_cpp_cli_cmake(){
 
 }
 # https://github.com/yt-dlp/yt-dlp#installation
-install_python_youtube_downloader(){
+install_python_youtube_downloader() {
 
-  if which yt-dlp > /dev/null; then
-      echo "yt-dlp founds"
-      return
+  if which yt-dlp >/dev/null; then
+    echo "yt-dlp founds"
+    return
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "Sorry yt-dlp installation on Windows not yet done"
-      return
+    echo "Sorry yt-dlp installation on Windows not yet done"
+    return
   fi
   if ! util_command_exists python; then
-      echo "python is required to install yt-dlp"
-      return 1
+    echo "python is required to install yt-dlp"
+    return 1
   fi
   echo "yt-dlp installation"
   python -m pip install yt-dlp
@@ -1737,15 +1742,15 @@ install_python_youtube_downloader(){
 
 }
 
-install_ffmpeg_brew(){
+install_ffmpeg_brew() {
   if util_command_exists ffmpeg; then
     echo "ffmpeg installed"
     return
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "ffmpeg not yet done"
-      return
+    echo "ffmpeg not yet done"
+    return
   fi
 
   echo "Installing ffmpeg"
@@ -1756,7 +1761,7 @@ install_ffmpeg_brew(){
 
 # deprecated: don't check for bad link
 # only for space and other constraint
-install_markdown_lint(){
+install_markdown_lint() {
 
   if util_command_exists markdownlint-cli; then
     echo "markdownlint-cli installed"
@@ -1764,8 +1769,8 @@ install_markdown_lint(){
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-      echo "markdownlint-cli not yet done"
-      return
+    echo "markdownlint-cli not yet done"
+    return
   fi
 
   echo "Installing markdownlint-cli"
@@ -1774,22 +1779,12 @@ install_markdown_lint(){
 
 }
 
-
-## Installation
-main(){
-
-  # Git (already installed normally as we store this repo in git)
-  install_git_check
-
+main_brew() {
   # install brew
   install_brew
 
   # install ffmpeg
   install_ffmpeg_brew
-
-  # install Zenity
-  # the default for our ssh askpass program
-  install_zenity_pinentry_apt
 
   # install whisper.cpp (whisper-cli)
   # install_whisper_cpp_cli_cmake
@@ -1802,17 +1797,18 @@ main(){
   # install editor config checker
   install_editorconfig_checker_brew
 
-  # install pass
-  install_pass_check
+  # install shfmt
+  install_shfmt_brew
 
-  # install github key
-  # dependency: pass
-  install_github
+}
 
-  # install git repo (ssh repo)
-  # dependency: github
-  install_git_repos
+main_apt() {
+  # install Zenity
+  # the default for our ssh askpass program
+  install_zenity_pinentry_apt
+}
 
+main_python() {
   # Install Python
   install_python
   # For python installation, the venv should be configured
@@ -1832,12 +1828,36 @@ main(){
 
   # Install python downloader
   install_python_youtube_downloader
+}
 
+main_node() {
   # Install node
   install_nodejs
 
   # Markdown check
   install_nodejs_markdown_check
+}
+
+## Installation
+main() {
+
+  # Git (already installed normally as we store this repo in git)
+  install_git_check
+
+  main_brew
+
+  # install pass
+  install_pass_check
+  # install github key
+  # dependency: pass
+  install_github
+  # install git repo (ssh repo)
+  # dependency: github
+  install_git_repos
+
+  main_python
+
+  main_node
 
   # Install openoffice
   install_openoffice
