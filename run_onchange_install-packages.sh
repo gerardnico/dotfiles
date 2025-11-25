@@ -839,6 +839,24 @@ install_jq_brew() {
   brew install jq
 
 }
+
+# https://formulae.brew.sh/formula/hugo
+install_hugo_brew() {
+
+  if util_command_exists hugo; then
+    echo "Hugo found"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Not yet done hugo installation on windows"
+    return
+  fi
+  echo "Installing hugo"
+  brew install hugo
+  echo "hugo installed"
+
+}
+
 # sudo apt install pinentry-gnome3
 install_gpg_pinentry() {
 
@@ -1799,6 +1817,9 @@ main_brew() {
 
   # install shfmt
   install_shfmt_brew
+
+  # install hugo
+  install_hugo_brew
 
 }
 
