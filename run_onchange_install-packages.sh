@@ -1819,7 +1819,7 @@ main_brew() {
   install_shfmt_brew
 
   # install hugo
-  install_hugo_brew
+  # install_hugo_brew
 
 }
 
