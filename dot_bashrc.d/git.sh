@@ -72,7 +72,7 @@ alias gd='git diff | nvim'
 
 # Gitx
 # Where all repo are
-export GIT_X_REPOS_DIRS="$HOME/code/combostrap:$HOME/code"
+export GITURE_REPOS_DIRS="$HOME/code/combostrap:$HOME/code"
 
 # Loss repo in the wild where the path is rigid
 # Brew Tap
@@ -84,4 +84,4 @@ export HOMEBREW_ERALDY_TAP_HOME="/home/linuxbrew/.linuxbrew/Homebrew/Library/Tap
 # export to be able to query them with env
 export ANSIBLE_X_COLLECTION_PATH="$HOME/.ansible/collections/ansible_collections/ans_e/ans_e_base"
 # Path
-export GIT_X_REPOS_PATH="$HOMEBREW_TAP_HOME:$ANSIBLE_X_COLLECTION_PATH:$HOMEBREW_ERALDY_TAP_HOME"
+export GITURE_REPOS_PATH="$HOMEBREW_TAP_HOME:$ANSIBLE_X_COLLECTION_PATH:$HOMEBREW_ERALDY_TAP_HOME"
