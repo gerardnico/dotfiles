@@ -5,12 +5,12 @@
 # Test conf with `ssh -G gerardnico@github.com -vvv`
 Host github.com
     # HostName is only need if the git host name is not the DNS  hostname
-    # Numeric IP addresses is permitted 
+    # Numeric IP addresses is permitted
     # HostName github.com
     # User gerardnico # always git
     PreferredAuthentications publickey
     # added to the agent with the default lifetime,
-    # This option can be set to 
+    # This option can be set to
     #   * ask, ssh(1) will require confirmation using the SSH_ASKPASS program
     #   * confirm (optionally followed by time interval) each use of the key must be confirmed, as if the -c option was specified to ssh-add(1).
     #   * a time interval to specify the key's lifetime
@@ -25,7 +25,7 @@ Host github.com
     # check the host IP address in the known_hosts file (prevent dns spoofing)
     # CheckHostIP yes
     # never automatically add host keys to the ~/.ssh/known_hosts
-    # the /etc/ssh/ssh_known_hosts file should be maintained 
+    # the /etc/ssh/ssh_known_hosts file should be maintained
     # the default value is ask
     # StrictHostKeyChecking yes
     # DNS and SSHFP resource records
@@ -50,7 +50,7 @@ Host github.com
     # %n : The original remote hostname
     # %p : The remote port
     # %r : The remote username
-    ProxyCommand env BASHLIB_LIBRARY_PATH=~/code/bash-lib/lib SSH_X_CALLERS_LOG=/tmp/ssh-x-auth-proxy-callers.log BASHLIB_ECHO_LEVEL=4 ~/code/ssh-x/bin/ssh-x-auth-proxy-command %h %n %p %r
+    ProxyCommand env SSH_BASHLIB_LIBRARY_PATH=~/code/bash-lib/lib SSH_X_CALLERS_LOG=/tmp/ssh-x-auth-proxy-callers.log BASHLIB_ECHO_LEVEL=4 ~/code/ssh-x/bin/ssh-x-auth-proxy-command %h %n %p %r
 
 
 # Global conf
@@ -58,5 +58,3 @@ Host github.com
 # We don't set any because the `~/.ssh` may be mounted in Docker
 Host *
     AddKeysToAgent 15m
-
-

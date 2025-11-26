@@ -1,7 +1,5 @@
-#!/usr/bin/env bash
-# The shebang is for the IDE
-# Shebang is not needed as the script is not executed but sourced
-# but we use it to get the IDE file type
+# In the IDE, add the dot_bashrc extension to the shell language
+# for intellisense
 
 # Bashrc: Bash runtime configuration
 # ~/.bashrc: executed by bash(1) for interactive shells.
@@ -109,16 +107,6 @@ alias du='du -h'
 # Paranoid: neither group nor others have any perms:
 # umask 077
 
-#####################
-# Add Bash Library
-#####################
-export BASHLIB_DIR=$HOME/code/bash-lib/lib
-# idempotent (why for whatever reason, idea calls profile 2 times when starting its terminal)
-if [[ ":$PATH:" != *":$BASHLIB_DIR:"* ]]; then
-  export PATH=$BASHLIB_DIR:$PATH
-fi
-
-export BASHLIB_ECHO_LEVEL=3 # info level
 
 
 #####################
@@ -157,18 +145,6 @@ export EDITOR=nvim
 
 
 ##############################
-# Secrets
-##############################
-# On Wsl, create the env on Windows and add it to `WSLENV`
-# example: WSLENV=WT_SESSION:WT_PROFILE_ID:SSH_AUTH_SOCK:HCLOUD_TOKEN
-SECRET_PATH=$HOME/.bashrc-secret
-if [ -f "$SECRET_PATH" ]; then
- # shellcheck disable=SC1090
- source "$SECRET_PATH"
-fi
-
-
-##############################
 # Cygwin
 ##############################
 # Cygwin or not
@@ -183,9 +159,13 @@ fi
 if [ -d ~/.bashrc.d ]; then
   # All file loaded in a directory should have a sh extension
   # This is how /etc/profile also work
+  echo "Loading .bashrc.d scripts" > /dev/stderr
   for file in ~/.bashrc.d/*.sh; do
     # shellcheck disable=SC1090
-    [ -r "$file" ] && source "$file"
+    if [ -r "$file" ]; then
+      # echo -n "$(basename "$file") " > /dev/stderr
+      source "$file"
+    fi
   done
   unset file
 fi
@@ -196,4 +176,3 @@ fi
 # Doc: https://learn.microsoft.com/en-us/windows/terminal/tutorials/tab-title
 # echo -ne "\033]0;New Title\a"
 # trap 'echo -ne "\e]0;$BASH_COMMAND\007"' DEBUG
-

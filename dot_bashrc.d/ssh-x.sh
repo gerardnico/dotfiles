@@ -2,7 +2,6 @@
 # SSH Env
 ##############################
 
-
 # Start the agent only in interactive mode
 # Otherwise we get a recursion because `ssh-x-agent-init`
 # is also a script (ie non-interactive bash)
@@ -13,4 +12,3 @@ fi
 
 # An alias
 alias ssx="ssh-x"
-

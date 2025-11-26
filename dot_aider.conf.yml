@@ -431,7 +431,7 @@ watch-files: true
 ## Enable/disable multi-line input mode with Meta-Enter to submit (default: False)
 ## Swaps the function of Meta-Enter and Enter, so that Enter inserts a newline, and Meta-Enter submits your command.
 ## https://aider.chat/docs/usage/tips.html#interrupting--inputting
-multiline: true
+multiline: false
 
 ## Enable/disable terminal bell notifications when LLM responses are ready (default: False)
 #notifications: false
