@@ -840,6 +840,24 @@ install_jq_brew() {
 
 }
 
+# Watch for file system change
+# https://github.com/inotify-tools/inotify-tools
+install_inotify_tools_brew() {
+
+  if util_command_exists inotifywait; then
+    echo "Inotify tools found"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Inotify tools not yet on windows"
+    return
+  fi
+  echo "Installing inotify"
+  brew install inotify-tools
+  echo "inotify tools installed"
+
+}
+
 # https://formulae.brew.sh/formula/hugo
 install_hugo_brew() {
 
@@ -1820,6 +1838,9 @@ main_brew() {
 
   # install hugo
   # install_hugo_brew
+
+  # install inotify
+  install_inotify_tools_brew
 
 }
 
