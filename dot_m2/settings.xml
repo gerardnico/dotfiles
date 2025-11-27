@@ -7,59 +7,20 @@
   <pluginGroups/>
   <servers/>
   <proxies/>
-  <mirrors>
-    <!--
+  <!--
       A mirror replaces one repository definition with another
       so all requests for the original repo are transparently redirected to the mirror.
     -->
-    <mirror>
-      <id>central</id>
-      <url>https://repo.maven.apache.org/maven2</url>
-      <mirrorOf>central</mirrorOf>
-    </mirror>
-  </mirrors>
+  <mirrors/>
 
   <profiles>
     <profile>
-      <id>central</id>
+      <id>default-repos</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
       <repositories>
-        <repository>
-          <id>central</id>
-          <url>https://repo.maven.apache.org/maven2</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-        </repository>
-        <repository>
-          <id>sonatype-central-snapshots</id>
-          <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-          <releases>
-            <enabled>false</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </repository>
-      </repositories>
-      <pluginRepositories>
-        <pluginRepository>
-          <id>central</id>
-          <url>https://repo.maven.apache.org/maven2</url>
-        </pluginRepository>
-      </pluginRepositories>
-    </profile>
-    <profile>
-      <id>google-mirror</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <repositories>
+        <!-- Google Mirror - Primary (faster) -->
         <repository>
           <id>google-maven-central</id>
           <name>GCS Maven Central mirror EU</name>
@@ -71,12 +32,49 @@
             <enabled>false</enabled>
           </snapshots>
         </repository>
+        <!-- Official Maven Central - Fallback -->
+        <repository>
+          <id>central</id>
+          <name>Maven Central Repository</name>
+          <url>https://repo.maven.apache.org/maven2</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+        <!-- Sonatype Snapshots -->
+        <repository>
+          <id>sonatype-snapshots</id>
+          <name>Sonatype Snapshots</name>
+          <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
       </repositories>
       <pluginRepositories>
+        <!-- Google Mirror - Primary (faster) -->
         <pluginRepository>
           <id>google-maven-central</id>
           <name>GCS Maven Central mirror</name>
           <url>https://maven-central.storage-download.googleapis.com/maven2/</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+        <!-- Official Maven Central - Fallback -->
+        <pluginRepository>
+          <id>central</id>
+          <name>Maven Central Repository</name>
+          <url>https://repo.maven.apache.org/maven2</url>
           <releases>
             <enabled>true</enabled>
           </releases>
