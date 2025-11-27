@@ -19,7 +19,10 @@ add_bin_dirs_from_code_repo() {
         if [[ "$bin_dir" == *"kubee"* ]]; then
           continue
         fi
-        export PATH="$bin_dir:$PATH"
+        # We set them last. The packager has a higher priority
+        # If the developer want to change this priority
+        # it should go to the project directory that will change it via .envrc
+        export PATH="$PATH:$bin_dir"
     done < <(find "$BASE_DIR" -maxdepth 2 -type d -name "bin")
 
 }
