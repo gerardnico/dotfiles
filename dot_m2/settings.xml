@@ -12,6 +12,8 @@
       so all requests for the original repo are transparently redirected to the mirror.
     -->
   <mirrors/>
+  <!-- A list of profile IDs that Maven should activate automatically for every build.-->
+  <activeProfiles/>
 
   <profiles>
     <profile>
@@ -85,7 +87,4 @@
       </pluginRepositories>
     </profile>
   </profiles>
-
-  <!-- A list of profile IDs that Maven should activate automatically for every build.-->
-  <activeProfiles/>
 </settings>

@@ -59,6 +59,7 @@ alias gfd='git-feature-delete'
 alias gl='git-log'
 alias gll='git log --pretty=format:"%h %s" --graph'
 alias gp='git-prepare'
+alias go='git-origin'
 alias gr='git-reset'
 alias gs='git status'
 alias gt='git-tag'
@@ -75,7 +76,7 @@ alias nga="$GITURE_BIN_PATH/git-amend"
 # shellcheck disable=SC2139
 alias ngc="$GITURE_BIN_PATH/git-commit"
 # shellcheck disable=SC2139
-alias ngit-remote="$GITURE_BIN_PATH/git-remote"
+alias ngo="$GITURE_BIN_PATH/git-origin"
 
 # No GIT_AUTHOR env
 # Why? Because it has the higher priority than the repository config
