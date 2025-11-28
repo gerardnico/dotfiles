@@ -68,6 +68,15 @@ alias gxs='git-exec status --short'
 
 alias gd='git diff | nvim'
 
+# Next version
+GITURE_BIN_PATH="$HOME/code/giture/bin"
+# shellcheck disable=SC2139
+alias nga="$GITURE_BIN_PATH/git-amend"
+# shellcheck disable=SC2139
+alias ngc="$GITURE_BIN_PATH/git-commit"
+# shellcheck disable=SC2139
+alias ngit-remote="$GITURE_BIN_PATH/git-remote"
+
 # No GIT_AUTHOR env
 # Why? Because it has the higher priority than the repository config
 # Deprecated: export GIT_AUTHOR_NAME="Nicolas GERARD"
