@@ -690,6 +690,24 @@ install_editorconfig_checker_brew() {
 
 }
 
+# https://github.com/rfc1036/whois
+install_whois_brew() {
+
+  if util_command_exists whois; then
+    echo "Whois founds"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Whois on Windows not yet done"
+    return
+  fi
+
+  echo "Whois with brew"
+  brew install whois
+  echo "Whois installed"
+
+}
+
 # https://git-cliff.org/docs/installation/
 install_git_cliff() {
 
@@ -1821,6 +1839,9 @@ main_brew() {
 
   # install ffmpeg
   install_ffmpeg_brew
+
+  # install whois
+  install_whois_brew
 
   # install whisper.cpp (whisper-cli)
   # install_whisper_cpp_cli_cmake
