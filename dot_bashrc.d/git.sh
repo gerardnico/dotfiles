@@ -61,7 +61,7 @@ alias gll='git log --pretty=format:"%h %s" --graph'
 alias gp='git-prepare'
 alias go='git-origin'
 alias gr='git-reset'
-alias gs='git status'
+alias gs='git-status'
 alias gt='git-tag'
 alias gtd='git-tag-delete'
 alias gx='git-exec' # and not git exec if you are working with Cygwin otherwise there is a path problem
@@ -79,6 +79,8 @@ alias ngc="$GITURE_BIN_PATH/git-commit"
 alias ngo="$GITURE_BIN_PATH/git-origin"
 # shellcheck disable=SC2139
 alias ngfm="$GITURE_BIN_PATH/git-feature-merge"
+# shellcheck disable=SC2139
+alias ngs="$GITURE_BIN_PATH/git-status"
 
 # No GIT_AUTHOR env
 # Why? Because it has the higher priority than the repository config

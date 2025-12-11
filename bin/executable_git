@@ -19,11 +19,8 @@ if [ -d "$HOME/.profile.d" ]; then
   unset file
 fi
 
-# Which git is wrapped (os or Brew)
-GIT_WRAPPED=/usr/bin/git
-GIT_BREW=/home/linuxbrew/.linuxbrew/bin/git
-if [ -f "$GIT_BREW" ]; then
-  GIT_WRAPPED=$GIT_BREW
-fi
 
-$GIT_WRAPPED "$@"
+# We select the second in path order
+# We take the second in order of priority
+# Why? we may get git from brew
+"$(which -a git | sed -n '2p')" "$@"
