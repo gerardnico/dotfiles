@@ -90,7 +90,7 @@ alias ngs="$GITURE_BIN_PATH/git-status"
 
 # Gitx
 # Where all repo are
-export GITURE_REPOS_DIRS="$HOME/code/combostrap:$HOME/code"
+export GITURE_REPOS_DIRS="$HOME/code/tabulify:$HOME/code/combostrap:$HOME/code"
 
 # Loss repo in the wild where the path is rigid
 # Brew Tap
