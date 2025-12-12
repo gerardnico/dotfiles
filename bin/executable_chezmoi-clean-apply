@@ -1,11 +1,10 @@
-#!/bin/bash
-# ChezMoi will not make a sync
+#!/usr/bin/env bash
+# ChezMoi will not delete already created files
 # This script deletes the scripts and `bashrc.d` to get all scripts
-
 
 set -Eeuo pipefail
 
-
 rm -rf "${HOME:?}"/bin
+rm -rf "${HOME:?}"/.profile.d
 rm -rf "${HOME:?}"/.bashrc.d
-chezmoi apply
+chezmoi apply --force
