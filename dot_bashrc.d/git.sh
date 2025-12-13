@@ -84,6 +84,8 @@ alias ngo="$GITURE_BIN_PATH/git-origin"
 alias ngfm="$GITURE_BIN_PATH/git-feature-merge"
 # shellcheck disable=SC2139
 alias ngs="$GITURE_BIN_PATH/git-status"
+# shellcheck disable=SC2139
+alias ngo="$GITURE_BIN_PATH/git-origin"
 
 # No GIT_AUTHOR env
 # Why? Because it has the higher priority than the repository config
