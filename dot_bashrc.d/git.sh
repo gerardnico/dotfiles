@@ -79,19 +79,20 @@ alias ngb="$GITURE_BIN_PATH/git-branch"
 # shellcheck disable=SC2139
 alias ngc="$GITURE_BIN_PATH/git-commit"
 # shellcheck disable=SC2139
-alias ngo="$GITURE_BIN_PATH/git-origin"
-# shellcheck disable=SC2139
 alias ngfl="$GITURE_BIN_PATH/git-feature-log"
 # shellcheck disable=SC2139
 alias ngfm="$GITURE_BIN_PATH/git-feature-merge"
 # shellcheck disable=SC2139
 alias ngfs="$GITURE_BIN_PATH/git-feature-squash"
 # shellcheck disable=SC2139
-alias ngs="$GITURE_BIN_PATH/git-status"
-# shellcheck disable=SC2139
 alias ngl="$GITURE_BIN_PATH/git-log"
 # shellcheck disable=SC2139
 alias ngo="$GITURE_BIN_PATH/git-origin"
+# shellcheck disable=SC2139
+alias ngs="$GITURE_BIN_PATH/git-status"
+# shellcheck disable=SC2139
+alias ngt="$GITURE_BIN_PATH/git-tag"
+
 
 # No GIT_AUTHOR env
 # Why? Because it has the higher priority than the repository config
