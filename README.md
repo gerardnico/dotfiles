@@ -6,4 +6,4 @@
 
 ## Apply with force
 
-See [Chezmoi clean apply](bin/executable_chezmoi-clean-apply)
+See [Chezmoi clean apply](bin/executable_chezmoi-apply-clean)
