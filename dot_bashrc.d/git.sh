@@ -85,6 +85,8 @@ alias ngfm="$GITURE_BIN_PATH/git-feature-merge"
 # shellcheck disable=SC2139
 alias ngs="$GITURE_BIN_PATH/git-status"
 # shellcheck disable=SC2139
+alias ngl="$GITURE_BIN_PATH/git-log"
+# shellcheck disable=SC2139
 alias ngo="$GITURE_BIN_PATH/git-origin"
 
 # No GIT_AUTHOR env
