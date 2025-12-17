@@ -90,6 +90,23 @@ sudo_safe() {
   eval "$*"
 }
 
+install_unzip_os_packager() {
+
+  if util_command_exists unzio; then
+    echo "unzip found"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "unzip installation"
+    winget install -e --id GnuWin32.UnZip
+    return
+  fi
+  echo "Linux/MacOs installation not done"
+  return
+
+}
+
 # Winget modify the PATH of windows
 # If we are working in a IDE, the path is not up to date
 # We use this function to check if the package is already installed
@@ -1865,10 +1882,15 @@ main_brew() {
 
 }
 
-main_apt() {
+main_os_packager_apt() {
+
   # install Zenity
   # the default for our ssh askpass program
   install_zenity_pinentry_apt
+
+  # install unzip
+  install_unzip_os_packager
+
 }
 
 main_python() {
