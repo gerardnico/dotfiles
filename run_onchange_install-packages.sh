@@ -329,6 +329,7 @@ install_python_copier() {
     return
   fi
   echo "Copier installation"
+  # pipx is a tool to use for installing python commands, not for installing dependencies
   pipx install copier
   echo "Copier installation done"
 
@@ -1676,6 +1677,22 @@ install_mail_spring_gui() {
 
 }
 
+# pipx is a tool to use for installing python commands, not for installing dependencies
+install_python_pipx() {
+
+  if util_command_exists pipx; then
+    echo "Pipx installed"
+    return
+  fi
+
+  echo "Installing Pipx"
+  brew install pipx
+#  python3 -m pip install --user pipx
+#  python3 -m pipx ensurepath
+  echo "Pipx installed"
+
+}
+
 install_python() {
 
   if util_command_exists python3; then
@@ -1690,9 +1707,6 @@ install_python() {
 
   echo "Installing Python"
   apt-get install python3 python3-venv
-  # init venv
-  source "$HOME"/.bashrc.d/python.sh
-  echo "Python Installation done"
 
 }
 
@@ -1896,6 +1910,12 @@ main_os_packager_apt() {
 main_python() {
   # Install Python
   install_python
+  install_python_pipx
+
+  # init venv (after pipx to not install it in the venv)
+  source "$HOME"/.bashrc.d/python.sh
+  echo "Python Installation done"
+
   # For python installation, the venv should be configured
   local PYTHON_CONF="$HOME/.bashrc.d/python.sh"
   if [ ! -f "$PYTHON_CONF" ]; then
