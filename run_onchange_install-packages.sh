@@ -92,17 +92,37 @@ sudo_safe() {
 
 install_unzip_os_packager() {
 
-  if util_command_exists unzio; then
+  if util_command_exists unzip; then
     echo "unzip found"
     return
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
     echo "unzip installation"
+    # install in: C:\Program Files (x86)\GnuWin32\bin
     winget install -e --id GnuWin32.UnZip
+    echo "unzip installation done"
     return
   fi
   echo "Linux/MacOs installation not done"
+  return
+
+}
+
+install_openjdk_os_packager() {
+
+  if util_command_exists java; then
+    echo "java found"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "java installation"
+    winget install -e --id ojdkbuild.openjdk.17.jdk
+    echo "java installation done"
+    return
+  fi
+  echo "Linux/MacOs is managed by sdk"
   return
 
 }
@@ -1904,6 +1924,9 @@ main_os_packager_apt() {
 
   # install unzip
   install_unzip_os_packager
+
+  # install openjdk
+  install_openjdk_os_packager
 
 }
 
