@@ -90,6 +90,17 @@ sudo_safe() {
   eval "$*"
 }
 
+# https://code.claude.com/docs/en/overview#get-started-in-30-seconds
+install_claude_code_bash() {
+  if util_command_exists claude; then
+    echo "claude found"
+    return
+  fi
+  echo "claude installation"
+  curl -fsSL https://claude.ai/install.sh | bash
+  echo "claude installation done"
+}
+
 install_unzip_os_packager() {
 
   if util_command_exists unzip; then
@@ -1707,8 +1718,8 @@ install_python_pipx() {
 
   echo "Installing Pipx"
   brew install pipx
-#  python3 -m pip install --user pipx
-#  python3 -m pipx ensurepath
+  #  python3 -m pip install --user pipx
+  #  python3 -m pipx ensurepath
   echo "Pipx installed"
 
 }
@@ -1966,13 +1977,25 @@ main_node() {
   install_nodejs_markdown_check
 }
 
+# Install via a bash script
+main_bash() {
+
+  # Install Claude
+  install_claude_code_bash
+
+}
+
 ## Installation
 main() {
 
   # Git (already installed normally as we store this repo in git)
   install_git_check
 
+  # Brew installer
   main_brew
+
+  # bash installer
+  main_bash
 
   # install pass
   install_pass_check
