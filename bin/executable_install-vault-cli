@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Vault Cli Installation
 # https://developer.hashicorp.com/vault/install#linux
 

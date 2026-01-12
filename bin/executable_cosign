@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ######################
 # Standard Library and conf
@@ -23,4 +23,3 @@ docker run \
   --rm \
   --name cosign \
   $IMAGE "$@"
-

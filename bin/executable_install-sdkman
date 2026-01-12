@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # https://sdkman.io/install
 # We already have bashrc
 curl -s "https://get.sdkman.io?rcupdate=false" | bash

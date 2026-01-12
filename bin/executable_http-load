@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Download a whole website
 # See also: https://k6.io/
 

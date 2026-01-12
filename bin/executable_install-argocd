@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # ArgoCd client installation
 
 ######################
@@ -45,4 +45,3 @@ echo "Next Steps"
 echo "  * Login with           :   argocd login argocd.i.eraldy.com --grpc-web"
 echo "  * Change the namespace :   kube-ns-current argocd"
 echo "  * List apps            :   argocd app list"
-

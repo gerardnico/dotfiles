@@ -1,15 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Install https://github.com/neovim/neovim/blob/master/INSTALL.md
 
 set -Eeuo pipefail
 
 # In debian,
 if [ -f "/etc/debian_version" ]; then
-   sudo apt-get install -y neovim
-   echo "To start Neovim, run nvim (not neovim)"
-   exit
+  sudo apt-get install -y neovim
+  echo "To start Neovim, run nvim (not neovim)"
+  exit
 fi
-
 
 # Standalone
 VERSION=v0.10.2

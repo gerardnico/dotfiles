@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Auto Push for ChezMoi. Give a commit message
 #
 # Don't install chezmoi in the bin directory because the path to the `chezmoi` executable is protected

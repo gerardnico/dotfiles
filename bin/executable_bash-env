@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Print information about the current shell environment.
 # Run it with minimal
 # bash -c "$HOME/bin/bash-env"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # https://krew.sigs.k8s.io/docs/user-guide/setup/install/
 
 source bashlib-echo.sh

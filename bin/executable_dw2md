@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+# DokuWiki to Markdown converter using Pandoc
+# Usage: ./dokuwiki2md.sh <file_path>
+
+set -Eeuo pipefail
+
+# Check if file path is provided
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <dokuwiki_file>"
+    echo "Example: $0 pages/wiki/syntax.txt"
+    exit 1
+fi
+
+INPUT_PATH="$1"
+
+# Determine the full path to the file
+if [[ "$INPUT_PATH" = /* ]]; then
+    # Absolute path
+    FULL_PATH="$INPUT_PATH"
+else
+    # Relative path - check for DOKUWIKI_HOME
+    if [ "${DOKUWIKI_HOME:-}" == '' ]; then
+        echo "Error: DOKUWIKI_HOME is not set for relative paths"
+        echo "Either:"
+        echo "  - Set DOKUWIKI_HOME: export DOKUWIKI_HOME=/path/to/dokuwiki"
+        echo "  - Use an absolute path"
+        exit 1
+    fi
+    FULL_PATH="$DOKUWIKI_HOME/$INPUT_PATH"
+fi
+
+# Check if the input file exists
+if [ ! -f "$FULL_PATH" ]; then
+    echo "Error: File not found: $FULL_PATH"
+    exit 1
+fi
+
+# Check if pandoc is installed
+if ! command -v pandoc &> /dev/null; then
+    echo "Error: pandoc is not installed"
+    echo "Install it with: sudo apt install pandoc (Ubuntu/Debian) or brew install pandoc (macOS)"
+    exit 1
+fi
+
+# Get the directory and filename
+DIR=$(dirname "$FULL_PATH")
+FILENAME=$(basename "$FULL_PATH")
+BASENAME="${FILENAME%.*}"
+
+# Create output path in the same directory
+OUTPUT_PATH="$DIR/$BASENAME.md"
+
+# Convert the file
+echo "Converting: $FULL_PATH"
+echo "Output: $OUTPUT_PATH"
+
+pandoc -f dokuwiki -t markdown "$FULL_PATH" -o "$OUTPUT_PATH"
+
+echo "✓ Conversion complete!"

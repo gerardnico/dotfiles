@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Fetch the commit of a site
 
 # The log and error handling
@@ -8,15 +8,13 @@
 set -Eeuo pipefail
 # echo and error_handling should be in your bashrc.d directory
 
-
 # Check if the app name is provided
 if [ -z "$1" ]; then
-    echo "Usage: $0 <site name>"
-    exit 1
+  echo "Usage: $0 <site name>"
+  exit 1
 fi
 
 SITE_NAME=$1
-
 
 SITE_QUALIFIED_NAME="site-com-$SITE_NAME"
 SITE_PATH="$HOME/code/$SITE_QUALIFIED_NAME"
@@ -26,9 +24,8 @@ if [ ! -d "$SITE_PATH" ]; then
   exit 1
 fi
 
-pushd  "$SITE_PATH" &>/dev/null
+pushd "$SITE_PATH" &>/dev/null
 
 git fetch && git pull
 
 popd &>/dev/null
-

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Ref:
 # https://stackoverflow.com/questions/10209660/using-notepad-for-git-inside-cygwin

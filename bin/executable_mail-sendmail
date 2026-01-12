@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Set the SMTP server details
 SMTP_HOST=$(ip route show | grep -i default | awk '{ print $3}')

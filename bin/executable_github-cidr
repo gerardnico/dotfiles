@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Get the CIDR of Github
 
 ######################
@@ -17,5 +17,3 @@ set -Eeuo pipefail
 ######################
 # Get the hooks CIDR line by line
 curl -s https://api.github.com/meta | jq --raw-output '.hooks | join("\n")'
-
-

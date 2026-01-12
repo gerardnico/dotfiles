@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Install kubectl
 # Adaptation from the [doc](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-using-native-package-management)

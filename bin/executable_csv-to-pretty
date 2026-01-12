@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Dep
 # for the column util
@@ -29,7 +29,7 @@ View a CSV file at the command line.
   filename      CSV file to be viewed
   -             For Stdin
 
-You can also 
+You can also
 EOF
 }
 
@@ -48,9 +48,6 @@ fi
 if [ "$descriptor" == '-' ]; then
   # cat reads from its fd 0 (stdin) and writes to its fd 1
   cat | column -s, -t | less -#2 -N -S
-else 
+else
   cat $descriptor | column -s, -t | less -#2 -N -S
 fi
-
-
-

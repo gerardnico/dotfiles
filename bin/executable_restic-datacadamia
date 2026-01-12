@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # The log and error handling
 # We still need to use the set command
@@ -7,9 +7,8 @@
 set -Eeuo pipefail
 # echo and error_handling should be in your bashrc.d directory
 
-
 RESTIC_PASSWORD=$RESTIC_PASSWORD \
- RESTIC_REPOSITORY=$RESTIC_REPOSITORY/datacadamia \
- AWS_SECRET_ACCESS_KEY=$RESTIC_AWS_SECRET_ACCESS_KEY \
- AWS_ACCESS_KEY_ID=$RESTIC_AWS_ACCESS_KEY_ID \
- /usr/bin/restic "$@"
+  RESTIC_REPOSITORY=$RESTIC_REPOSITORY/datacadamia \
+  AWS_SECRET_ACCESS_KEY=$RESTIC_AWS_SECRET_ACCESS_KEY \
+  AWS_ACCESS_KEY_ID=$RESTIC_AWS_ACCESS_KEY_ID \
+  /usr/bin/restic "$@"

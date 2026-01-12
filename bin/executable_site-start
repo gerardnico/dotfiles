@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Start a site
 
 # The log and error handling
@@ -10,35 +10,37 @@ set -Eeuo pipefail
 # Load echo package
 source bashlib-echo.sh
 
-
 # Check if the app name is provided
 if [ -z "$1" ]; then
-    echo::info "Usage: $0 <site name>"
-    exit 1
+  echo::info "Usage: $0 <site name>"
+  exit 1
 fi
 
 SITE_NAME=$1
 
 case "$SITE_NAME" in
-  "combostrap")
-    SITE_QUALIFIED_NAME="site-com-$SITE_NAME"
-    PORT=8081 ;;
-  "datacadamia")
-    SITE_QUALIFIED_NAME="site-com-$SITE_NAME"
-    PORT=8082 ;;
-  "tabulify")
-    SITE_QUALIFIED_NAME="site-com-$SITE_NAME"
-    PORT=8083 ;;
-  "dd")
-    SITE_QUALIFIED_NAME="dokuwiki-docker"
-    PORT=8084 ;;
-  *)
-    SITE_QUALIFIED_NAME="site-com-$SITE_NAME"
-    PORT=8080
-    echo::info "Unknown site: $SITE_NAME, port given $PORT"
+"combostrap")
+  SITE_QUALIFIED_NAME="site-com-$SITE_NAME"
+  PORT=8081
+  ;;
+"datacadamia")
+  SITE_QUALIFIED_NAME="site-com-$SITE_NAME"
+  PORT=8082
+  ;;
+"tabulify")
+  SITE_QUALIFIED_NAME="site-com-$SITE_NAME"
+  PORT=8083
+  ;;
+"dd")
+  SITE_QUALIFIED_NAME="dokuwiki-docker"
+  PORT=8084
+  ;;
+*)
+  SITE_QUALIFIED_NAME="site-com-$SITE_NAME"
+  PORT=8080
+  echo::info "Unknown site: $SITE_NAME, port given $PORT"
   ;;
 esac
-
 
 SITE_PATH="$HOME/code/$SITE_QUALIFIED_NAME"
 
@@ -47,7 +49,7 @@ if [ ! -d "$SITE_PATH" ]; then
   exit 1
 fi
 
-pushd  "$SITE_PATH" &>/dev/null
+pushd "$SITE_PATH" &>/dev/null
 
 if [ "$SITE_NAME" == "dd" ]; then
   docker run \
@@ -86,4 +88,3 @@ fi
 echo::info "$SITE_NAME should be available at http://localhost:$PORT"
 
 popd &>/dev/null
-

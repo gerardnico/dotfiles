@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # https://aider.chat/docs/install/pipx.html
 
 set -Eeuo pipefail
@@ -20,5 +20,3 @@ fi
 
 # pipx install globally on your system within its own python environment.
 pipx install aider-chat
-
-

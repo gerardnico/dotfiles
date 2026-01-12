@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source bashlib-echo.sh
 source bashlib-error.sh

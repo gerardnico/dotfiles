@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # https://docs.liquibase.com/start/install/liquibase-linux-debian-ubuntu.html
 
 # Add the repo

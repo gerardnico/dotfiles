@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # @description Switch or create a new window
 # @arg $1 the window name
 # @arg $2 the start directory

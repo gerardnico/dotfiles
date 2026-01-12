@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Check the utility
 source bashlib-command.sh
 source bashlib-echo.sh

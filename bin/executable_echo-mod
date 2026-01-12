@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source bashlib-linux.sh
 source bashlib-echo.sh
