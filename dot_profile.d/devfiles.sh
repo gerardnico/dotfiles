@@ -13,7 +13,6 @@ export DEVF_COMBOSTRAP_DIR=$HOME/code/combostrap/devfiles
 export DEVF_TABULIFY_EMAIL="nico@tabulify.com"
 # Long format
 export DEVF_TABULIFY_SIGNING_KEY="$DEVF_COMBOSTRAP_SIGNING_KEY"
-
 # Repo Manager location
 export DEVF_TABULIFY_DIR="$DEVF_COMBOSTRAP_DIR"
 
@@ -24,6 +23,14 @@ export DEVF_TABULIFY_DIR="$DEVF_COMBOSTRAP_DIR"
 export DEVF_GERARDNICO_EMAIL="nico@gerardnico.com"
 # Long format
 export DEVF_GERARDNICO_SIGNING_KEY="$DEVF_COMBOSTRAP_SIGNING_KEY"
-
 # Repo Manager location
 export DEVF_GERARDNICO_DIR="$DEVF_COMBOSTRAP_DIR"
+
+############
+# Gerardnico
+###########
+export DEVF_BYTLE_EMAIL="nico@gerardnico.com"
+# Long format
+export DEVF_BYTLE_SIGNING_KEY="21B4F6A5CE5BA34E"
+# Repo Manager location
+export DEVF_BYTLE_DIR=$HOME/code/combostrap/devfiles
