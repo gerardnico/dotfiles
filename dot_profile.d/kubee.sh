@@ -3,8 +3,14 @@
 # https://github.com/bytle/kubee
 # We keep kube in the name because this is how we search for kube related repo
 ##############################
-# Adding nkubee
-alias nkubee="~/code/bytle/kubee/bin/kubee"
+
+# Adding nkubee in the PATH
+NKUBEE_DIR=$HOME/code/bytle/kubee/contrib/scripts-global
+if [[ ":$PATH:" != *":$NKUBEE_DIR:"* ]]; then
+  # for an unknown reason, this script is called twice
+  # we check if the nkubee dir is already in the PATH
+  export PATH="$PATH:$NKUBEE_DIR"
+fi
 
 export KUBEE_CHARTS_PATH="$HOME/code/kube-argocd/charts"
 export KUBEE_CLUSTERS_PATH="$HOME/code/kube-argocd/clusters"
