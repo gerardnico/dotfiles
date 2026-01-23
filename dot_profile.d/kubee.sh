@@ -4,7 +4,7 @@
 # We keep kube in the name because this is how we search for kube related repo
 ##############################
 # Adding nkubee
-alias nkubee=$HOME/code/kubee/bin/kubee
+alias nkubee="~/code/bytle/kubee/bin/kubee"
 
 export KUBEE_CHARTS_PATH="$HOME/code/kube-argocd/charts"
 export KUBEE_CLUSTERS_PATH="$HOME/code/kube-argocd/clusters"
