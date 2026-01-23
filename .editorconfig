@@ -27,16 +27,31 @@ insert_final_newline = unset
 #          xmlns:xsi>
 ij_xml_align_attributes = false
 
-# https://github.com/patrickvane/shfmt#description
+# https://github.com/mvdan/sh
+# https://github.com/mvdan/sh/blob/master/cmd/shfmt/shfmt.1.scd#examples
 # noinspection EditorConfigKeyCorrectness
-[*.sh]
-shell_variant      = posix # like -ln=posix
-binary_next_line   = true  # like -bn
-switch_case_indent = true  # like -ci
-space_redirects    = true  # like -sr
-keep_padding       = true  # like -kp
-function_next_line = true  # like -fn
-never_split        = true  # like -ns
+[{*.bash,*.sh,*.zsh,.envrc,.envrc.jinja2}]
+# formats code for POSIX-compliant shells rather than bash-specific features.
+shell_variant = posix # like -ln=posix
+simplify = true
+# Places binary operators (&&, ||, |) at the beginning of the next line in multi-line commands, rather than at the end of the previous line.
+binary_next_line = unset # like -bn
+ij_shell_binary_ops_start_line = unset
+# indents case statement branches an additional level inside the case block, making the structure more visually clear.
+switch_case_indent = true # like -ci
+ij_shell_switch_cases_indented = true
+# adds spaces around redirection operators (e.g., > file instead of >file), improving readability.
+space_redirects = true # like -sr
+ij_shell_redirect_followed_by_space = true
+# Preserves alignment padding in consecutive lines, useful for keeping column-like structures aligned (such as variable assignments or array elements).
+keep_padding = true # like -kp
+# places the opening brace of function definitions on the next line rather than on the same line as the function name.
+function_next_line = true # like -fn
+# Prevents shfmt from splitting long lines. Lines will remain as-is rather than being automatically wrapped, giving you manual control over line breaks.
+never_split = true # like -ns
+# Don't delete any space
+minify = false
+ij_shell_minify_program = false
 
 [*.md]
 # indent is unset because
@@ -55,3 +70,16 @@ indent_size = unset
 # /**
 #  * Star is at once space
 indent_size = unset
+
+[*.java]
+# Due to catch (IllegalBlockSizeException
+#        InvalidKeyException e) {
+indent_size = unset
+# Block comment (single star on all lines!) should align to the code and not to the first column
+# By default, only javadoc comment (double star) do that
+ij_java_block_comment_at_first_column = false
+# if true, the comments characters (//) are set at the beginning
+ij_java_line_comment_at_first_column = false
+
+[*.{cmd,bat}]
+end_of_line = crlf

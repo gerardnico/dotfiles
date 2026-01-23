@@ -3,3 +3,4 @@
 
 # Exception: cmd command uses CRLF (Windows line endings)
 *.cmd text eol=crlf
+*.bat text eol=crlf

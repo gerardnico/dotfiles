@@ -38,10 +38,12 @@ repos:
         additional_dependencies: [ '@commitlint/config-conventional' ]
         args: [ "--verbose", "--config", ".config/commitlint.config.js" ]
   - repo: https://github.com/combostrap/devfiles
-    rev: "v0.1.3"
+    rev: "v0.1.8"
     hooks:
       - id: git-prevent-out-of-sync-commit
         name: prevent out-of-sync branch commit
+#      - id: idea-format
+#        name: auto formatting with idea intellij if present
   - repo: https://github.com/editorconfig-checker/editorconfig-checker
     rev: c9d5ed0 # v3.4.1
     hooks:
