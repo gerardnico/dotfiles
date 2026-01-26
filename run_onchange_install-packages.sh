@@ -19,7 +19,7 @@ echo "$(basename "$0") - Install my Packages"
 util_command_exists() {
   # start to check subcommand such as `kubectl oidc-login`
   # does not work always for subcommand, you could just do `if command -help >/dev/null 2>1; then`
-  command -v "$@" >/dev/null 2>&1
+  command -v "$@" > /dev/null 2>&1
 }
 
 # Function to ensure Whisper model exists and download if missing
@@ -50,9 +50,9 @@ util_whisper_model_download() {
   echo "Downloading $model_name model..."
 
   # Try using the official download script first
-  if command -v curl >/dev/null 2>&1; then
+  if command -v curl > /dev/null 2>&1; then
     echo "Attempting download using official script..."
-    if bash -c "$(curl -fsSL https://raw.githubusercontent.com/ggerganov/whisper.cpp/master/models/download-ggml-model.sh)" -- "$model_name" 2>/dev/null; then
+    if bash -c "$(curl -fsSL https://raw.githubusercontent.com/ggerganov/whisper.cpp/master/models/download-ggml-model.sh)" -- "$model_name" 2> /dev/null; then
       # Move the downloaded file to our specified directory if it's not already there
       if [ -f "ggml-${model_name}.bin" ] && [ "$models_dir" != "." ]; then
         mv "ggml-${model_name}.bin" "$model_file"
@@ -120,6 +120,33 @@ install_unzip_os_packager() {
 
 }
 
+# https://geminicli.com/docs/get-started/installation/
+install_nodejs_npm_gemini() {
+  if util_command_exists gemini; then
+    echo "gemini found"
+    return
+  fi
+  echo "gemini installation"
+  npm install -g @google/gemini-cli
+  echo "gemini installation done"
+}
+
+# https://code.claude.com/docs/en/sandboxing
+install_claude_sandboxing_bubblewrap_apt() {
+
+  if util_command_exists bwrap; then
+    echo "bubblewrap found"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "sandboxing not supported on windows"
+    return
+  fi
+  echo "bubblewrap installation"
+  sudo apt-get install bubblewrap socat
+  echo "bubblewrap installation done"
+}
+
 install_openjdk_os_packager() {
 
   if util_command_exists java; then
@@ -145,7 +172,7 @@ winget_package_play() {
 
   local package_id="$1"
   # Check if the package is installed
-  if winget list --id "$package_id" &>/dev/null; then
+  if winget list --id "$package_id" &> /dev/null; then
     echo "Package '$package_id' is installed."
     return
   fi
@@ -226,10 +253,10 @@ install_from_github_binary() {
 
 # Function to check if a package is installed
 package_installed() {
-  dpkg -l "$1" >/dev/null 2>&1
+  dpkg -l "$1" > /dev/null 2>&1
 }
 
-install_nodejs_markdown_check() {
+install_nodejs_npm_markdown_check() {
 
   if util_command_exists markdown-link-check; then
     echo "markdown-link-check found"
@@ -292,7 +319,7 @@ install_helm_plugin() {
   # The command exists does work with helm plugin ..
   # Testing the help option instead
   # shellcheck disable=SC2210
-  if helm "$subcommand" --help >/dev/null 2>&1; then
+  if helm "$subcommand" --help > /dev/null 2>&1; then
     echo "Helm diff plugin founds"
     return
   fi
@@ -398,7 +425,7 @@ install_flyctl() {
 # https://aider.chat/docs/install.html
 install_python_aider() {
 
-  if which aider >/dev/null; then
+  if which aider > /dev/null; then
     echo "aider founds"
     return
   fi
@@ -1074,7 +1101,7 @@ install_github() {
   # see HOME/.ssh/config
   GITHUB_PUBLIC_KEY=$HOME/.ssh/id_git_github.com.pub
   if [ ! -f "$GITHUB_PUBLIC_KEY" ]; then
-    pass ssh-x/id_git_github.com.pub >"$GITHUB_PUBLIC_KEY"
+    pass ssh-x/id_git_github.com.pub > "$GITHUB_PUBLIC_KEY"
   else
     echo "GitHub Public Key Found"
   fi
@@ -1114,19 +1141,19 @@ get_cpu_arch_name() {
 
   # Map architecture to the binary names
   case "$ARCH" in
-  x86_64)
-    ARCH_NAME="amd64"
-    ;;
-  aarch64)
-    ARCH_NAME="arm64"
-    ;;
-  arm*)
-    ARCH_NAME="arm"
-    ;;
-  *)
-    echo "Unsupported architecture: $ARCH"
-    return 1
-    ;;
+    x86_64)
+      ARCH_NAME="amd64"
+      ;;
+    aarch64)
+      ARCH_NAME="arm64"
+      ;;
+    arm*)
+      ARCH_NAME="arm"
+      ;;
+    *)
+      echo "Unsupported architecture: $ARCH"
+      return 1
+      ;;
   esac
   echo $ARCH_NAME
 
@@ -1742,7 +1769,7 @@ install_python() {
 }
 
 install_cmake_brew() {
-  if which whisper-cli >/dev/null; then
+  if which whisper-cli > /dev/null; then
     echo "cmake founds"
     return
   fi
@@ -1770,7 +1797,7 @@ install_whisper_base_model_brew() {
 
 install_github_cli_brew_winget() {
 
-  if which gh >/dev/null; then
+  if which gh > /dev/null; then
     echo "gh founds (github cli)"
     return
   fi
@@ -1793,7 +1820,7 @@ install_github_cli_brew_winget() {
 # https://formulae.brew.sh/formula/whisper-cpp !!
 install_whisper_cpp_brew() {
   #  https://formulae.brew.sh/formula/whisper-cpp instead
-  if which whisper-cli >/dev/null; then
+  if which whisper-cli > /dev/null; then
     echo "whisper-cli founds"
     return
   fi
@@ -1812,7 +1839,7 @@ install_whisper_cpp_brew() {
 # https://github.com/ggml-org/whisper.cpp?tab=readme-ov-file#quick-start
 install_whisper_cpp_cli_cmake() {
 
-  if which whisper-cli >/dev/null; then
+  if which whisper-cli > /dev/null; then
     echo "whisper-cli founds"
     return
   fi
@@ -1839,7 +1866,7 @@ install_whisper_cpp_cli_cmake() {
 # https://github.com/yt-dlp/yt-dlp#installation
 install_python_youtube_downloader() {
 
-  if which yt-dlp >/dev/null; then
+  if which yt-dlp > /dev/null; then
     echo "yt-dlp founds"
     return
   fi
@@ -1939,6 +1966,9 @@ main_os_packager_apt() {
   # install openjdk
   install_openjdk_os_packager
 
+  # install bubblewrap sandbox
+  install_claude_sandboxing_bubblewrap_apt
+
 }
 
 main_python() {
@@ -1974,7 +2004,11 @@ main_node() {
   install_nodejs
 
   # Markdown check
-  install_nodejs_markdown_check
+  install_nodejs_npm_markdown_check
+
+  # Gemini
+  install_nodejs_npm_gemini
+
 }
 
 # Install via a bash script
@@ -1987,6 +2021,8 @@ main_bash() {
 
 ## Installation
 main() {
+
+  main_os_packager_apt
 
   # Git (already installed normally as we store this repo in git)
   install_git_check
