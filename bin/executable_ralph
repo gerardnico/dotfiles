@@ -1,16 +1,47 @@
-#!/bin/bash
-# afk-ralph.sh — Fully automated Ralph loop
-# Usage: ./afk-ralph.sh <iterations>
-# Ref: https://ralph-specs.vercel.app/
+#!/usr/bin/env bash
+# ralph.sh
+# Usage: ./ralph.sh <iterations>
 
 set -e
-ITERATIONS=${1:-50}
-echo "🚀 Starting Ralph with $ITERATIONS iterations..."
 
-for ((i = 1; i <= ITERATIONS; i++)); do
-  echo "🔄 Iteration $i of $ITERATIONS"
+if [ -z "$1" ]; then
+  echo "Usage: $0 <iterations>"
+  exit 1
+fi
+COMMAND="run"
+PROMPT="1"
+ITERATIONS=3
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+  -p | --prompt)
+    shift
+    if [ "${1:-}" == "" ]; then
+      echo::err "The -p or --prompt flag expects 1 or 2"
+      exit 1
+    fi
+    PROMPT="$1"
+    ;;
+  -c | --command)
+    shift
+    if [ "${1:-}" == "" ]; then
+      echo::err "The -c or --command flag expects a value"
+      exit 1
+    fi
+    echo "Command ($1)"
+    COMMAND="$1"
+    ;;
+  *)
+    ITERATIONS=${1}
+    break
+    ;;
+  esac
+  shift
+done
 
-  result=$(claude --permission-mode bypassPermissions -p "@PRD.md @progress.txt \
+END_WORK_FLAG="<promise>COMPLETE</promise>"
+
+# Ref: https://ralph-specs.vercel.app/
+RALPH_PROMPT="@PRD.md @progress.txt \
 You are building this project based on the PRD.
 
 WORKFLOW:
@@ -22,14 +53,43 @@ WORKFLOW:
     - PRD.md: Change [ ] to [x] for the completed task
     - progress.txt: Add task number, timestamp, and notes
 
-If ALL tasks complete, output: <promise>COMPLETE</promise>")
+If ALL tasks complete, output: $END_WORK_FLAG"
+
+if [ "$PROMPT" == "2" ]; then
+  # https://www.aihero.dev/tips-for-ai-coding-with-ralph-wiggum
+  RALPH_PROMPT="@some-plan-file.md @progress.txt \
+1. Decide which task to work on next. \
+This should be the one YOU decide has the highest priority, \
+- not necessarily the first in the list. \
+2. Check any feedback loops, such as types and tests. \
+3. Append your progress to the progress.txt file. \
+4. Make a git commit of that feature. \
+ONLY WORK ON A SINGLE FEATURE. \
+If, while implementing the feature, you notice that all work \
+is complete, output $END_WORK_FLAG \
+"
+fi
+
+if [ "$COMMAND" == "check" ]; then
+  echo "Not yet implemented"
+  exit 1
+fi
+
+# For each iteration, run Claude Code with the following prompt.
+# This prompt is basic, we'll expand it later.
+echo "🚀 Starting Ralph with $ITERATIONS iterations..."
+for ((i = 1; i <= ITERATIONS; i++)); do
+  echo "🔄 Iteration $i of $ITERATIONS"
+  result=$(docker sandbox run claude -p "$RALPH_PROMPT")
 
   echo "$result"
 
-  if [[ "$result" == *"<promise>COMPLETE</promise>"* ]]; then
+  if [[ "$result" == *"$END_WORK_FLAG"* ]]; then
     echo "🎉 All tasks COMPLETE!"
+    echo "PRD complete, exiting."
     exit 0
   fi
 done
 
 echo "⏸️ Reached $ITERATIONS iterations. Run again to continue."
+exit 1
