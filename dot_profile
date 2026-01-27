@@ -23,11 +23,11 @@
 # Calling echo to check that it's not called a crazy number of times
 calling_command=$(ps -o cmd= -p $PPID)
 # pstree -p $PPID >/dev/stderr
-echo "$HOME/.profile: Started by ${0} (Sourced by (${BASH_SOURCE[1]}), $# Args: $*) <- Parent (command: $calling_command, Id $PPID) " >/dev/stderr
+echo "$HOME/.profile: Started by ${0} (Sourced by (${BASH_SOURCE[1]}), $# Args: $*) <- Parent (command: $calling_command, Id $PPID) " >&2
 
 # bug??? Called twice by Idea ??? but not by wsl
 if [ "${DOT_PROFILE_CALLED}" != "" ]; then
-  echo "$HOME/.profile already called (Idea bug)" >/dev/stderr
+  echo "$HOME/.profile already called (Idea bug)" >&2
   # We can't return otherwise the bash functions are not loaded
 fi
 export DOT_PROFILE_CALLED="yes"
@@ -40,7 +40,7 @@ export DOT_PROFILE_CALLED="yes"
 # Loading env variable
 # Should be before bashrc as we add bin path
 ##############################
-echo "$HOME/.profile: Loading env variables" >/dev/stderr
+echo "$HOME/.profile: Loading env variables" >&2
 if [ -d "$HOME/.profile.d" ]; then
   # All file loaded in a directory should have a sh extension
   # This is how /etc/profile also work
@@ -51,8 +51,7 @@ if [ -d "$HOME/.profile.d" ]; then
   unset file
 fi
 
-
-echo "$HOME/.profile: Env variables loaded" >/dev/stderr
+echo "$HOME/.profile: Env variables loaded" >&2
 ##############################
 # Loading bash env script (alias, function, ...)
 ##############################
@@ -60,15 +59,13 @@ echo "$HOME/.profile: Env variables loaded" >/dev/stderr
 # ie does not run when the terminal is started
 # If we are not running interactively, we return
 if [[ "$-" != *i* ]]; then
-  echo "$HOME/.profile: Session is non-interactive. No bashrc. Returning" >/dev/stderr
+  echo "$HOME/.profile: Session is non-interactive. No bashrc. Returning" >&2
   return
 fi
-echo "Loading bash env (alias, function, ...) for interactive/repl session" >/dev/stderr
+echo "Loading bash env (alias, function, ...) for interactive/repl session" >&2
 if [ -n "$BASH_VERSION" ]; then
-    # include .bashrc if it exists
-    if [ -f "$HOME/.bashrc" ]; then
-	    . "$HOME/.bashrc"
-    fi
+  # include .bashrc if it exists
+  if [ -f "$HOME/.bashrc" ]; then
+    . "$HOME/.bashrc"
+  fi
 fi
-
-
