@@ -1863,6 +1863,53 @@ install_whisper_cpp_cli_cmake() {
   echo "whisper-cli installation done"
 
 }
+
+# https://docs.mitmproxy.org/stable/overview/installation/#linux
+# https://www.mitmproxy.org/downloads/#12.2.1/
+install_mitmproxy_bash() {
+
+  if util_command_exists mitmproxy; then
+    echo "mitmproxy founds"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Sorry mitmproxy installation on Windows not yet done"
+    return
+  fi
+
+  # https://www.mitmproxy.org/downloads/#12.2.1/
+  VERSION="12.2.1"
+  ARCH="linux-x86_64"
+  TARBALL="mitmproxy-${VERSION}-${ARCH}.tar.gz"
+  URL="https://downloads.mitmproxy.org/${VERSION}/${TARBALL}"
+
+  echo "Installing mitmproxy ${VERSION}"
+  # Temporary working directory
+  WORKDIR="$(mktemp -d)"
+
+  cleanup() {
+    rm -rf "$WORKDIR"
+  }
+  # Delete on exit
+  trap cleanup EXIT
+
+  echo "Downloading mitmproxy ${VERSION}..."
+  curl -fsSL "$URL" -o "$WORKDIR/$TARBALL"
+
+  echo "Extracting..."
+  tar -xzf "$WORKDIR/$TARBALL" -C "$WORKDIR"
+
+  echo "Installing binaries to /usr/local/bin (may require sudo)..."
+  sudo install -m 0755 \
+    "$WORKDIR/mitmproxy" \
+    "$WORKDIR/mitmdump" \
+    "$WORKDIR/mitmweb" \
+    /usr/local/bin/
+
+  echo "mitmproxy ${VERSION} installed successfully!"
+
+}
 # https://github.com/yt-dlp/yt-dlp#installation
 install_python_youtube_downloader() {
 
@@ -1956,6 +2003,8 @@ main_brew() {
 
 }
 
+# Package Manager or just file
+
 main_os_packager_apt() {
 
   # install Zenity
@@ -2018,6 +2067,9 @@ main_bash() {
 
   # Install Claude
   install_claude_code_bash
+
+  # Install mitm
+  install_mitmproxy_bash
 
 }
 
