@@ -50,22 +50,28 @@ def get_transcript(video_id: str, with_timestamps: bool = False) -> str:
 
   return '\n'.join(lines)
 
+# Custom parser to print the help (not the small usage)
+class ArgumentParserNoUsage(argparse.ArgumentParser):
+  def error(self, message):
+    # Print the error message and the help (not the usage)
+    # https://docs.python.org/3.11/library/argparse.html#printing-help
+    print(f'\nerror: {message}', self.format_help(), sep='\n\n', file=sys.stderr)
+    sys.exit(2)
+
 
 def main():
-  parser = argparse.ArgumentParser(description='Get YouTube video transcript')
+  parser = ArgumentParserNoUsage(
+    add_help=False,
+    description='Get YouTube video transcript'
+  )
   parser.add_argument('video', help='YouTube video URL or video ID')
   parser.add_argument('--timestamps', '-t', action='store_true',
                       help='Include timestamps in output')
+
   args = parser.parse_args()
-
-  try:
-    video_id = extract_video_id(args.video)
-    transcript = get_transcript(video_id, with_timestamps=args.timestamps)
-    print(transcript)
-  except Exception as e:
-    print(f"Error: {e}", file=sys.stderr)
-    sys.exit(1)
-
+  video_id = extract_video_id(args.video)
+  transcript = get_transcript(video_id, with_timestamps=args.timestamps)
+  print(transcript)
 
 if __name__ == '__main__':
   main()
