@@ -64,10 +64,16 @@ This should be the one YOU decide has the highest priority, \
 2. Check any feedback loops, such as types and tests. \
 3. Append your progress to the progress.txt file. \
 4. Make a git commit of that feature. \
-ONLY WORK ON A SINGLE FEATURE. \
+5. ONLY WORK ON A SINGLE FEATURE. \
 If, while implementing the feature, you notice that all work \
-is complete, output $END_WORK_FLAG \
+is complete, output $END_WORK_FLAG
 "
+# What the LLM saw
+# Prioritize work - Review the plan file and choose the highest-priority task (not just the first one listed)
+# Run feedback loops - Check types and tests to validate the work
+# Log progress - Append updates to progress.txt
+# Commit changes - Make a git commit for the completed feature
+# Stay focused - Only work on one feature at a time
 fi
 
 if [ "$COMMAND" == "check" ]; then

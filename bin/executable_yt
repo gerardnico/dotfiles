@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# File processing is really hard in bash
+# for instance, deleting the duplicate line of a transcript
+# We should write this script in a higher language (python)
+# For more code see youtube.md
+
+COMMAND=""
+URL=""
+LANG="en"
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+  -l | --lang)
+    shift
+    if [ "${1:-}" == "" ]; then
+      echo::err "The -l or --lang flag expects a  lang"
+      exit 1
+    fi
+    LANG="$1"
+    ;;
+  *)
+    if [ "$COMMAND" == "" ]; then
+      COMMAND=$1
+      shift
+      continue
+    fi
+    # May be tiktok
+    URL=${1}
+    break
+    ;;
+  esac
+  shift
+done
+
+ID=""
+if [[ "$URL" == *youtube* ]]; then
+  ID="${URL#*v=}"
+else
+  echo "Video provider not yet supported"
+  exit 1
+fi
+
+case "$COMMAND" in
+transcript)
+  EXTENSION=srt
+  # It doesn’t download the video (--skip-download)
+  # It tries to download uploaded subtitles (--write-subs)
+  # If no uploaded subtitles exist, it falls back to auto-generated ones (--write-auto-subs)
+  #  --sub-langs en restricts to English captions
+  #  --convert-subs srt converts the downloaded captions to .srt instead of the default .vtt
+  # o - options https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#output-template
+  if ! yt-dlp \
+    --skip-download \
+    --write-subs \
+    --write-auto-subs \
+    --sub-langs "$LANG" \
+    --convert-subs $EXTENSION \
+    -o "%(id)s.%(ext)s" \
+    "$URL"; then
+    echo "Error while downloading the transcript"
+    exit 1
+  fi
+  FILE_NAME="$ID.$LANG"
+  FILE="$FILE_NAME.$EXTENSION"
+  echo "Transcript is available at $FILE"
+
+  # Delete the timestamp
+  FILE_TXT="$FILE_NAME.txt"
+  sed -E '/^[0-9]+$|^([0-9]{2}:){2}[0-9]{2}/d' "$FILE" |
+    sed '/^$/d' >"$FILE_TXT"
+  echo "Transcript without timestamp at $FILE_TXT"
+  ;;
+
+*)
+  echo "Command $COMMAND unknown"
+  echo 1
+  ;;
+esac
