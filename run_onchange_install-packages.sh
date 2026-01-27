@@ -1881,6 +1881,7 @@ install_python_youtube_downloader() {
   fi
   echo "yt-dlp installation"
   # Brew is only for mac!
+  # LLM adds: `--break-system-packages` ???
   python -m pip install yt-dlp
   echo "yt-dlp installation done"
 
