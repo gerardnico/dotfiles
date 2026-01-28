@@ -784,6 +784,25 @@ install_whois_brew() {
 
 }
 
+# Deno required by yt-dlp
+# https://github.com/yt-dlp/yt-dlp/wiki/EJS#deno
+install_deno_brew() {
+
+  if util_command_exists deno; then
+    echo "Deno founds"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Deno on Windows not yet done"
+    return
+  fi
+
+  echo "deno with brew"
+  brew install deno
+  echo "deno installed"
+
+}
+
 # https://git-cliff.org/docs/installation/
 install_git_cliff() {
 
@@ -2000,6 +2019,9 @@ main_brew() {
 
   # install inotify
   install_inotify_tools_brew
+
+  # deno
+  install_deno_brew
 
 }
 
