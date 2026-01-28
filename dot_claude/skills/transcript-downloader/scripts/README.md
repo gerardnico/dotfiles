@@ -13,6 +13,8 @@ source .venv/bin/activate
 
 ```bash
 pip install -r requirements.txt
+# for impersonation: https://github.com/yt-dlp/yt-dlp#impersonation
+python -m pip install "yt-dlp[default,curl-cffi]"
 ```
 
 * Run

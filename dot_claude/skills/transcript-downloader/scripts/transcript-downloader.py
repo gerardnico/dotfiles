@@ -8,7 +8,9 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+# May be process the requirement file?
 YT_DLP_VERSION = "2025.12.8"
+WEB_VTT_VERSION = "0.5.1"
 
 try:
   import yt_dlp
@@ -252,13 +254,18 @@ def extract_url_components(url) -> ServiceInfo:
 
 def main():
   _require_dependency("yt-dlp", YT_DLP_VERSION)
+  _require_dependency("webvtt-py", WEB_VTT_VERSION)
 
   parser = ArgumentParserNoUsage(description='Get video transcript')
   parser.add_argument('url', help='Video URL')
   parser.add_argument('--output', '-o',
                       help='Output file path')
+  parser.add_argument('--langs', '-l',
+                      help='The languages separated by a comma')
   args = parser.parse_args()
   url = args.url
+
+  url_components = extract_url_components(url)
 
   # Determine the output directory
   # Note that if we want to add a timestamp, we
@@ -266,8 +273,40 @@ def main():
   # or, we can add `%(upload_date>%Y-%m-%d)s` in a template
   download_directory = args.output
   if download_directory is None:
-    url_components = extract_url_components(url)
     download_directory = f"out/{url_components.service_name}/{url_components.id}"
+
+  langs = args.langs
+  # orig is a lang suffix of YouTube
+  # it the video is in nl, you get 2 subtitles, `nl` and `nl-orig`
+  orig = "orig"
+  if langs is None:
+    # lang_input = input("Please specify a lang (example: en): ")
+    # print(f"You selected: {lang_input}")
+    if url_components.service_name == "youtube":
+      langs = orig
+    else:
+      langs = "en"
+
+  # Split by comma and loop
+  langs_regexp = []
+  case_insensitivity_flag = "(?i)"
+  lang_separator = ','
+  found_orig = False
+  for lang in langs.split(lang_separator):
+    if lang == orig:
+      found_orig = True
+      langs_regexp.append(f"{case_insensitivity_flag}.*-{orig}.*")
+    else:
+      langs_regexp.append(f"{case_insensitivity_flag}{lang}.*")
+  langs_ytd = lang_separator.join(langs_regexp)
+
+  # Don't download the orig subtitle if not specified
+  if found_orig == False and url_components.service_name == "youtube":
+    langs_ytd = f"{langs_ytd}{lang_separator}-.*-{orig}.*"
+
+  # YouTube block by video once you are blocked, it can take time,
+  # but it will work with another video
+  sleep = len(langs_regexp) * 2
 
   # We use the main cli
   # because it's also possible to embed it, but it's a pain in the ass
@@ -287,19 +326,19 @@ def main():
     # Write automatically generated subtitle file (Alias: --write-automatic-subs)
     "--write-auto-subs",
     # Subtitle format; accepts formats preference separated by "/", e.g. "srt" or "ass/srt/best"
-    "--sub-format", "ass/srt/best",
+    "--sub-format", "vtt/srt/best",
     # Lang selections: Languages of the subtitles to download (can be regex) or "all" separated by commas, e.g.
     # --sub-langs "en.*,ja" (where "en.*" is a regex pattern that matches "en" followed by 0 or more of any character).
     # You can prefix the language code with a "-" to exclude it from the requested languages, e.g.
     # --sub-langs all,-live_chat. Use --list-subs for a list of available language tags
-    "--sub-langs", "en.*",
+    "--sub-langs", f"{langs_ytd}",
     # indicate a template for the output file names
     # https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#output-template
     # "-o", "subtitle:%(extractor)s-%(uploader)s-%(id)s.%(ext)s",
     "-o", f"subtitle:subtitle.%(ext)s",
     # Write video metadata to a .info.json file
     "--write-info-json",
-    "-o" f"infojson:infojson",
+    "-o", f"infojson:infojson",
     # Location in the filesystem where yt-dlp can store some downloaded information (such as
     # client ids and signatures) permanently. By default, ${XDG_CACHE_HOME}/yt-dlp
     # --cache-dir DIR
@@ -307,11 +346,11 @@ def main():
     # originCover
     "--write-thumbnail",
     # not .%(ext)s as it's added by yt_dlp as image
-    "-o" f"thumbnail:thumbnail",
+    "-o", f"thumbnail:thumbnail",
     # Convert the thumbnails to another format (currently supported: jpg, png, webp)
     "--convert-thumbnails", "webp",
     # Number of seconds to sleep before each subtitle download
-    "--sleep-subtitles", "1",
+    "--sleep-subtitles", f"{sleep}",
     # The paths where the files should be downloaded.
     # Specify the type of file and the path separated by a colon ":". All the same
     # TYPES as --output are supported. Additionally, you can also provide "home" (default) and "temp" paths.

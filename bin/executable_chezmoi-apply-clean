@@ -7,4 +7,5 @@ set -Eeuo pipefail
 rm -rf "${HOME:?}"/bin
 rm -rf "${HOME:?}"/.profile.d
 rm -rf "${HOME:?}"/.bashrc.d
+rm -rf "${HOME:?}"/.claude/skills
 chezmoi apply --force
