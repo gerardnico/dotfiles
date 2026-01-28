@@ -1,4 +1,4 @@
-# Skill to download a YouTube Transcript
+# Skill to download a Transcript from a social video
 
 ## Ref
 

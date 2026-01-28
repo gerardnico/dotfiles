@@ -5,6 +5,8 @@ Downloads and formats transcripts from TikTok videos
 """
 import argparse
 import sys
+from dataclasses import dataclass
+from pathlib import Path
 
 YT_DLP_VERSION = "2025.12.8"
 
@@ -13,6 +15,11 @@ try:
 except ImportError:
   print("Error: yt-dlp is not installed. Install it with: pip install yt-dlp", file=sys.stderr)
   sys.exit(1)
+
+try:
+  import webvtt
+except ImportError:
+  print("Warning: webvtt-py not installed. Install with: pip install webvtt-py")
 
 
 def _require_dependency(pkg: str, version: str):
@@ -136,18 +143,131 @@ class ArgumentParserNoUsage(argparse.ArgumentParser):
     sys.exit(2)
 
 
+from urllib.parse import urlparse, parse_qs
+
+
+def post_processing_vtt(vtt_file_path: Path) -> None:
+  """
+  Process a single VTT file using the webvtt library.
+
+  Args:
+      vtt_file_path: Path to the VTT file
+  """
+  try:
+    # Parse the VTT file
+    vtt = webvtt.read(str(vtt_file_path))
+
+    # Extract all text from captions
+    text_lines = []
+    for caption in vtt:
+      # Get the text and strip whitespace
+      text = caption.text.strip()
+      if text:
+        text_lines.append(text)
+
+    # Create output filename with .txt extension
+    output_file = vtt_file_path.with_suffix('.txt')
+
+    # Write the cleaned text to file
+    with open(output_file, 'w', encoding='utf-8') as f:
+      f.write('\n'.join(text_lines))
+
+    print(f"Processed: {vtt_file_path.name} -> {output_file.name}")
+
+  except Exception as e:
+    print(f"Error processing {vtt_file_path.name}: {e}")
+
+
+def post_processing(directory: str) -> None:
+  """
+  Search for all .vtt files in a directory using the webvtt library,
+  extract clean text, and save as .txt files.
+
+  Args:
+      directory: Path to the directory containing VTT files
+  """
+
+  directory_path = Path(directory)
+
+  if not directory_path.exists():
+    raise ValueError(f"Directory does not exist: {directory}")
+
+  processed_count = 0
+  for item in directory_path.iterdir():
+    # Check if it's a file and has .vtt extension
+    if item.is_file() and item.suffix.lower() == '.vtt':
+      post_processing_vtt(item)
+      processed_count += 1
+
+  if processed_count == 0:
+    print(f"No .vtt files found in {directory}")
+  else:
+    print(f"Processed {processed_count} VTT file(s)")
+
+
+@dataclass
+class ServiceInfo:
+  apex_name: str
+  service_name: str
+  id: str
+
+
+# If you want to use dot notation (like result.id), you need to use a dataclass or regular class
+# because with TypedDict, you need to access the values using dictionary bracket notation, not dot notation
+def extract_url_components(url) -> ServiceInfo:
+  parsed = urlparse(url)
+  apex_name = parsed.netloc
+
+  # remove www. if present
+  if apex_name.startswith("www."):
+    apex_name = apex_name[4:]
+
+  # service name is the first part before the dot
+  service_name = apex_name.split('.')[0]
+
+  # default id is empty
+  id_value = ""
+
+  # YouTube URL handling
+  if "youtube.com" in apex_name:
+    # YouTube video ID is usually in the 'v' query parameter
+    query_params = parse_qs(parsed.query)
+    id_value = query_params.get('v', [''])[0]
+
+  # TikTok URL handling
+  elif "tiktok.com" in apex_name:
+    # TikTok ID is made of username (without @) + last part of path
+    path_parts = [p for p in parsed.path.split('/') if p]
+    if len(path_parts) >= 3 and path_parts[0].startswith('@') and path_parts[1] == 'video':
+      username = path_parts[0][1:]  # remove @
+      video_id = path_parts[2]
+      id_value = f"{username}-{video_id}"
+
+  return ServiceInfo(
+    apex_name=apex_name,
+    service_name=service_name,
+    id=id_value
+  )
+
+
 def main():
   _require_dependency("yt-dlp", YT_DLP_VERSION)
 
-  parser = ArgumentParserNoUsage(description='Get Tiktok video transcript')
+  parser = ArgumentParserNoUsage(description='Get video transcript')
   parser.add_argument('url', help='Video URL')
-  parser.add_argument('--no-timestamps', '-t', action='store_true',
-                      help='Include timestamps in output')
   parser.add_argument('--output', '-o',
                       help='Output file path')
   args = parser.parse_args()
   url = args.url
-  no_timestamps = args.no_timestamps
+
+  # Determine the output directory
+  # Note that if we want to add a timestamp, we
+  # * need to get the info.json first
+  # or, we can add `%(upload_date>%Y-%m-%d)s` in a template
+  download_directory = args.output
+  if download_directory is None:
+    url_components = extract_url_components(url)
+    download_directory = f"out/{url_components.service_name}/{url_components.id}"
 
   # We use the main cli
   # because it's also possible to embed it, but it's a pain in the ass
@@ -175,10 +295,11 @@ def main():
     "--sub-langs", "en.*",
     # indicate a template for the output file names
     # https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#output-template
-    "-o", "subtitle:%(extractor)s-%(uploader)s-%(id)s.%(ext)s",
+    # "-o", "subtitle:%(extractor)s-%(uploader)s-%(id)s.%(ext)s",
+    "-o", f"subtitle:subtitle.%(ext)s",
     # Write video metadata to a .info.json file
     "--write-info-json",
-    "-o" "infojson:%(extractor)s-%(uploader)s-%(id)s",
+    "-o" f"infojson:infojson",
     # Location in the filesystem where yt-dlp can store some downloaded information (such as
     # client ids and signatures) permanently. By default, ${XDG_CACHE_HOME}/yt-dlp
     # --cache-dir DIR
@@ -186,7 +307,7 @@ def main():
     # originCover
     "--write-thumbnail",
     # not .%(ext)s as it's added by yt_dlp as image
-    "-o" "thumbnail:%(extractor)s-%(uploader)s-%(id)s",
+    "-o" f"thumbnail:thumbnail",
     # Convert the thumbnails to another format (currently supported: jpg, png, webp)
     "--convert-thumbnails", "webp",
     # Number of seconds to sleep before each subtitle download
@@ -198,17 +319,22 @@ def main():
     # the home path after download is finished.
     # This option is ignored if --output is an absolute path
     # Specify the working directory (home)
-    "--paths", "home:out",
+    "--paths", f"home:{download_directory}",
     # put all temporary files in "wd\tmp"
     "--paths", "temp:tmp",
-    # put all subtitle files in "wd\subs\id.ext
+    # put all subtitle files in home/working directory
     "--paths", "subtitle:.",
     url
   ]
-  yt_dlp.main(args)
-  # download_transcript(url, output_file, include_timestamps, detect_para)
-  # if not output_file:
-  #   print(transcript)
+  try:
+    yt_dlp.main(args)
+  except SystemExit as e:
+    # We do post-processing, so we catch the system exit
+    if e.code != 0:
+      raise  # Re-raise to actually exit
+
+  # Vtt file processing
+  post_processing(download_directory)
 
 
 if __name__ == '__main__':
