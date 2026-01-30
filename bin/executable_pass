@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# A pass wrapper to intercept who is calling pass
+
+set -Eeuo pipefail
+export PATH=${SSH_BASHLIB_LIBRARY_PATH}:$PATH
+
+# Trying to see who call it
+source "bashlib-stack.sh"
+stack::print_process_tree >> ~/code/nico/tmp/gh-call.log
+
+# Run
+# We select the second in path order
+# Why? we may get it from the project (ie sdk man) and also globally from brew.
+# We take the second in order of priority
+/usr/bin/pass "$@"

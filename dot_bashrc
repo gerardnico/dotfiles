@@ -112,7 +112,6 @@ alias du='du -h'
 #####################
 # Executable: Add the bin
 #####################
-export PATH="$HOME/bin:$PATH"
 # set PATH so it includes user's private bin if it exists
 # idempotent (why for whatever reason, idea calls profile 2 times when starting its terminal)
 if [ -d "$HOME/bin" ] && [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
