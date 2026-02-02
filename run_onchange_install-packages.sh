@@ -1583,13 +1583,6 @@ install_git_repos() {
     echo "Git-x present"
   fi
 
-  # Homebrew
-  if [ ! -d "$HOME/code/homebrew-tap-eraldy" ]; then
-    git clone git@github.com:EraldyHq/homebrew-tap.git "$HOME/code/homebrew-tap-eraldy"
-  else
-    echo "homebrew-tap-eraldy present"
-  fi
-
 }
 
 # * Linux: [pass](https://www.passwordstore.org/#download)
@@ -1929,6 +1922,48 @@ install_mitmproxy_bash() {
   echo "mitmproxy ${VERSION} installed successfully!"
 
 }
+
+# https://docs.sprites.dev/quickstart/#install-the-cli
+# This script auto-detects your platform, verifies checksums, and installs the latest Sprite CLI to ~/.local/bin.
+install_sprite_bash() {
+
+  #  This script auto-detects your platform, verifies checksums, and installs the latest Sprite CLI to ~/.local/bin.
+  if which sprite > /dev/null; then
+    echo "sprite founds"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Sorry sprite installation on Windows not yet done"
+    return
+  fi
+  echo "sprite installation"
+  curl https://sprites.dev/install.sh | bash
+  echo "sprite installation done"
+
+}
+
+util_install_local_bin() {
+  SOURCE=${1}
+  CMD_NAME=${2}
+  LOCAL_BIN="$HOME/.local/bin"
+  BIN_TARGET_FILE="$LOCAL_BIN/$CMD_NAME"
+  if [ -f "$BIN_TARGET_FILE" ]; then
+    rm "$BIN_TARGET_FILE"
+  fi
+  ln -s "$SOURCE" "$BIN_TARGET_FILE"
+}
+
+# Install script without touching the PATH
+main_local_script() {
+
+  # Downloader
+  util_install_local_bin "$HOME/.claude/skills/transcript-downloader/scripts/transcript-downloader.py" "transcript-downloader"
+  # ntabul
+  util_install_local_bin "$HOME/code/tabulify/tabulify/contrib/script/ntabul" "ntabul"
+
+}
+
 # https://github.com/yt-dlp/yt-dlp#installation
 install_python_youtube_downloader() {
 
@@ -2095,6 +2130,9 @@ main_bash() {
   # Install mitm
   install_mitmproxy_bash
 
+  # Install Sprite
+  install_sprite_bash
+
 }
 
 ## Installation
@@ -2110,6 +2148,9 @@ main() {
 
   # bash installer
   main_bash
+
+  # Local Python/Bash Script installer
+  main_local_script
 
   # install pass
   install_pass_check

@@ -15,7 +15,8 @@ Host github.com
     #   * confirm (optionally followed by time interval) each use of the key must be confirmed, as if the -c option was specified to ssh-add(1).
     #   * a time interval to specify the key's lifetime
     # Time format:  https://man.openbsd.org/sshd_config.5#TIME_FORMATS
-    AddKeysToAgent 10m
+    # Ref: https://man.archlinux.org/man/ssh_config.5.en#AddKeysToAgent
+    #AddKeysToAgent 10m
     HashKnownHosts yes
     # Connection options
     ServerAliveInterval 60
@@ -50,11 +51,11 @@ Host github.com
     # %n : The original remote hostname
     # %p : The remote port
     # %r : The remote username
-    ProxyCommand env SSH_BASHLIB_LIBRARY_PATH=~/code/bash-lib/lib SSH_X_CALLERS_LOG=/tmp/ssh-x-auth-proxy-callers.log BASHLIB_ECHO_LEVEL=4 ~/code/ssh-x/bin/ssh-x-auth-proxy-command %h %n %p %r
+    ProxyCommand env SSH_BASHLIB_LIBRARY_PATH=~/code/bash-lib/lib SSH_X_CALLERS_LOG=~/code/nico/tmp BASHLIB_ECHO_LEVEL=4 ~/code/ssh-x/bin/ssh-x-auth-proxy-command %h %n %p %r
 
 
 # Global conf
 # Should be at the end because the first conf matched win
 # We don't set any because the `~/.ssh` may be mounted in Docker
 Host *
-    AddKeysToAgent 15m
+    #AddKeysToAgent 15m

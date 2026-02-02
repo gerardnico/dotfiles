@@ -12,7 +12,7 @@ export SSH_X_KEY_STORE="pass"
 export SSH_BASHLIB_LIBRARY_PATH="$HOME/code/bash-lib/lib"
 
 # A caller logs
-export SSH_X_CALLERS_LOG=/tmp/ssh-x-auth-proxy-parent.log
+export SSH_X_CALLERS_LOG=$HOME/code/nico/tmp
 
 # Load ssh-agent env if any
 SSH_X_AGENT_ENV=$HOME/.ssh/ssh-x-agent.env

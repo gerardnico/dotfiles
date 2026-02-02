@@ -261,7 +261,8 @@ def main():
   parser.add_argument('--output', '-o',
                       help='Output file path')
   parser.add_argument('--langs', '-l',
-                      help='The languages separated by a comma')
+                      help='The languages codes separated by a comma. Example for Spanish and French: es,fr'
+                      )
   args = parser.parse_args()
   url = args.url
 

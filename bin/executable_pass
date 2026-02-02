@@ -6,7 +6,8 @@ export PATH=${SSH_BASHLIB_LIBRARY_PATH}:$PATH
 
 # Trying to see who call it
 source "bashlib-stack.sh"
-stack::print_process_tree >> ~/code/nico/tmp/gh-call.log
+timestamp=$(date +"%Y-%m-%d:%H:%M:%S")
+stack::print_process_tree >> "$HOME/code/nico/tmp/${timestamp}-pass.log"
 
 # Run
 # We select the second in path order

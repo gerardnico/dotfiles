@@ -2,14 +2,14 @@
 
 ## How to use / Requirement
 
-* Activate the venv if needed
+### Activate the venv if needed
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 ```
 
-* Install the requirement
+### Install the requirement
 
 ```bash
 pip install -r requirements.txt
@@ -17,7 +17,13 @@ pip install -r requirements.txt
 python -m pip install "yt-dlp[default,curl-cffi]"
 ```
 
-* Run
+### Install the script
+
+```bash
+sudo ln -s transcript-downloader.py /usr/local/bin/transcript-downloader
+```
+
+### Run
 
 ```bash
 python get-transcript.py https://www.tiktok.com/@xxx/video/xxx
