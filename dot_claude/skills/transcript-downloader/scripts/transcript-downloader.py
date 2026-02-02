@@ -240,10 +240,19 @@ def extract_url_components(url) -> ServiceInfo:
   elif "tiktok.com" in apex_name:
     # TikTok ID is made of username (without @) + last part of path
     path_parts = [p for p in parsed.path.split('/') if p]
-    if len(path_parts) >= 3 and path_parts[0].startswith('@') and path_parts[1] == 'video':
-      username = path_parts[0][1:]  # remove @
-      video_id = path_parts[2]
-      id_value = f"{username}-{video_id}"
+    if len(path_parts) != 3 or (not path_parts[0].startswith('@')) or path_parts[1] != 'video':
+      raise ValueError("The tiktok url is not valid")
+    username = path_parts[0][1:]  # remove @
+    video_id = path_parts[2]
+    id_value = f"{username}-{video_id}"
+  elif "x.com" in apex_name:
+    # https://x.com/forrestpknight/status/2012561898097594545
+    path_parts = [p for p in parsed.path.split('/') if p]
+    if len(path_parts) != 3 and path_parts[1] != 'status':
+      raise ValueError("The x url is not valid")
+    username = path_parts[0]
+    video_id = path_parts[2]
+    id_value = f"{username}-{video_id}"
 
   return ServiceInfo(
     apex_name=apex_name,

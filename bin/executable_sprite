@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# A sprite wrapper
+
+set -Eeuo pipefail
+
+SPRITE_COMMAND="$HOME/.local/bin/sprite"
+export SPRITE_TOKEN
+SPRITE_TOKEN="$(pass sprite/token)"
+if ! "$SPRITE_COMMAND" org auth; then
+  if ! "$SPRITE_COMMAND" org keyring enable; then
+    echo "Error enabling keyring"
+    exit 1
+  fi
+  if ! "$SPRITE_COMMAND" auth setup --token "$SPRITE_TOKEN"; then
+    echo "Error setting up token"
+    exit 1
+  fi
+fi
+"$HOME/.local/bin/sprite" "$@"
