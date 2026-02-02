@@ -4,9 +4,14 @@ TikTok Transcript Downloader using yt-dlp
 Downloads and formats transcripts from TikTok videos
 """
 import argparse
+import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional, List
+
+from git.objects.submodule.root import URLCHANGE
+from pydantic.v1 import UrlUserInfoError
 
 # May be process the requirement file?
 YT_DLP_VERSION = "2025.12.8"
@@ -208,15 +213,34 @@ def post_processing(directory: str) -> None:
 
 
 @dataclass
-class ServiceInfo:
+class UrlInfo:
   apex_name: str
   service_name: str
   id: str
+  url: str
+
+
+@dataclass
+class ModeInfo:
+  type: str
+  file_name: Optional[str] = None
+  file_extension: Optional[str] = None
+  video_path: Optional[str] = None
+  # The resulting audio file path
+  audio_path: Optional[str] = None
+
+
+@dataclass
+class Context:
+  video: UrlInfo
+  langs: List[str]
+  download_directory: str
+  mode: ModeInfo
 
 
 # If you want to use dot notation (like result.id), you need to use a dataclass or regular class
 # because with TypedDict, you need to access the values using dictionary bracket notation, not dot notation
-def extract_url_components(url) -> ServiceInfo:
+def get_url_info(url) -> UrlInfo:
   parsed = urlparse(url)
   apex_name = parsed.netloc
 
@@ -254,55 +278,22 @@ def extract_url_components(url) -> ServiceInfo:
     video_id = path_parts[2]
     id_value = f"{username}-{video_id}"
 
-  return ServiceInfo(
+  return UrlInfo(
     apex_name=apex_name,
     service_name=service_name,
-    id=id_value
+    id=id_value,
+    url=url
   )
 
 
-def main():
-  _require_dependency("yt-dlp", YT_DLP_VERSION)
-  _require_dependency("webvtt-py", WEB_VTT_VERSION)
-
-  parser = ArgumentParserNoUsage(description='Get video transcript')
-  parser.add_argument('url', help='Video URL')
-  parser.add_argument('--output', '-o',
-                      help='Output file path')
-  parser.add_argument('--langs', '-l',
-                      help='The languages codes separated by a comma. Example for Spanish and French: es,fr'
-                      )
-  args = parser.parse_args()
-  url = args.url
-
-  url_components = extract_url_components(url)
-
-  # Determine the output directory
-  # Note that if we want to add a timestamp, we
-  # * need to get the info.json first
-  # or, we can add `%(upload_date>%Y-%m-%d)s` in a template
-  download_directory = args.output
-  if download_directory is None:
-    download_directory = f"out/{url_components.service_name}/{url_components.id}"
-
-  langs = args.langs
-  # orig is a lang suffix of YouTube
-  # it the video is in nl, you get 2 subtitles, `nl` and `nl-orig`
-  orig = "orig"
-  if langs is None:
-    # lang_input = input("Please specify a lang (example: en): ")
-    # print(f"You selected: {lang_input}")
-    if url_components.service_name == "youtube":
-      langs = orig
-    else:
-      langs = "en"
-
+def main_transcript_file(context: Context):
   # Split by comma and loop
   langs_regexp = []
   case_insensitivity_flag = "(?i)"
   lang_separator = ','
   found_orig = False
-  for lang in langs.split(lang_separator):
+  orig = "orig"
+  for lang in context.langs:
     if lang == orig:
       found_orig = True
       langs_regexp.append(f"{case_insensitivity_flag}.*-{orig}.*")
@@ -311,7 +302,7 @@ def main():
   langs_ytd = lang_separator.join(langs_regexp)
 
   # Don't download the orig subtitle if not specified
-  if found_orig == False and url_components.service_name == "youtube":
+  if found_orig == False and context.video.service_name == "youtube":
     langs_ytd = f"{langs_ytd}{lang_separator}-.*-{orig}.*"
 
   # YouTube block by video once you are blocked, it can take time,
@@ -368,12 +359,12 @@ def main():
     # the home path after download is finished.
     # This option is ignored if --output is an absolute path
     # Specify the working directory (home)
-    "--paths", f"home:{download_directory}",
+    "--paths", f"home:{context.download_directory}",
     # put all temporary files in "wd\tmp"
     "--paths", "temp:tmp",
     # put all subtitle files in home/working directory
     "--paths", "subtitle:.",
-    url
+    context.video.url
   ]
   try:
     yt_dlp.main(args)
@@ -383,7 +374,177 @@ def main():
       raise  # Re-raise to actually exit
 
   # Vtt file processing
-  post_processing(download_directory)
+  post_processing(context.download_directory)
+
+
+def main_download_video_or_audio(context):
+  if Path(context.mode.video_path).exists():
+    print(f"File {context.mode.video_path} already downloaded")
+    return
+  # Download
+  args = [
+    # https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#preset-aliases
+    "-t", context.mode.file_extension,
+    # indicate a template for the output file names
+    # https://github.com/yt-dlp/yt-dlp#output-template
+    "-o", context.mode.file_name,
+    # Write video metadata to a .info.json file
+    "--write-info-json",
+    "-o", f"infojson:infojson",
+    # The directory
+    "--paths", f"home:{context.download_directory}",
+    context.video.url
+  ]
+  try:
+    yt_dlp.main(args)
+  except SystemExit as e:
+    # We do post-processing, so we catch the system exit
+    if e.code != 0:
+      raise  # Re-raise to actually exit
+
+
+def main_video_to_audio(context):
+  if context.mode.type == 'audio':
+    raise ValueError("Audio processing not yet implemented")
+
+  if Path(context.mode.audio_path).exists():
+    print(f"Audio file already exist: {context.mode.audio_path}")
+    return
+
+  command = [
+    "ffmpeg",
+    "-i", f"{context.mode.video_path}",
+    "-ar", "16000",
+    "-ac", "1",
+    "-af", "loudnorm=I=-16:TP=-1.5:LRA=11",
+    "-c:a", "pcm_s16le",
+    context.mode.audio_path
+  ]
+
+  try:
+    result = subprocess.run(
+      command,
+      check=True,
+      capture_output=True,
+      text=True
+    )
+    print("Video to audio transformation was successful")
+    print(result.stdout)
+  except subprocess.CalledProcessError as e:
+    print(f"Error occurred: {e}")
+    print(f"Error output: {e.stderr}")
+
+
+def main_audio_to_text(context):
+  output_file_path_without_extension = f"{context.download_directory}/speech"
+  output_format_extension = "txt"
+  output_format_whisper_argument = "--output-txt"
+  output_file_path = f"{output_file_path_without_extension}.{output_format_extension}"
+  if Path(output_file_path).exists():
+    print(f"Speech file exists: {output_file_path}")
+    return
+
+  # https://github.com/ggml-org/whisper.cpp/tree/master/examples/cli
+  # --print-colors
+
+  whisper_model_name = "base"
+  lang = context.langs[0]
+  if lang == "en":
+    # The .en models (tiny.en, base.en, small.en, medium.en) are English-only and will always translate to English
+    whisper_model_name = "base.en"
+
+  # Get the brew prefix for whisper-cpp
+  brew_prefix = subprocess.check_output(
+    ["brew", "--prefix", "whisper-cpp"],
+    text=True
+  ).strip()
+
+  whisper_model = f"{brew_prefix}/models/ggml-{whisper_model_name}.bin"
+  command = [
+    "whisper-cli",
+    "--model", whisper_model,
+    "--no-timestamps",  # no timestamp left to the text
+    # "--print-colors",  # confidence  - highlight words with high or low confidence:
+    "--processors", "4",  # number of processors to use during computation
+    "--language", lang,  # language
+    "--output-file", output_file_path_without_extension,  # without the extension
+    output_format_whisper_argument,
+    "-f", context.mode.audio_path
+  ]
+
+  try:
+    subprocess.run(command)
+    print("Audio Speech to text transformation was successful")
+  except subprocess.CalledProcessError as e:
+    print(f"Error occurred: {e}")
+    print(f"Error output: {e.stderr}")
+
+
+def main():
+  _require_dependency("yt-dlp", YT_DLP_VERSION)
+  _require_dependency("webvtt-py", WEB_VTT_VERSION)
+
+  parser = ArgumentParserNoUsage(description='Get video transcript')
+  parser.add_argument('url', help='Video URL')
+  parser.add_argument('--output', '-o',
+                      help='Output file path')
+  parser.add_argument('--langs', '-l',
+                      help='The languages codes separated by a comma. Example for Spanish and French: es,fr'
+                      )
+  parser.add_argument('--mode', '-m',
+                      default='text',
+                      choices=['text', 'audio', 'video'],
+                      help='The mode of transcript: text (download the text subtitle file) or video (download, speech to text)'
+                      )
+  args = parser.parse_args()
+  url = args.url
+
+  url_info = get_url_info(url)
+
+  # Determine the output directory
+  # Note that if we want to add a timestamp, we
+  # * need to get the info.json first
+  # or, we can add `%(upload_date>%Y-%m-%d)s` in a template
+  download_directory = args.output
+  if download_directory is None:
+    download_directory = f"out/{url_info.service_name}/{url_info.id}"
+
+  # orig is a lang suffix of YouTube
+  # it the video is in nl, you get 2 subtitles, `nl` and `nl-orig`
+  orig = "orig"
+  if args.langs is None:
+    # lang_input = input("Please specify a lang (example: en): ")
+    # print(f"You selected: {lang_input}")
+    if url_info.service_name == "youtube":
+      langs = [orig]
+    else:
+      langs = ["en"]
+  else:
+    langs = args.langs.split(",")
+
+  context = Context(
+    video=url_info,
+    langs=langs,
+    download_directory=download_directory,
+    mode=ModeInfo(type=args.mode)
+  )
+  mode = args.mode
+  if mode == 'text':
+    main_transcript_file(context)
+  else:
+    if context.mode.type == 'video':
+      context.mode.file_extension = "mp4"
+      context.mode.file_name = f"{context.mode.type}.{context.mode.file_extension}"
+      context.mode.video_path = f"{context.download_directory}/{context.mode.file_name}"
+      context.mode.audio_path = f"{context.download_directory}/audio.wav"
+      main_download_video_or_audio(context)
+      main_video_to_audio(context)
+      main_audio_to_text(context)
+    else:
+      context.mode.file_extension = "mp3"
+      context.mode.file_name = f"{context.mode.type}.{context.mode.file_extension}"
+      context.mode.audio_path = f"{context.download_directory}/{context.mode.file_name}"
+      raise ValueError(f"{context.mode.type} not yet implemented")
 
 
 if __name__ == '__main__':

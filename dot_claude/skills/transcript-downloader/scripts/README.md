@@ -17,6 +17,12 @@ pip install -r requirements.txt
 python -m pip install "yt-dlp[default,curl-cffi]"
 ```
 
+* Deno for challenge: https://github.com/yt-dlp/yt-dlp/wiki/EJS
+
+```bash
+brew install deno
+```
+
 ### Install the script
 
 ```bash
