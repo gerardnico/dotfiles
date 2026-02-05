@@ -766,23 +766,7 @@ install_editorconfig_checker_brew() {
 
 }
 
-# https://github.com/rfc1036/whois
-install_whois_brew() {
 
-  if util_command_exists whois; then
-    echo "Whois founds"
-    return
-  fi
-  if [ "$CHEZMOI_OS" == "windows" ]; then
-    echo "Whois on Windows not yet done"
-    return
-  fi
-
-  echo "Whois with brew"
-  brew install whois
-  echo "Whois installed"
-
-}
 
 # Deno required by yt-dlp
 # https://github.com/yt-dlp/yt-dlp/wiki/EJS#deno
@@ -971,22 +955,24 @@ install_inotify_tools_brew() {
 
 }
 
-# https://formulae.brew.sh/formula/hugo
-install_hugo_brew() {
-
-  if util_command_exists hugo; then
-    echo "Hugo found"
+# Install from brew
+util_install_brew() {
+  COMMAND=${1}
+  FORMULA=${2:-${1}}
+  if util_command_exists "${COMMAND}"; then
+    echo "${COMMAND} found"
     return
   fi
   if [ "$CHEZMOI_OS" == "windows" ]; then
-    echo "Not yet done hugo installation on windows"
+    echo "Not yet done $COMMAND installation on windows"
     return
   fi
-  echo "Installing hugo"
-  brew install hugo
-  echo "hugo installed"
+  echo "Installing $COMMAND"
+  brew install "$FORMULA"
+  echo "$COMMAND installed"
 
 }
+
 
 # sudo apt install pinentry-gnome3
 install_gpg_pinentry() {
@@ -1829,24 +1815,7 @@ install_github_cli_brew_winget() {
 
 }
 
-# https://formulae.brew.sh/formula/whisper-cpp !!
-install_whisper_cpp_brew() {
-  #  https://formulae.brew.sh/formula/whisper-cpp instead
-  if which whisper-cli > /dev/null; then
-    echo "whisper-cli founds"
-    return
-  fi
 
-  if [ "$CHEZMOI_OS" == "windows" ]; then
-    echo "Sorry whisper-cli installation on Windows not yet done"
-    return
-  fi
-
-  echo "whisper-cpp installation"
-  brew install whisper-cpp
-  echo "whisper-cpp installed"
-
-}
 
 # https://github.com/ggml-org/whisper.cpp?tab=readme-ov-file#quick-start
 install_whisper_cpp_cli_cmake() {
@@ -1951,6 +1920,7 @@ util_install_local_bin() {
   if [ -f "$BIN_TARGET_FILE" ]; then
     rm "$BIN_TARGET_FILE"
   fi
+  chmod +x "$SOURCE"
   ln -s "$SOURCE" "$BIN_TARGET_FILE"
 }
 
@@ -1959,6 +1929,7 @@ main_local_script() {
 
   # Downloader
   util_install_local_bin "$HOME/.claude/skills/transcript-downloader/scripts/transcript-downloader.py" "transcript-downloader"
+  util_install_local_bin "$HOME/.claude/skills/pdf-compressor/scripts/pdf-compressor.py" "pdf-compressor"
   # ntabul
   util_install_local_bin "$HOME/code/tabulify/tabulify/contrib/script/ntabul" "ntabul"
 
@@ -1990,22 +1961,6 @@ install_python_youtube_downloader() {
 
 }
 
-install_ffmpeg_brew() {
-  if util_command_exists ffmpeg; then
-    echo "ffmpeg installed"
-    return
-  fi
-
-  if [ "$CHEZMOI_OS" == "windows" ]; then
-    echo "ffmpeg not yet done"
-    return
-  fi
-
-  echo "Installing ffmpeg"
-  brew install ffmpeg
-  echo "ffmpeg Installation done"
-
-}
 
 # deprecated: don't check for bad link
 # only for space and other constraint
@@ -2028,18 +1983,26 @@ install_markdown_lint() {
 }
 
 main_brew() {
+
   # install brew
   install_brew
 
   # install ffmpeg
-  install_ffmpeg_brew
+  util_install_brew ffmpeg
+
+  # typst
+  # https://typst.app/open-source/#download
+  # https://formulae.brew.sh/formula/typst
+  util_install_brew typst
 
   # install whois
-  install_whois_brew
+  # https://github.com/rfc1036/whois
+  util_install_brew "whois"
 
   # install whisper.cpp (whisper-cli)
   # install_whisper_cpp_cli_cmake
-  install_whisper_cpp_brew
+  # https://formulae.brew.sh/formula/whisper-cpp !!
+  util_install_brew "whisper-cli" "whisper-cpp"
   install_whisper_base_model_brew
 
   # install github cli
@@ -2052,7 +2015,10 @@ main_brew() {
   install_shfmt_brew
 
   # install hugo
-  # install_hugo_brew
+  # util_install_brew hugo
+
+  # dnstools
+  util_install_brew dnscontrol
 
   # install inotify
   install_inotify_tools_brew
