@@ -62,6 +62,7 @@ alias gll='git-log-all'
 alias gp='git-prepare'
 alias go='git-origin'
 alias gr='git-reset'
+# clash with ghostscript but yeah
 alias gs='git-status'
 alias gt='git-tag'
 alias gtd='git-tag-delete'
@@ -84,6 +85,8 @@ alias ngfl="$GITURE_BIN_PATH/git-feature-log"
 alias ngfm="$GITURE_BIN_PATH/git-feature-merge"
 # shellcheck disable=SC2139
 alias ngfs="$GITURE_BIN_PATH/git-feature-squash"
+# shellcheck disable=SC2139
+alias ngfr="$GITURE_BIN_PATH/git-feature-rebase"
 # shellcheck disable=SC2139
 alias ngl="$GITURE_BIN_PATH/git-log"
 # shellcheck disable=SC2139
