@@ -10,9 +10,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional, List
 
-from git.objects.submodule.root import URLCHANGE
-from pydantic.v1 import UrlUserInfoError
-
 # May be process the requirement file?
 YT_DLP_VERSION = "2025.12.8"
 WEB_VTT_VERSION = "0.5.1"
@@ -366,15 +363,19 @@ def main_transcript_file(context: Context):
     "--paths", "subtitle:.",
     context.video.url
   ]
+  final_error = None
   try:
     yt_dlp.main(args)
   except SystemExit as e:
-    # We do post-processing, so we catch the system exit
-    if e.code != 0:
-      raise  # Re-raise to actually exit
+    # We capture it as the error could be after that the transcript as been downloaded
+    # example: processing thumbnail: ERROR: Preprocessing: Error opening output files: Invalid argument
+    final_error = e
 
   # Vtt file processing
   post_processing(context.download_directory)
+
+  if final_error is not None and final_error.code != 0:
+    raise final_error
 
 
 def main_download_video_or_audio(context):

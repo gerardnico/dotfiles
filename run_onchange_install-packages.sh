@@ -1920,8 +1920,8 @@ util_install_local_bin() {
   if [ -f "$BIN_TARGET_FILE" ]; then
     rm "$BIN_TARGET_FILE"
   fi
-  chmod +x "$SOURCE"
   ln -s "$SOURCE" "$BIN_TARGET_FILE"
+  chmod +x "$BIN_TARGET_FILE"
 }
 
 # Install script without touching the PATH
