@@ -6,9 +6,8 @@ This script compresses all PDF files in a directory using Ghostscript.
 Compressed files are saved with a '-compressed' suffix.
 """
 
-import os
-import subprocess
 import argparse
+import subprocess
 from pathlib import Path
 
 
