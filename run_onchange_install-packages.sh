@@ -636,6 +636,23 @@ install_maven() {
   echo "Maven installed"
 }
 
+# Utility to install package globally
+util_install_npm(){
+  COMMAND=${1}
+  PACKAGE=${2:-${1}}
+  if util_command_exists "${COMMAND}"; then
+    echo "${COMMAND} found"
+    return
+  fi
+  if ! util_command_exists npm; then
+    echo "npm not founds !!! Install first node"
+    return 1
+  fi
+  echo "Installing $COMMAND"
+  npm install -g "$PACKAGE"
+  echo "$COMMAND installed"
+}
+
 # https://commitlint.js.org/guides/getting-started.html
 install_nodejs_commitlint() {
 
@@ -2084,6 +2101,9 @@ main_node() {
 
   # Gemini
   install_nodejs_npm_gemini
+
+  # svgo
+  util_install_npm svgo
 
 }
 
