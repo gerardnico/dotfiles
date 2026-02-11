@@ -41,6 +41,33 @@ def _require_dependency(pkg: str, version: str):
     )
 
 
+@dataclass
+class UrlInfo:
+  apex_name: str
+  service_name: str
+  id: str
+  url: str
+
+
+@dataclass
+class ModeInfo:
+  type: str
+  file_name: Optional[str] = None
+  file_extension: Optional[str] = None
+  video_path: Optional[str] = None
+  # The resulting audio file path
+  audio_path: Optional[str] = None
+
+
+@dataclass
+class Context:
+  video: UrlInfo
+  langs: List[str]
+  download_directory: str
+  mode: ModeInfo
+  transcribe: bool = False
+
+
 def clean_duplicate_lines(lines):
   """Remove consecutive duplicate lines"""
   if not lines:
@@ -182,57 +209,50 @@ def post_processing_vtt(vtt_file_path: Path) -> None:
     print(f"Error processing {vtt_file_path.name}: {e}")
 
 
-def post_processing(directory: str) -> None:
+def get_transcription(context, vtt_file_count):
+  if not context.transcribe:
+    print(f"  * Transcribe option is disabled, no transcription")
+    return False
+  if not Path(context.mode.video_path).exists():
+    print(f"  * Video is not present, no transcription")
+    return False
+  if not vtt_file_count == 0:
+    print(f"  * Subtitle file found, no transcription")
+    return False
+  return True
+
+
+def post_processing(context: Context) -> None:
   """
-  Search for all .vtt files in a directory using the webvtt library,
-  extract clean text, and save as .txt files.
+  Scan all files in a directory
+  * extract clean text, and save as .txt files.
+  * transcribe if needed
 
   Args:
-      directory: Path to the directory containing VTT files
+      context: The context object
   """
-
+  directory = context.download_directory
   directory_path = Path(directory)
 
   if not directory_path.exists():
     raise ValueError(f"Directory does not exist: {directory}")
 
-  processed_count = 0
+  vtt_file_count = 0
   for item in directory_path.iterdir():
     # Check if it's a file and has .vtt extension
     if item.is_file() and item.suffix.lower() == '.vtt':
       post_processing_vtt(item)
-      processed_count += 1
+      vtt_file_count += 1
 
-  if processed_count == 0:
+  if vtt_file_count == 0:
     print(f"No .vtt files found in {directory}")
   else:
-    print(f"Processed {processed_count} VTT file(s)")
+    print(f"Processed {vtt_file_count} VTT file(s)")
 
-
-@dataclass
-class UrlInfo:
-  apex_name: str
-  service_name: str
-  id: str
-  url: str
-
-
-@dataclass
-class ModeInfo:
-  type: str
-  file_name: Optional[str] = None
-  file_extension: Optional[str] = None
-  video_path: Optional[str] = None
-  # The resulting audio file path
-  audio_path: Optional[str] = None
-
-
-@dataclass
-class Context:
-  video: UrlInfo
-  langs: List[str]
-  download_directory: str
-  mode: ModeInfo
+  print(f"Trying to transcribe")
+  if get_transcription(context, vtt_file_count):
+    post_processing_transcribe_video_to_audio(context)
+    post_processing_transcribe_audio_to_text(context)
 
 
 # If you want to use dot notation (like result.id), you need to use a dataclass or regular class
@@ -283,7 +303,37 @@ def get_url_info(url) -> UrlInfo:
   )
 
 
-def main_transcript_file(context: Context):
+def get_download_video(context):
+  if context.mode.type == 'text':
+    print(f"Text mode: no video download")
+    return False
+  if Path(context.mode.video_path).exists():
+    print(f"File {context.mode.video_path} already downloaded")
+    return False
+  print(f"No video found, video mode: download video")
+  return True
+
+
+# Execute yt-dlp
+def main_download(context: Context):
+  args = []
+
+  # Download video?
+  if get_download_video(context):
+    args += [
+      # https://github.com/yt-dlp/yt-dlp#preset-aliases
+      "-t", context.mode.file_extension,
+      # indicate a template for the output file names
+      # https://github.com/yt-dlp/yt-dlp#output-template
+      "-o", context.mode.file_name
+    ]
+  else:
+    args += [
+      # Do not download the video but write all related files (Alias: --no-download)
+      "--skip-download"
+    ]
+
+  # Subtitle Lang determination
   # Split by comma and loop
   langs_regexp = []
   case_insensitivity_flag = "(?i)"
@@ -315,10 +365,7 @@ def main_transcript_file(context: Context):
   # with yt_dlp.YoutubeDL(ydl_opts) as ydl:
   #    info = ydl.extract_info(url, download=False)
 
-  # transcript = download_transcript(url, output_file, include_timestamps, detect_para)
-  args = [
-    # Do not download the video but write all related files (Alias: --no-download)
-    "--skip-download",
+  args += [
     # Download the subtitle (not generated)
     "--write-subs",
     # Write automatically generated subtitle file (Alias: --write-automatic-subs)
@@ -363,48 +410,11 @@ def main_transcript_file(context: Context):
     "--paths", "subtitle:.",
     context.video.url
   ]
-  final_error = None
-  try:
-    yt_dlp.main(args)
-  except SystemExit as e:
-    # We capture it as the error could be after that the transcript as been downloaded
-    # example: processing thumbnail: ERROR: Preprocessing: Error opening output files: Invalid argument
-    final_error = e
-
-  # Vtt file processing
-  post_processing(context.download_directory)
-
-  if final_error is not None and final_error.code != 0:
-    raise final_error
+  print("Command: yt-dlp "+ " ".join(str(x) for x in args))
+  yt_dlp.main(args)
 
 
-def main_download_video_or_audio(context):
-  if Path(context.mode.video_path).exists():
-    print(f"File {context.mode.video_path} already downloaded")
-    return
-  # Download
-  args = [
-    # https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#preset-aliases
-    "-t", context.mode.file_extension,
-    # indicate a template for the output file names
-    # https://github.com/yt-dlp/yt-dlp#output-template
-    "-o", context.mode.file_name,
-    # Write video metadata to a .info.json file
-    "--write-info-json",
-    "-o", f"infojson:infojson",
-    # The directory
-    "--paths", f"home:{context.download_directory}",
-    context.video.url
-  ]
-  try:
-    yt_dlp.main(args)
-  except SystemExit as e:
-    # We do post-processing, so we catch the system exit
-    if e.code != 0:
-      raise  # Re-raise to actually exit
-
-
-def main_video_to_audio(context):
+def post_processing_transcribe_video_to_audio(context):
   if context.mode.type == 'audio':
     raise ValueError("Audio processing not yet implemented")
 
@@ -436,13 +446,13 @@ def main_video_to_audio(context):
     print(f"Error output: {e.stderr}")
 
 
-def main_audio_to_text(context):
+def post_processing_transcribe_audio_to_text(context):
   output_file_path_without_extension = f"{context.download_directory}/speech"
   output_format_extension = "txt"
   output_format_whisper_argument = "--output-txt"
   output_file_path = f"{output_file_path_without_extension}.{output_format_extension}"
   if Path(output_file_path).exists():
-    print(f"Speech file exists: {output_file_path}")
+    print(f"Transcribed output Speech file already exists: {output_file_path}")
     return
 
   # https://github.com/ggml-org/whisper.cpp/tree/master/examples/cli
@@ -495,8 +505,13 @@ def main():
   parser.add_argument('--mode', '-m',
                       default='text',
                       choices=['text', 'audio', 'video'],
-                      help='The mode of transcript: text (download the text subtitle file) or video (download, speech to text)'
+                      help='The mode of transcript: text (download the text subtitle file only) or video (download the video)'
                       )
+  parser.add_argument('--transcribe', '-t',
+                      action='store_true',
+                      help='Transcribe the audio (default: False)'
+                      )
+
   args = parser.parse_args()
   url = args.url
 
@@ -527,25 +542,37 @@ def main():
     video=url_info,
     langs=langs,
     download_directory=download_directory,
-    mode=ModeInfo(type=args.mode)
+    mode=ModeInfo(type=args.mode),
+    transcribe=args.transcribe
   )
-  mode = args.mode
-  if mode == 'text':
-    main_transcript_file(context)
-  else:
-    if context.mode.type == 'video':
-      context.mode.file_extension = "mp4"
-      context.mode.file_name = f"{context.mode.type}.{context.mode.file_extension}"
-      context.mode.video_path = f"{context.download_directory}/{context.mode.file_name}"
-      context.mode.audio_path = f"{context.download_directory}/audio.wav"
-      main_download_video_or_audio(context)
-      main_video_to_audio(context)
-      main_audio_to_text(context)
-    else:
-      context.mode.file_extension = "mp3"
-      context.mode.file_name = f"{context.mode.type}.{context.mode.file_extension}"
-      context.mode.audio_path = f"{context.download_directory}/{context.mode.file_name}"
-      raise ValueError(f"{context.mode.type} not yet implemented")
+
+  # Compute derived properties
+  if context.mode.type == 'video':
+    context.mode.file_extension = "mp4"
+    context.mode.file_name = f"{context.mode.type}.{context.mode.file_extension}"
+    context.mode.video_path = f"{context.download_directory}/{context.mode.file_name}"
+    context.mode.audio_path = f"{context.download_directory}/audio.wav"
+  elif context.mode.type == 'audio':
+    context.mode.file_extension = "mp3"
+    context.mode.file_name = f"{context.mode.type}.{context.mode.file_extension}"
+    context.mode.audio_path = f"{context.download_directory}/{context.mode.file_name}"
+    raise ValueError(f"{context.mode.type} not yet implemented")
+
+  final_error = None
+  try:
+    # Download subtitle and optionally the video
+    main_download(context)
+  except SystemExit as e:
+    # We capture it as the error could be after that the transcript as been downloaded
+    # example: processing thumbnail: ERROR: Preprocessing: Error opening output files: Invalid argument
+    final_error = e
+
+  # Post processing (vtt file, transcribe)
+  post_processing(context)
+
+  # Raise if any error
+  if final_error is not None and final_error.code != 0:
+    raise final_error
 
 
 if __name__ == '__main__':
