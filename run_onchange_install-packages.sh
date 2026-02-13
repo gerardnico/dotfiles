@@ -1949,6 +1949,16 @@ main_local_script() {
   util_install_local_bin "$HOME/.claude/skills/pdf-compressor/scripts/pdf-compressor.py" "pdf-compressor"
   # ntabul
   util_install_local_bin "$HOME/code/tabulify/tabulify/contrib/script/ntabul" "ntabul"
+  # aider wrapper
+  util_install_local_bin "$HOME/bin-local/aider" "aider"
+  # git wrapper
+  util_install_local_bin "$HOME/bin-local/git" "git"
+  # pass wrapper
+  util_install_local_bin "$HOME/bin-local/pass" "pass"
+  # chezmoi apply wrapper
+  util_install_local_bin "$HOME/bin-local/chezmoi-apply-clean" "chezmoi-apply-clean"
+  # claude api key helper
+  util_install_local_bin "$HOME/bin-local/claude-api-key-helper" "claude-api-key-helper"
 
 }
 

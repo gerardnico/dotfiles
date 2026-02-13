@@ -5,7 +5,9 @@
 set -Eeuo pipefail
 
 rm -rf "${HOME:?}"/bin
+rm -rf "${HOME:?}"/bin-local
 rm -rf "${HOME:?}"/.profile.d
 rm -rf "${HOME:?}"/.bashrc.d
 rm -rf "${HOME:?}"/.claude/skills
+rm -rf "${HOME:?}"/.claude/settings.json
 chezmoi apply --force

@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+# Claude Wrapper script to inject the convention file
+# Key is given by the api key helper claude-api-key-helper
+
+# Project name should be in a envrc
+PROJECT_NAME=${PROJECT_NAME:-}
+if [ "$PROJECT_NAME" == "" ]; then
+  echo "Project Name env (PROJECT_NAME) is missing"
+  exit 1
+fi
+ORGANIZATION_NAME=${ORGANIZATION_NAME:-}
+if [ "$ORGANIZATION_NAME" == "" ]; then
+  echo "Organization Name env (ORGANIZATION_NAME) is missing"
+  exit 1
+fi
+
+# "$(which -a git | sed -n '2p')" "$@"
+CLAUDE_PATH=${CLAUDE_PATH:-"$HOME/.local/bin/claude"}
+if ! [ -f "$CLAUDE_PATH" ]; then
+  echo "Claude not found at $CLAUDE_PATH."
+  echo "Possible Solutions: Set the CLAUDE_PATH env to another path"
+  exit 1
+fi
+
+ARGS=()
+
+# Claude instruction file
+CLAUDE_INSTRUCTION_FILE="CLAUDE.md"
+if [ ! -f "$CLAUDE_INSTRUCTION_FILE" ]; then
+  # Project Instruction file
+  INSTRUCTION_FILE="./.agent/AGENT.md"
+  if [ -f "$INSTRUCTION_FILE" ]; then
+
+    # We create a symlink otherwise we don't see it in the /context command
+    ln -s "$INSTRUCTION_FILE" "CLAUDE.md"
+    echo "Created symlink file ($INSTRUCTION_FILE)"
+
+    # We could have use --append-system-prompt-file
+    # but it's difficult to see if it was taken into account
+    # https://code.claude.com/docs/en/cli-reference
+    # ARGS+=(--append-system-prompt-file "$INSTRUCTION_FILE")
+    # echo "Added agent convention file ($INSTRUCTION_FILE)"
+  fi
+else
+  echo "$CLAUDE_INSTRUCTION_FILE detected"
+fi
+
+"$CLAUDE_PATH" "${ARGS[@]}"

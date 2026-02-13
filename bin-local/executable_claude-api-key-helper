@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Claude does not react to ANTHROPIC_API_KEY
+# but has a apiKeyHelper see https://code.claude.com/docs/en/settingsWrapper
+
+# Project name should be in a envrc
+PROJECT_NAME=${PROJECT_NAME:-}
+if [ "$PROJECT_NAME" == "" ]; then
+  echo "Project Name env (PROJECT_NAME) is missing"
+  exit 1
+fi
+ORGANIZATION_NAME=${ORGANIZATION_NAME:-}
+if [ "$ORGANIZATION_NAME" == "" ]; then
+  echo "Organization Name env (ORGANIZATION_NAME) is missing"
+  exit 1
+fi
+
+# Key
+PROVIDER="anthropic"
+LLM_KEY_PATH="${PROVIDER}/${ORGANIZATION_NAME}/${PROJECT_NAME}"
+if ! LLM_KEY=$(pass "$LLM_KEY_PATH"); then
+  echo "${LLM:-} Api Key Not Found at $LLM_KEY_PATH"
+  LLM_KEY_PATH="${PROVIDER}/${ORGANIZATION_NAME}/default"
+  if ! LLM_KEY=$(pass "$LLM_KEY_PATH"); then
+    echo "${LLM:-} Api Key Not Found at $LLM_KEY_PATH"
+    exit 1
+  fi
+fi
+echo "ANTHROPIC_API_KEY found at: $LLM_KEY_PATH" >&2
+echo "$LLM_KEY"
