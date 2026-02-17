@@ -375,23 +375,6 @@ install_email_spfquery() {
 
 }
 
-# https://copier.readthedocs.io/en/stable/#installation
-install_python_copier() {
-
-  if util_command_exists copier; then
-    echo "Copier founds"
-    return
-  fi
-  if [ "$CHEZMOI_OS" == "windows" ]; then
-    echo "Sorry copier installation on Windows not yet done"
-    return
-  fi
-  echo "Copier installation"
-  # pipx is a tool to use for installing python commands, not for installing dependencies
-  pipx install copier
-  echo "Copier installation done"
-
-}
 # Return all data
 install_email_checkdmarc() {
   if util_command_exists checkdmarc; then
@@ -420,29 +403,6 @@ install_flyctl() {
   echo "flyctl installation"
   brew install flyctl
   echo "flyctl installation done"
-}
-
-# https://aider.chat/docs/install.html
-install_python_aider() {
-
-  if which aider > /dev/null; then
-    echo "aider founds"
-    return
-  fi
-
-  if [ "$CHEZMOI_OS" == "windows" ]; then
-    echo "Sorry aider installation on Windows not yet done"
-    return
-  fi
-  if ! util_command_exists python; then
-    echo "python is required to install aider"
-    return 1
-  fi
-  echo "aider installation"
-  python -m pip install aider-install
-  aider-install
-  echo "aider installation done"
-
 }
 
 # https://formulae.brew.sh/formula/composer
@@ -636,8 +596,33 @@ install_maven() {
   echo "Maven installed"
 }
 
+# Utility to install via pipx
+util_install_pipx() {
+
+  COMMAND=${1}
+  PACKAGE=${2:-${1}}
+
+  # because of wrapper the command may exist
+  # because pipx install on linux at local bin
+  # we check it
+  if [ -f "$HOME/.local/bin/${COMMAND}" ]; then
+    echo "${COMMAND} found"
+    return
+  fi
+  if ! util_command_exists pipx; then
+    echo "pipx is required to install $COMMAND"
+    return 1
+  fi
+  echo "$COMMAND installation with package $PACKAGE via pipx"
+  # https://aider.chat/docs/install.html#install-with-pipx
+  # --force because if the link into .local/bin is not created for any reason
+  pipx install --force "$PACKAGE"
+  echo "$COMMAND installation done"
+
+}
+
 # Utility to install package globally
-util_install_npm(){
+util_install_npm() {
   COMMAND=${1}
   PACKAGE=${2:-${1}}
   if util_command_exists "${COMMAND}"; then
@@ -782,8 +767,6 @@ install_editorconfig_checker_brew() {
   echo "Editorconfig Checker installed"
 
 }
-
-
 
 # Deno required by yt-dlp
 # https://github.com/yt-dlp/yt-dlp/wiki/EJS#deno
@@ -989,7 +972,6 @@ util_install_brew() {
   echo "$COMMAND installed"
 
 }
-
 
 # sudo apt install pinentry-gnome3
 install_gpg_pinentry() {
@@ -1832,8 +1814,6 @@ install_github_cli_brew_winget() {
 
 }
 
-
-
 # https://github.com/ggml-org/whisper.cpp?tab=readme-ov-file#quick-start
 install_whisper_cpp_cli_cmake() {
 
@@ -1949,8 +1929,6 @@ main_local_script() {
   util_install_local_bin "$HOME/.claude/skills/pdf-compressor/scripts/pdf-compressor.py" "pdf-compressor"
   # ntabul
   util_install_local_bin "$HOME/code/tabulify/tabulify/contrib/script/ntabul" "ntabul"
-  # aider wrapper
-  util_install_local_bin "$HOME/bin-local/aider" "aider"
   # git wrapper
   util_install_local_bin "$HOME/bin-local/git" "git"
   # pass wrapper
@@ -1987,7 +1965,6 @@ install_python_youtube_downloader() {
   echo "yt-dlp installation done"
 
 }
-
 
 # deprecated: don't check for bad link
 # only for space and other constraint
@@ -2074,6 +2051,8 @@ main_os_packager_apt() {
 
 }
 
+# Install python cli
+
 main_python() {
   # Install Python
   install_python
@@ -2083,7 +2062,8 @@ main_python() {
   source "$HOME"/.bashrc.d/python.sh
   echo "Python Installation done"
 
-  # For python installation, the venv should be configured
+  # For python library installation, the venv should be configured
+  # Deprecated for pipx as it will create a venv for each cli
   local PYTHON_CONF="$HOME/.bashrc.d/python.sh"
   if [ ! -f "$PYTHON_CONF" ]; then
     echo "Python venv conf file was not found ($PYTHON_CONF)"
@@ -2093,13 +2073,18 @@ main_python() {
   source "$PYTHON_CONF"
 
   # Install aider
-  install_python_aider
+  # https://aider.chat/docs/install.html#install-with-pipx
+  util_install_pipx aider aider-chat
 
   # install copier
-  install_python_copier
+  # https://copier.readthedocs.io/en/stable/#installation
+  util_install_pipx copier
 
   # Install python downloader
   install_python_youtube_downloader
+
+
+
 }
 
 main_node() {
@@ -2144,9 +2129,6 @@ main() {
 
   # bash installer
   main_bash
-
-  # Local Python/Bash Script installer
-  main_local_script
 
   # install pass
   install_pass_check
@@ -2302,6 +2284,12 @@ main() {
   install_mail_swaks
   # Install postal helper
   install_postal
+
+  # Local Python/Bash Script installer
+  # At the end as they are may wrapper cli
+  # Otherwise you get the error: chmod: cannot operate on dangling symlink '/home/admin/.local/bin/aider'
+  main_local_script
+
 }
 
 main

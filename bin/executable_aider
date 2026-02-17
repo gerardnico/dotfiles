@@ -16,7 +16,7 @@ if [ "$ORGANIZATION_NAME" == "" ]; then
 fi
 
 # "$(which -a git | sed -n '2p')" "$@"
-AIDER_PATH=${AIDER_PATH:-"$HOME/.venv/bin/aider"}
+AIDER_PATH=${AIDER_PATH:-"$HOME/.local/bin/aider"}
 if ! [ -f "$AIDER_PATH" ]; then
   echo "Aider not found at $AIDER_PATH."
   echo "Possible Solutions: Set the AIDER_PATH env to another path"
