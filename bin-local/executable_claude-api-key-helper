@@ -5,12 +5,12 @@
 # Project name should be in a envrc
 PROJECT_NAME=${PROJECT_NAME:-}
 if [ "$PROJECT_NAME" == "" ]; then
-  echo "Project Name env (PROJECT_NAME) is missing"
+  echo "Project Name env (PROJECT_NAME) is missing" >&2
   exit 1
 fi
 ORGANIZATION_NAME=${ORGANIZATION_NAME:-}
 if [ "$ORGANIZATION_NAME" == "" ]; then
-  echo "Organization Name env (ORGANIZATION_NAME) is missing"
+  echo "Organization Name env (ORGANIZATION_NAME) is missing" >&2
   exit 1
 fi
 
@@ -18,10 +18,10 @@ fi
 PROVIDER="anthropic"
 LLM_KEY_PATH="${PROVIDER}/${ORGANIZATION_NAME}/${PROJECT_NAME}"
 if ! LLM_KEY=$(pass "$LLM_KEY_PATH"); then
-  echo "${LLM:-} Api Key Not Found at $LLM_KEY_PATH"
+  echo "${LLM:-} Api Key Not Found at $LLM_KEY_PATH" >&2
   LLM_KEY_PATH="${PROVIDER}/${ORGANIZATION_NAME}/default"
   if ! LLM_KEY=$(pass "$LLM_KEY_PATH"); then
-    echo "${LLM:-} Api Key Not Found at $LLM_KEY_PATH"
+    echo "${LLM:-} Api Key Not Found at $LLM_KEY_PATH" >&2 >&2
     exit 1
   fi
 fi

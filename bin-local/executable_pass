@@ -6,8 +6,10 @@ export PATH=${SSH_BASHLIB_LIBRARY_PATH}:$PATH
 
 # Trying to see who call it
 source "bashlib-stack.sh"
-timestamp=$(date +"%Y-%m-%d:%H:%M:%S")
-stack::print_process_tree >> "$HOME/code/nico/tmp/${timestamp}-pass.log"
+BASE_DIR="$HOME/code/nico/tmp/"
+DAY_LOG_DIR="$BASE_DIR/$(date +"%Y-%m-%d")"
+mkdir -p "$DAY_LOG_DIR"
+stack::print_process_tree >> "$DAY_LOG_DIR/$(date +"%Y%m%d-%H%M%S")-pass.log"
 
 # Run
 # We select the second in path order
