@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "transcript-downloader"
+version = "0.1.0"
+dependencies = [
+  "yt-dlp==2025.12.8",
+  "webvtt-py==0.5.1",
+  "packaging==26.0",
+]
+
+[project.scripts]
+# Note the hyphen vs underscore —
+# the CLI command uses a hyphen (as you named it),
+# but the Python module name uses an underscore since hyphens aren't valid in Python identifiers.
+transcript-downloader = "transcript_downloader:main"

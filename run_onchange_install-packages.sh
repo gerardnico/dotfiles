@@ -613,9 +613,16 @@ util_install_pipx() {
     echo "pipx is required to install $COMMAND"
     return 1
   fi
+
+  # Local Package made by us in a directory
+  if [ -d "$PACKAGE" ]; then
+    pipx install -e "$PACKAGE"
+    return;
+  fi
+
   echo "$COMMAND installation with package $PACKAGE via pipx"
   # https://aider.chat/docs/install.html#install-with-pipx
-  # --force because if the link into .local/bin is not created for any reason
+  # --force if the link into .local/bin is not created for any reason
   pipx install --force "$PACKAGE"
   echo "$COMMAND installation done"
 
@@ -1927,8 +1934,6 @@ util_install_local_bin() {
 # Install script without touching the PATH
 main_local_script() {
 
-  # Downloader
-  util_install_local_bin "$HOME/.claude/skills/transcript-downloader/scripts/transcript-downloader.py" "transcript-downloader"
   util_install_local_bin "$HOME/.claude/skills/pdf-compressor/scripts/pdf-compressor.py" "pdf-compressor"
   # ntabul
   util_install_local_bin "$HOME/code/tabulify/tabulify/contrib/script/ntabul" "ntabul"
@@ -2082,6 +2087,9 @@ main_python() {
   # install copier
   # https://copier.readthedocs.io/en/stable/#installation
   util_install_pipx copier
+
+  # transcript-downloader
+  util_install_pipx transcript-downloader "$HOME/.claude/skills/transcript-downloader/scripts/"
 
   # Install python downloader
   install_python_youtube_downloader
