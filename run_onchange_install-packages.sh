@@ -1914,11 +1914,14 @@ util_install_local_bin() {
   CMD_NAME=${2}
   LOCAL_BIN="$HOME/.local/bin"
   BIN_TARGET_FILE="$LOCAL_BIN/$CMD_NAME"
-  if [ -f "$BIN_TARGET_FILE" ]; then
+  if [ -L "$BIN_TARGET_FILE" ]; then
     rm "$BIN_TARGET_FILE"
   fi
   ln -s "$SOURCE" "$BIN_TARGET_FILE"
-  chmod +x "$BIN_TARGET_FILE"
+  if [ -f "$SOURCE" ]; then
+    # why to avoid: chmod: cannot operate on dangling symlink '/xxx'
+    chmod +x "$BIN_TARGET_FILE"
+  fi
 }
 
 # Install script without touching the PATH
