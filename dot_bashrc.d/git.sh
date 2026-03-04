@@ -72,7 +72,7 @@ alias gxs='git-exec status --short'
 alias gd='git diff | nvim'
 
 # Next version
-GITURE_BIN_PATH="$HOME/code/giture/bin"
+GITURE_BIN_PATH="$HOME/code/gerardnico/giture/bin"
 # shellcheck disable=SC2139
 alias nga="$GITURE_BIN_PATH/git-amend"
 # shellcheck disable=SC2139

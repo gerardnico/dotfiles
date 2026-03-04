@@ -11,3 +11,5 @@ description: Rules when developing javascript projects (in node or the browser)
 * Use `zod` to create schema
 * Use `zod` to create React props
 * When creating schema with `zod`, add custom messages
+* When manipulating URL, use the URL object
+* Create constant for literal values
