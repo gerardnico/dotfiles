@@ -1945,6 +1945,8 @@ main_local_script() {
   util_install_local_bin "$HOME/bin-local/chezmoi-apply-clean" "chezmoi-apply-clean"
   # claude api key helper
   util_install_local_bin "$HOME/bin-local/claude-api-key-helper" "claude-api-key-helper"
+  # dock-x
+  util_install_local_bin "$HOME/code/gerardnico/dock-x/bin/dock-x" "dock-x"
 
 }
 
