@@ -92,8 +92,10 @@ sudo_safe() {
 
 # https://code.claude.com/docs/en/overview#get-started-in-30-seconds
 install_claude_code_bash() {
-  if util_command_exists claude; then
-    echo "claude found"
+  # it's installed on local bin
+  local CLAUDE_PATH=${CLAUDE_PATH:-"$HOME/.local/bin/claude"}
+  if [ -f "$CLAUDE_PATH" ]; then
+    echo "claude found at $CLAUDE_PATH"
     return
   fi
   echo "claude installation"
