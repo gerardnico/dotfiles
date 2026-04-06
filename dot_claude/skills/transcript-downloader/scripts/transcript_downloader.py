@@ -10,10 +10,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional, List
 
-# May be process the requirement file?
-YT_DLP_VERSION = "2025.12.8"
-WEB_VTT_VERSION = "0.5.1"
-
 try:
   import yt_dlp
 except ImportError:
@@ -492,8 +488,6 @@ def post_processing_transcribe_audio_to_text(context):
 
 
 def main():
-  _require_dependency("yt-dlp", YT_DLP_VERSION)
-  _require_dependency("webvtt-py", WEB_VTT_VERSION)
 
   parser = ArgumentParserNoUsage(description='Get video transcript')
   parser.add_argument('url', help='Video URL')

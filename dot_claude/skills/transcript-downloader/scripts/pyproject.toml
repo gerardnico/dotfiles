@@ -5,8 +5,10 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "transcript-downloader"
 version = "0.1.0"
+# https://github.com/yt-dlp/yt-dlp/releases
+# curl-cffi is for the impersonnation: https://github.com/yt-dlp/yt-dlp#impersonation
 dependencies = [
-  "yt-dlp==2025.12.8",
+  "yt-dlp[default,curl-cffi]==2026.03.17",
   "webvtt-py==0.5.1",
   "packaging==26.0",
 ]

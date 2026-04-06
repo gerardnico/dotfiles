@@ -7,7 +7,8 @@
 
 * Create a venv, install dependency, install script
 ```bash
-pipx install -e .
+rm -rf ~/.local/share/pipx/venvs/transcript-downloader
+pipx install -e --force .
 ```
 
 * Deno for challenge: https://github.com/yt-dlp/yt-dlp/wiki/EJS
