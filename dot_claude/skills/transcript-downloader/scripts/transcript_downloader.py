@@ -406,7 +406,7 @@ def main_download(context: Context):
     "--paths", "subtitle:.",
     context.video.url
   ]
-  print("Command: yt-dlp "+ " ".join(str(x) for x in args))
+  print("Command: yt-dlp " + " ".join(str(x) for x in args))
   yt_dlp.main(args)
 
 
@@ -488,7 +488,6 @@ def post_processing_transcribe_audio_to_text(context):
 
 
 def main():
-
   parser = ArgumentParserNoUsage(description='Get video transcript')
   parser.add_argument('url', help='Video URL')
   parser.add_argument('--output', '-o',
@@ -532,11 +531,16 @@ def main():
   else:
     langs = args.langs.split(",")
 
+  # If we transcribe, we need to download the video
+  arg_mode = args.mode
+  if args.transcribe:
+    arg_mode = 'video'
+
   context = Context(
     video=url_info,
     langs=langs,
     download_directory=download_directory,
-    mode=ModeInfo(type=args.mode),
+    mode=ModeInfo(type=arg_mode),
     transcribe=args.transcribe
   )
 
