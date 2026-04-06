@@ -15,4 +15,4 @@ stack::print_process_tree >> "$DAY_LOG_DIR/$(date +"%Y%m%d-%H%M%S")-pass.log"
 # We select the second in path order
 # Why? we may get it from the project (ie sdk man) and also globally from brew.
 # We take the second in order of priority
-/usr/bin/pass "$@"
+"$(which -a pass | sed -n '2p')" "$@"

@@ -24,7 +24,6 @@ if ! [ -f "$CLAUDE_PATH" ]; then
   exit 1
 fi
 
-ARGS=()
 
 # Claude instruction file
 CLAUDE_INSTRUCTION_FILE="CLAUDE.md"
@@ -47,4 +46,4 @@ else
   echo "$CLAUDE_INSTRUCTION_FILE detected"
 fi
 
-"$CLAUDE_PATH" "${ARGS[@]}"
+"$CLAUDE_PATH" "$*"
