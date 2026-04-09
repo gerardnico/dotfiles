@@ -18,3 +18,12 @@ dependencies = [
 # the CLI command uses a hyphen (as you named it),
 # but the Python module name uses an underscore since hyphens aren't valid in Python identifiers.
 transcript-downloader = "transcript_downloader:main"
+
+# To resolve: raceback (most recent call last):
+#  File "/home/admin/.local/bin/transcript-downloader", line 3, in <module>
+#    from transcript_downloader import main
+#   ModuleNotFoundError: No module named 'transcript_downloader'
+#   The behavior difference between laptops is likely a setuptools version difference —
+#   older setuptools used to auto-discover top-level .py modules, newer versions require explicit py-modules declaration.
+[tool.setuptools]
+py-modules = ["transcript_downloader"]

@@ -2009,7 +2009,8 @@ main_brew() {
   # typst
   # https://typst.app/open-source/#download
   # https://formulae.brew.sh/formula/typst
-  util_install_brew typst
+  # can't add ? @0.14.2
+  util_install_brew "typst"
 
   # install whois
   # https://github.com/rfc1036/whois
