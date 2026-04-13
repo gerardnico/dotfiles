@@ -9,17 +9,20 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional, List
+import logging
+
+logger = logging.getLogger(__name__)
 
 try:
   import yt_dlp
 except ImportError:
-  print("Error: yt-dlp is not installed. Install it with: pip install yt-dlp", file=sys.stderr)
+  logger.error("Error: yt-dlp is not installed. Install it with: pip install yt-dlp")
   sys.exit(1)
 
 try:
   import webvtt
 except ImportError:
-  print("Warning: webvtt-py not installed. Install with: pip install webvtt-py")
+  logger.warning("Warning: webvtt-py not installed. Install with: pip install webvtt-py")
 
 
 def _require_dependency(pkg: str, version: str):
@@ -61,7 +64,7 @@ class Context:
   langs: List[str]
   download_directory: str
   mode: ModeInfo
-  transcribe: bool = False
+  verbose: bool
 
 
 def clean_duplicate_lines(lines):
@@ -199,21 +202,21 @@ def post_processing_vtt(vtt_file_path: Path) -> None:
     with open(output_file, 'w', encoding='utf-8') as f:
       f.write('\n'.join(text_lines))
 
-    print(f"Processed: {vtt_file_path.name} -> {output_file.name}")
+    logger.info(f"Processed: {vtt_file_path.name} -> {output_file.name}")
 
   except Exception as e:
-    print(f"Error processing {vtt_file_path.name}: {e}")
+    logger.error(f"Error processing {vtt_file_path.name}: {e}")
 
 
 def get_transcription(context, vtt_file_count):
-  if not context.transcribe:
-    print(f"  * Transcribe option is disabled, no transcription")
+  if not vtt_file_count == 0:
+    logger.debug(f"  * Subtitle file found, no transcription")
+    return False
+  if context.mode.type != "video":
+    logger.debug(f"  * Not a video mode, no transcription")
     return False
   if not Path(context.mode.video_path).exists():
-    print(f"  * Video is not present, no transcription")
-    return False
-  if not vtt_file_count == 0:
-    print(f"  * Subtitle file found, no transcription")
+    logger.debug(f"  * Video is not present, no transcription")
     return False
   return True
 
@@ -241,11 +244,11 @@ def post_processing(context: Context) -> None:
       vtt_file_count += 1
 
   if vtt_file_count == 0:
-    print(f"No .vtt files found in {directory}")
+    logger.info(f"No .vtt files found in {directory}")
   else:
-    print(f"Processed {vtt_file_count} VTT file(s)")
+    logger.info(f"Processed {vtt_file_count} VTT file(s)")
 
-  print(f"Trying to transcribe")
+  logger.info(f"Trying to transcribe")
   if get_transcription(context, vtt_file_count):
     post_processing_transcribe_video_to_audio(context)
     post_processing_transcribe_audio_to_text(context)
@@ -301,17 +304,17 @@ def get_url_info(url) -> UrlInfo:
 
 def get_download_video(context):
   if context.mode.type == 'text':
-    print(f"Text mode: no video download")
+    logger.info(f"Text mode: no video download")
     return False
   if Path(context.mode.video_path).exists():
-    print(f"File {context.mode.video_path} already downloaded")
+    logger.info(f"File {context.mode.video_path} already downloaded")
     return False
-  print(f"No video found, video mode: download video")
+  logger.info(f"No video found, video mode: download video")
   return True
 
 
 # Execute yt-dlp
-def main_download(context: Context):
+def execute_yt_dlp(context: Context):
   args = []
 
   # Download video?
@@ -336,17 +339,6 @@ def main_download(context: Context):
   lang_separator = ','
   found_orig = False
   orig = "orig"
-  for lang in context.langs:
-    if lang == orig:
-      found_orig = True
-      langs_regexp.append(f"{case_insensitivity_flag}.*-{orig}.*")
-    else:
-      langs_regexp.append(f"{case_insensitivity_flag}{lang}.*")
-  langs_ytd = lang_separator.join(langs_regexp)
-
-  # Don't download the orig subtitle if not specified
-  if found_orig == False and context.video.service_name == "youtube":
-    langs_ytd = f"{langs_ytd}{lang_separator}-.*-{orig}.*"
 
   # YouTube block by video once you are blocked, it can take time,
   # but it will work with another video
@@ -361,6 +353,34 @@ def main_download(context: Context):
   # with yt_dlp.YoutubeDL(ydl_opts) as ydl:
   #    info = ydl.extract_info(url, download=False)
 
+  if not context.verbose:
+    args += [
+      "--quiet",
+      "--no-warnings"
+    ]
+
+  # Lang selections:
+  # By default, we don't set a lang. We let yt-dlp decide
+  # --sub-langs: Languages of the subtitles to download (can be regex) or "all" separated by commas, e.g.
+  # --sub-langs "en.*,ja" (where "en.*" is a regex pattern that matches "en" followed by 0 or more of any character).
+  # You can prefix the language code with a "-" to exclude it from the requested languages, e.g.
+  # --sub-langs all,-live_chat. Use --list-subs for a list of available language tags
+  if not context.langs is None:
+    for lang in context.langs:
+      if lang == orig:
+        found_orig = True
+        langs_regexp.append(f"{case_insensitivity_flag}.*-{orig}.*")
+      else:
+        langs_regexp.append(f"{case_insensitivity_flag}{lang}.*")
+    langs_ytd = lang_separator.join(langs_regexp)
+    # Don't download the orig subtitle if not specified
+    if found_orig == False and context.video.service_name == "youtube":
+      langs_ytd = f"{langs_ytd}{lang_separator}-.*-{orig}.*"
+    args += [
+      "--sub-langs",
+      f"{langs_ytd}"
+    ]
+
   args += [
     # Download the subtitle (not generated)
     "--write-subs",
@@ -368,18 +388,13 @@ def main_download(context: Context):
     "--write-auto-subs",
     # Subtitle format; accepts formats preference separated by "/", e.g. "srt" or "ass/srt/best"
     "--sub-format", "vtt/srt/best",
-    # Lang selections: Languages of the subtitles to download (can be regex) or "all" separated by commas, e.g.
-    # --sub-langs "en.*,ja" (where "en.*" is a regex pattern that matches "en" followed by 0 or more of any character).
-    # You can prefix the language code with a "-" to exclude it from the requested languages, e.g.
-    # --sub-langs all,-live_chat. Use --list-subs for a list of available language tags
-    "--sub-langs", f"{langs_ytd}",
-    # indicate a template for the output file names
-    # https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#output-template
+    # For the output file names, this is a template string
+    # https://github.com/yt-dlp/yt-dlp#output-template
     # "-o", "subtitle:%(extractor)s-%(uploader)s-%(id)s.%(ext)s",
     "-o", f"subtitle:subtitle.%(ext)s",
     # Write video metadata to a .info.json file
     "--write-info-json",
-    "-o", f"infojson:infojson",
+    "-o", f"infojson:data",  # file is data.info.json
     # Location in the filesystem where yt-dlp can store some downloaded information (such as
     # client ids and signatures) permanently. By default, ${XDG_CACHE_HOME}/yt-dlp
     # --cache-dir DIR
@@ -406,7 +421,7 @@ def main_download(context: Context):
     "--paths", "subtitle:.",
     context.video.url
   ]
-  print("Command: yt-dlp " + " ".join(str(x) for x in args))
+  logger.info("Command: yt-dlp " + " ".join(str(x) for x in args))
   yt_dlp.main(args)
 
 
@@ -415,7 +430,7 @@ def post_processing_transcribe_video_to_audio(context):
     raise ValueError("Audio processing not yet implemented")
 
   if Path(context.mode.audio_path).exists():
-    print(f"Audio file already exist: {context.mode.audio_path}")
+    logger.debug(f"Audio file already exist: {context.mode.audio_path}")
     return
 
   command = [
@@ -435,11 +450,11 @@ def post_processing_transcribe_video_to_audio(context):
       capture_output=True,
       text=True
     )
-    print("Video to audio transformation was successful")
-    print(result.stdout)
+    logger.info("Video to audio transformation was successful")
+    logger.info(result.stdout)
   except subprocess.CalledProcessError as e:
-    print(f"Error occurred: {e}")
-    print(f"Error output: {e.stderr}")
+    logger.error(f"Error occurred: {e}")
+    logger.error(f"Error output: {e.stderr}")
 
 
 def post_processing_transcribe_audio_to_text(context):
@@ -448,7 +463,7 @@ def post_processing_transcribe_audio_to_text(context):
   output_format_whisper_argument = "--output-txt"
   output_file_path = f"{output_file_path_without_extension}.{output_format_extension}"
   if Path(output_file_path).exists():
-    print(f"Transcribed output Speech file already exists: {output_file_path}")
+    logger.debug(f"Transcribed output Speech file already exists: {output_file_path}")
     return
 
   # https://github.com/ggml-org/whisper.cpp/tree/master/examples/cli
@@ -481,14 +496,14 @@ def post_processing_transcribe_audio_to_text(context):
 
   try:
     subprocess.run(command)
-    print("Audio Speech to text transformation was successful")
+    logger.info("Audio Speech to text transformation was successful")
   except subprocess.CalledProcessError as e:
-    print(f"Error occurred: {e}")
-    print(f"Error output: {e.stderr}")
+    logger.error(f"Error occurred: {e}")
+    logger.error(f"Error output: {e.stderr}")
 
 
 def main():
-  parser = ArgumentParserNoUsage(description='Get video transcript')
+  parser = ArgumentParserNoUsage(description='Get video transcripts')
   parser.add_argument('url', help='Video URL')
   parser.add_argument('--output', '-o',
                       help='Output file path')
@@ -498,14 +513,27 @@ def main():
   parser.add_argument('--mode', '-m',
                       default='text',
                       choices=['text', 'audio', 'video'],
-                      help='The mode of transcript: text (download the text subtitle file only) or video (download the video)'
+                      help='The mode of execution: text (download the text subtitle file only) or video (download the video and transcribe)'
                       )
-  parser.add_argument('--transcribe', '-t',
+  parser.add_argument('--json', '-j',
                       action='store_true',
-                      help='Transcribe the audio (default: False)'
+                      help='Output result info as json'
+                      )
+  parser.add_argument('--verbose', '-v',
+                      action='store_true',
+                      help='Verbose mode'
                       )
 
   args = parser.parse_args()
+
+  logging_level = logging.ERROR
+  if args.verbose:
+    logging_level = logging.DEBUG
+  logging.basicConfig(
+    level=logging_level,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+  )
+
   url = args.url
 
   url_info = get_url_info(url)
@@ -522,26 +550,21 @@ def main():
   # it the video is in nl, you get 2 subtitles, `nl` and `nl-orig`
   orig = "orig"
   if args.langs is None:
-    # lang_input = input("Please specify a lang (example: en): ")
-    # print(f"You selected: {lang_input}")
     if url_info.service_name == "youtube":
       langs = [orig]
     else:
-      langs = ["en"]
+      # we let yt-dlp decide, normally the spoken language of the video
+      langs = None
   else:
     langs = args.langs.split(",")
 
-  # If we transcribe, we need to download the video
-  arg_mode = args.mode
-  if args.transcribe:
-    arg_mode = 'video'
-
+  # context building
   context = Context(
     video=url_info,
     langs=langs,
     download_directory=download_directory,
-    mode=ModeInfo(type=arg_mode),
-    transcribe=args.transcribe
+    mode=ModeInfo(type=args.mode),
+    verbose=args.verbose
   )
 
   # Compute derived properties
@@ -559,7 +582,7 @@ def main():
   final_error = None
   try:
     # Download subtitle and optionally the video
-    main_download(context)
+    execute_yt_dlp(context)
   except SystemExit as e:
     # We capture it as the error could be after that the transcript as been downloaded
     # example: processing thumbnail: ERROR: Preprocessing: Error opening output files: Invalid argument
@@ -568,10 +591,17 @@ def main():
   # Post processing (vtt file, transcribe)
   post_processing(context)
 
+  # Result
+  print(f"Transcript files:")
+  for item in Path(context.download_directory).iterdir():
+    if not item.is_file():
+      continue
+    if item.name.startswith('subtitle') and item.suffix.lower() == '.txt':
+      print(item)
+
   # Raise if any error
   if final_error is not None and final_error.code != 0:
     raise final_error
-
 
 if __name__ == '__main__':
   main()

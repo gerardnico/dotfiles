@@ -1380,6 +1380,8 @@ install_telnet() {
 }
 
 # https://rsync.samba.org/download.html
+# needed for Python WSL
+# https://www.jetbrains.com/help/pycharm/using-wsl-as-a-remote-interpreter.html#configure-wsl
 install_rsync() {
 
   # rsync
@@ -1953,7 +1955,7 @@ main_local_script() {
 }
 
 # https://github.com/yt-dlp/yt-dlp#installation
-install_python_youtube_downloader() {
+install_python_yt_dlp_youtube_downloader() {
 
   if which yt-dlp > /dev/null; then
     echo "yt-dlp founds"
@@ -1972,6 +1974,7 @@ install_python_youtube_downloader() {
   # Brew is only for mac!
   # LLM adds: `--break-system-packages` ???
   python -m pip install yt-dlp
+  # Update: python -m pip install --upgrade yt-dlp
   # for impersonation
   pip freeze > requirements.txt
   echo "yt-dlp installation done"
@@ -2097,7 +2100,7 @@ main_python() {
   util_install_pipx transcript-downloader "$HOME/.claude/skills/transcript-downloader/scripts/"
 
   # Install python downloader
-  install_python_youtube_downloader
+  install_python_yt_dlp_youtube_downloader
 
 
 

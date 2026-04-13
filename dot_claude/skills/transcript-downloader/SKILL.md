@@ -1,6 +1,8 @@
 ---
 name: transcript-downloader
-description: Download/Get transcripts/captions/subtitle from a video
+description: |
+    Download / get transcripts / captions / subtitles from a video
+    on social media such as TikTok, YouTube, Twitter
 allowed-tools: Bash,Read,Write
 disable-model-invocation: false # to prevent Claude from triggering it automatically.
 model: haiku
@@ -8,66 +10,38 @@ model: haiku
 
 ## How to Use
 
-### Step 1: Determine the video URL and the Language
+### Step 1: Execute the transcript-downloader cli
 
-If not specified, ask the user which languages they want.
-Common language codes include:
+Execute the `transcript-downloader` command with:
+* the URL as argument
+* and optionally the language if asked
 
-- `en` - English
-- `es` - Spanish
-- `nl` - Dutch
-- `fr` - French
-- `de` - German
-- `it` - Italian
-- `pt` - Portuguese
-- `ja` - Japanese
-- `zh` - Chinese
-- `ko` - Korean
-- `ar` - Arabic
+#### Example without language
 
-Confirm the language code with the user if it's ambiguous
-
-### Step 2: Run the Script
-
-Execute the `transcript-downloader` command with the language and URL.
-
-```bash
-usage: transcript-downloader [-h] [--output OUTPUT] [--langs LANGS] url
-
-Get video transcript
-
-positional arguments:
-  url                   Video URL
-
-options:
-  -h, --help            show this help message and exit
-  --output OUTPUT, -o OUTPUT
-                        Output file path
-  --langs LANGS, -l LANGS
-                        The languages codes separated by a comma
-```
-
-Example Usage:
-
-**User:** "Can you download the English transcript for the
+**User:** "Can you download the transcript for the
 video https://www.tiktok.com/@account/video/7589746658594819358?"
 
-**Claude:**
+**Agent:** I'll download the transcript for you.
 
 ```bash
-transcript-downloader --lang en https://www.tiktok.com/@account/video/7589746658594819358
+transcript-downloader https://www.tiktok.com/@account/video/7589746658594819358
 ```
 
-**User:** "Get me transcripts in Spanish and French for the video https://x.com/account/status/2012561898097594545"
+#### Example with languages
 
-**Claude:** I'll download transcripts in both languages for you.
+**User:** "Get me the transcripts in French for the video https://x.com/account/status/2012561898097594545"
+
+**Agent:** I'll download the transcripts in French for you.
 
 ```bash
-transcript-downloader --lang es,fr https://x.com/account/status/2012561898097594545
+transcript-downloader --lang fr https://x.com/account/status/2012561898097594545
 ```
 
-### Step 3: Handle the Output
+### Step 2: Handle the command stdout
 
-- Check if the script executed successfully
-- Inform the user of the results
-- If there are any downloaded files, let the user know where they can be found
+- Get the transcript file from the stdout.
+  - The transcript file has the pattern `subtitle.$LANG.txt` where `$LANG` is the language code
+  - Example for English United States: `subtitle.eng-US.txt` where the `$LANG` value is `eng-US`
+- Output the transcript file content and the language downloaded
+- And tells the user that if he wants he can ask for another language
+- if the user asks for another language, repeat to [step 1](#step-1-execute-the-transcript-downloader-cli)
