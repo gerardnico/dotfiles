@@ -1,8 +1,8 @@
 ---
 name: transcript-downloader
 description: |
-    Download / get transcripts / captions / subtitles from a video
-    on social media such as TikTok, YouTube, Twitter
+    Download / get transcripts / captions / subtitles from a social media URL
+    such as TikTok, YouTube, Twitter
 allowed-tools: Bash,Read,Write
 disable-model-invocation: false # to prevent Claude from triggering it automatically.
 model: haiku
@@ -13,8 +13,10 @@ model: haiku
 ### Step 1: Execute the transcript-downloader cli
 
 Execute the `transcript-downloader` command with:
+
+* the `--agent` flag
 * the URL as argument
-* and optionally the language if asked
+* and optionally the language in 2 letters format if asked
 
 #### Example without language
 
@@ -24,7 +26,7 @@ video https://www.tiktok.com/@account/video/7589746658594819358?"
 **Agent:** I'll download the transcript for you.
 
 ```bash
-transcript-downloader https://www.tiktok.com/@account/video/7589746658594819358
+transcript-downloader --agent https://www.tiktok.com/@account/video/7589746658594819358
 ```
 
 #### Example with languages
@@ -34,14 +36,11 @@ transcript-downloader https://www.tiktok.com/@account/video/7589746658594819358
 **Agent:** I'll download the transcripts in French for you.
 
 ```bash
-transcript-downloader --lang fr https://x.com/account/status/2012561898097594545
+transcript-downloader --agent --lang fr https://x.com/account/status/2012561898097594545
 ```
 
 ### Step 2: Handle the command stdout
 
-- Get the transcript file from the stdout.
-  - The transcript file has the pattern `subtitle.$LANG.txt` where `$LANG` is the language code
-  - Example for English United States: `subtitle.eng-US.txt` where the `$LANG` value is `eng-US`
-- Output the transcript file content and the language downloaded
-- And tells the user that if he wants he can ask for another language
-- if the user asks for another language, repeat to [step 1](#step-1-execute-the-transcript-downloader-cli)
+- The transcript is printed to stdout. Show it to the user
+- Tells the user that if he wants he can ask for another language
+- If the user asks for another language, repeat to [step 1](#step-1-execute-the-transcript-downloader-cli)
