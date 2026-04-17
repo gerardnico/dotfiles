@@ -1676,19 +1676,6 @@ install_mail_utils() {
 
 }
 
-# Pre-commit
-# https://pre-commit.com/#installation
-install_pre_commit() {
-  if util_command_exists pre-commit; then
-    echo "Pre-commit already installed"
-    return
-  fi
-
-  echo "Pre-commit installation"
-  pip install pre-commit
-  echo "Pre-commit installed"
-
-}
 
 install_tpcds() {
   if util_command_exists dsqgen; then
@@ -1743,10 +1730,33 @@ install_mail_spring_gui() {
 
 }
 
+# https://scoop.sh/
+# then add: ~\scoop\shims in PATH
+install_scoop_windows_manager(){
+  if [ "$CHEZMOI_OS" != "windows" ]; then
+      echo "Scoop is only for windows"
+      return
+  fi
+  if util_command_exists scoop; then
+      echo "Scoop Installed"
+      return
+  fi
+  powershell -ExecutionPolicy ByPass RemoteSigned -Scope CurrentUser -c "Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression"
+}
+
 # pipx is a tool to use for installing python commands, not for installing dependencies
+# https://github.com/pypa/pipx#install-pipx
 install_python_pipx() {
 
   if util_command_exists pipx; then
+    echo "Pipx installed"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Installing Pipx with scoop"
+    scoop install pipx
+    pipx ensurepath
     echo "Pipx installed"
     return
   fi
@@ -1822,6 +1832,25 @@ install_github_cli_brew_winget() {
   # https://github.com/cli/cli/blob/trunk/docs/install_macos.md#homebrew
   brew install gh
   echo "gh installation done"
+
+}
+
+install_uv_brew() {
+
+  if which uv > /dev/null; then
+    echo "uv founds"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "uv installation on windows"
+    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+    return
+  fi
+
+  echo "uv installation"
+  brew install uv
+  echo "uv installation done"
 
 }
 
@@ -1954,32 +1983,6 @@ main_local_script() {
 
 }
 
-# https://github.com/yt-dlp/yt-dlp#installation
-install_python_yt_dlp_youtube_downloader() {
-
-  if which yt-dlp > /dev/null; then
-    echo "yt-dlp founds"
-    return
-  fi
-
-  if [ "$CHEZMOI_OS" == "windows" ]; then
-    echo "Sorry yt-dlp installation on Windows not yet done"
-    return
-  fi
-  if ! util_command_exists python; then
-    echo "python is required to install yt-dlp"
-    return 1
-  fi
-  echo "yt-dlp installation"
-  # Brew is only for mac!
-  # LLM adds: `--break-system-packages` ???
-  python -m pip install yt-dlp
-  # Update: python -m pip install --upgrade yt-dlp
-  # for impersonation
-  pip freeze > requirements.txt
-  echo "yt-dlp installation done"
-
-}
 
 # deprecated: don't check for bad link
 # only for space and other constraint
@@ -2046,6 +2049,9 @@ main_brew() {
   # deno
   install_deno_brew
 
+  # uv / python manager
+  install_uv_brew
+
 }
 
 # Package Manager or just file
@@ -2096,13 +2102,16 @@ main_python() {
   # https://copier.readthedocs.io/en/stable/#installation
   util_install_pipx copier
 
+  # Pre-commit
+  # https://pre-commit.com/#installation
+  util_install_pipx pre-commit
+
+  # https://github.com/yt-dlp/yt-dlp#installation
+  # Brew is only for mac!
+  util_install_pipx yt-dlp
+
   # transcript-downloader
-  util_install_pipx transcript-downloader "$HOME/.claude/skills/transcript-downloader/scripts/"
-
-  # Install python downloader
-  install_python_yt_dlp_youtube_downloader
-
-
+  util_install_pipx transcribe "$HOME/code/gerardnico/transcribe"
 
 }
 
@@ -2142,6 +2151,9 @@ main() {
 
   # Git (already installed normally as we store this repo in git)
   install_git_check
+
+
+  install_scoop_windows_manager
 
   # Brew installer
   main_brew
@@ -2242,9 +2254,6 @@ main() {
 
   # Task Runner
   install_go_task
-
-  # Pre-commit
-  install_pre_commit
 
   # Zoxide cd
   install_zoxide_cd

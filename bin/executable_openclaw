@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# OPENCLAW_STATE_DIR/OPENCLAW_CONFIG_PATH: default to ~/.openclaw
+# multiple profile ~/.openclaw-<name>
+
+cd /tmp/code/openclaw/ && docker compose run --rm openclaw-cli "$@"
