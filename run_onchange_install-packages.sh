@@ -1515,7 +1515,9 @@ install_direnv() {
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-    echo "direnv on windows not yet done"
+    echo "direnv on windows"
+    scoop install direnv
+    echo "direnv installed"
     return
   fi
   echo "Installing direnv"
@@ -1581,7 +1583,8 @@ install_git_repos() {
 
 }
 
-# * Linux: [pass](https://www.passwordstore.org/#download)
+# Linux: [pass](https://www.passwordstore.org/#download)
+# pass depends on the gpg program for encryption and decryption.
 install_pass_check() {
 
   if util_command_exists pass; then
@@ -1590,11 +1593,35 @@ install_pass_check() {
   fi
 
   if [ "$CHEZMOI_OS" == "windows" ]; then
-    echo "go pass on windows, not yet done"
+    echo "go pass windows installation on windows"
+    # https://github.com/gopasspw/gopass/blob/master/docs/setup.md#windows
+    # git should be installed otherwise winget install Git.Git
+    install_gpg
+    # with winget, I was not able to find the binary - winget install gopass.gopass
+    scoop install gopass
     return
   fi
 
-  echo "Pass should have been already installed via .install-password-manager.sh"
+  echo "Pass for linux, should have been already installed via .install-password-manager.sh"
+  exit 1
+
+}
+
+install_open_ssl() {
+
+  if util_command_exists openssl; then
+    echo "openssl found"
+    return
+  fi
+
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Install open Ssl"
+    scoop install openssl
+    echo "Open Ssl Installed"
+    return
+  fi
+
+  echo "Openssl not yet installed for Linux"
   exit 1
 
 }
@@ -2010,6 +2037,8 @@ main_brew() {
   install_brew
 
   # install ffmpeg
+  # scoop install ffmpeg on windows
+  # this is: https://www.gyan.dev/ffmpeg/builds/ that is advertised on the ffmpeg install page
   util_install_brew ffmpeg
 
   # typst
@@ -2108,6 +2137,7 @@ main_python() {
 
   # https://github.com/yt-dlp/yt-dlp#installation
   # Brew is only for mac!
+  # on windows: scoop install yt-dlp
   util_install_pipx yt-dlp
 
   # transcript-downloader
@@ -2152,7 +2182,6 @@ main() {
   # Git (already installed normally as we store this repo in git)
   install_git_check
 
-
   install_scoop_windows_manager
 
   # Brew installer
@@ -2169,6 +2198,9 @@ main() {
   # install git repo (ssh repo)
   # dependency: github
   install_git_repos
+
+  # Open Ssl
+  install_open_ssl
 
   main_python
 
