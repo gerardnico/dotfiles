@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Wrapper
+
+export VAULT_ADDR
+VAULT_ADDR=$(pass kube/vault/addr)
+# https://developer.hashicorp.com/vault/docs/commands/login
+export VAULT_TOKEN
+VAULT_TOKEN=$(pass kube/vault/token) # is not necessary in case of `vault login`
+
+# Take the second vault
+"$(which -a vault | sed -n '2p')" "$@"

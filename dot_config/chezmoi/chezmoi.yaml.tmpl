@@ -4,6 +4,8 @@ sourceDir: {{ .chezmoi.homeDir }}/code/dotfiles
 # Melissa 01
 interpreters:
   sh:
+    # this is WSL, it start bash in WSL,
+    # bash here is C:\Windows\system32\bash.exe
     command: "bash"
 {{ end }}
 

@@ -2133,6 +2133,7 @@ main_python() {
 
   # Pre-commit
   # https://pre-commit.com/#installation
+  # works on windows and linux
   util_install_pipx pre-commit
 
   # https://github.com/yt-dlp/yt-dlp#installation
