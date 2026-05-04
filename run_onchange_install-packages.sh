@@ -2063,7 +2063,9 @@ main_brew() {
   # install crictl
   # https://formulae.brew.sh/formula/cri-tools
   # https://github.com/kubernetes-sigs/cri-tools/releases
-  util_install_brew "cri-tools"
+  # This is a local app, not a client one. It will connect
+  # to the container runtime via file
+  # util_install_brew "cri-tools"
 
   # install editor config checker
   install_editorconfig_checker_brew
