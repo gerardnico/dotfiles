@@ -924,7 +924,12 @@ install_gpg() {
   # https://packages.debian.org/bookworm/gpg
   # https://packages.debian.org/bookworm/gpg-agent
   echo "gpg command installation"
+
+  # double installation case on debian
+  # dpkg -l | grep -E 'gnupg|gpg'
+  # sudo apt -y remove gpg gpg-agent
   # sudo apt -y install gnupg2 gnupg-agent
+
   # Note brew pass installation require gpg with brew
   # so we get it already normally
   brew install gpg
