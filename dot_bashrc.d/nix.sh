@@ -13,3 +13,6 @@ fi
 # Most users will want the stable/large channel
 # https://channels.nixos.org/
 # export NIX_PATH="nixpkgs=channel:nixos-24.11"
+# See also the nixpkgs channel value: nix-channel --list
+# Set the channel
+# nix-channel --add https://nixos.org/channels/nixos-25.11-small nixpkgs

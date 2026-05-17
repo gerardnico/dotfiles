@@ -46,4 +46,4 @@ else
   echo "$CLAUDE_INSTRUCTION_FILE detected"
 fi
 
-"$CLAUDE_PATH" "$*"
+"$CLAUDE_PATH" "$@"

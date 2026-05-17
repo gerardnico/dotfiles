@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# ngrok wrapper
+
+# https://dashboard.ngrok.com/get-started/your-authtoken
+export NGROK_AUTHTOKEN
+NGROK_AUTHTOKEN=$(pass ngrok/auth-token)
+
+"$(which -a ngrok | sed -n '2p')" "$@"

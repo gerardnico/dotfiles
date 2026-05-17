@@ -133,6 +133,28 @@ install_nodejs_npm_gemini() {
   echo "gemini installation done"
 }
 
+# https://dashboard.ngrok.com/get-started/setup/linux
+# ngrok brew: # https://formulae.brew.sh/cask/ngrok
+# is only for macos, so no util_install_brew ngrok --cask ngrok
+install_ngrok_apt() {
+  if util_command_exists ngrok; then
+    echo "ngrok found"
+    return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "ngrok Installation on windows not done"
+    return
+  fi
+  echo "Installing Ngrok"
+  curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc \
+    | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null \
+    && echo "deb https://ngrok-agent.s3.amazonaws.com bookworm main" \
+    | sudo tee /etc/apt/sources.list.d/ngrok.list \
+    && sudo apt update \
+    && sudo apt install ngrok
+  echo "Ngrok installed"
+}
+
 # https://code.claude.com/docs/en/sandboxing
 install_claude_sandboxing_bubblewrap_apt() {
 
@@ -972,7 +994,13 @@ install_inotify_tools_brew() {
 # Install from brew
 util_install_brew() {
   COMMAND=${1}
-  FORMULA=${2:-${1}}
+  # install may use a cask
+  # example: brew install --cask ngrok, work only on macos
+  if [ "$#" -gt 1 ]; then
+      INSTALL_ARGS=("${@:2}")
+  else
+      INSTALL_ARGS=("$1")
+  fi
   if util_command_exists "${COMMAND}"; then
     echo "${COMMAND} found"
     return
@@ -981,8 +1009,8 @@ util_install_brew() {
     echo "Not yet done $COMMAND installation on windows"
     return
   fi
-  echo "Installing $COMMAND"
-  brew install "$FORMULA"
+  echo "Installing $COMMAND with args ${INSTALL_ARGS[*]}"
+  brew install "${INSTALL_ARGS[@]}"
   echo "$COMMAND installed"
 
 }
@@ -2111,6 +2139,9 @@ main_os_packager_apt() {
 
   # install bubblewrap sandbox
   install_claude_sandboxing_bubblewrap_apt
+
+  # install ngrok
+  install_ngrok_apt
 
 }
 
