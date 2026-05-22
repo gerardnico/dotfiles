@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# posthog-cli wrapper
+
+# https://dashboard.ngrok.com/get-started/your-authtoken
+# Personal API key with error tracking write and organization read scopes
+export POSTHOG_CLI_API_KEY
+POSTHOG_CLI_API_KEY=$(pass posthog/map-upload-api-key)
+
+"$(which -a posthog-cli | sed -n '2p')" "$@"

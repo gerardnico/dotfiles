@@ -661,7 +661,7 @@ util_install_npm() {
     return
   fi
   if ! util_command_exists npm; then
-    echo "npm not founds !!! Install first node"
+    echo "npm not founds !!! Install node first"
     return 1
   fi
   echo "Installing $COMMAND"
@@ -2090,6 +2090,10 @@ main_brew() {
   util_install_brew "whisper-cli" "whisper-cpp"
   install_whisper_base_model_brew
 
+  # tofu
+  # https://opentofu.org/docs/intro/install/homebrew/
+  util_install_brew tofu opentofu
+
   # install github cli
   install_github_cli_brew_winget
 
@@ -2190,6 +2194,7 @@ main_python() {
 }
 
 main_node() {
+
   # Install node
   install_nodejs
 
@@ -2201,6 +2206,9 @@ main_node() {
 
   # svgo
   util_install_npm svgo
+
+  # posthog-cli
+  util_install_npm "posthog-cli" "@posthog/cli"
 
 }
 
