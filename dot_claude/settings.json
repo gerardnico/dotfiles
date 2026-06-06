@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "apiKeyHelper": "claude-api-key-helper",
   "hooks": {
     "PreToolUse": [

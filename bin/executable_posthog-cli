@@ -4,6 +4,11 @@
 # https://dashboard.ngrok.com/get-started/your-authtoken
 # Personal API key with error tracking write and organization read scopes
 export POSTHOG_CLI_API_KEY
-POSTHOG_CLI_API_KEY=$(pass posthog/map-upload-api-key)
+POSTHOG_CLI_API_KEY="$(pass posthog/map-upload-api-key)"
+export POSTHOG_CLI_HOST
+POSTHOG_CLI_HOST="$(pass gerardnico/nico/posthog-ui-host)"
+export POSTHOG_CLI_PROJECT_ID
+POSTHOG_CLI_PROJECT_ID="$(pass gerardnico/nico/posthog-project-id)"
+
 
 "$(which -a posthog-cli | sed -n '2p')" "$@"

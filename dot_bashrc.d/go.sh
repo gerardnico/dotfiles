@@ -17,9 +17,9 @@
   # export GOROOT=/usr/local/go
   # export PATH=$GOROOT/bin:$PATH
 # fi
+export GOPATH="$HOME/go"
 
-export GOPATH=$HOME/go
 # idempotent (why for whatever reason, idea calls profile 2 times when starting its terminal)
 if [[ ":$PATH:" != *":$GOPATH:"* ]]; then
-  export PATH=$GOPATH/bin:$PATH
+  export PATH="$GOPATH/bin:$PATH"
 fi

@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Local setup for project agent
+
+
+
+
+create_claude_symlink() {
+  local SOURCE="$1"
+  local TARGET="$2"
+
+
+  if [[ ! -f "$SOURCE" ]]; then
+    echo "Claude Source file not found: $SOURCE"
+    return
+  fi
+
+  if [[ -L "$TARGET" ]]; then
+    echo "Claude symlink found: $TARGET -> $(readlink "$TARGET")"
+    return
+  fi
+
+  if [[ -f "$TARGET" ]]; then
+    echo "A regular file already exists at $TARGET — refusing to overwrite."
+    return
+  fi
+
+  ln -s "$SOURCE" "$TARGET"
+  echo "Link created: $SOURCE -> $TARGET"
+}
+
+if [[ ! -d "./.claude" ]]; then
+  mkdir -p "./.claude"
+fi
+
+# Claude
+SOURCE="$HOME/.claude/settings.local.json"
+TARGET="$PROJECT_DIR/.claude/settings.local.json"
+create_claude_symlink $SOURCE $TARGET
+
+# Claude
+SOURCE="$PROJECT_DIR/AGENT.md"
+TARGET="$PROJECT_DIR/CLAUDE.md"
+create_claude_symlink $SOURCE $TARGET
