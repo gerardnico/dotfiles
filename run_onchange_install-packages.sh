@@ -1075,6 +1075,7 @@ install_zenity_pinentry_apt() {
   echo "Zenity installed"
 }
 
+
 install_vagrant() {
   if util_command_exists vagrant; then
     echo "Vagrant Found"
@@ -1523,7 +1524,8 @@ install_netcat() {
 
 # List open files on Linux/Darwin
 # https://github.com/lsof-org/lsof
-install_net_lsof() {
+#
+install_net_lsof_apt() {
 
   if util_command_exists lsof; then
     echo "lsof installed"
@@ -1535,7 +1537,8 @@ install_net_lsof() {
     return
   fi
   echo "Installing lsof"
-  brew install lsof
+  # not as brew because root needs it brew install lsof
+  sudo apt install lsof -y
   echo "lsof installed"
 
 }
@@ -2135,8 +2138,16 @@ main_os_packager_apt() {
   # the default for our ssh askpass program
   install_zenity_pinentry_apt
 
+  # Needs to be in the system, not brew as it must run as sudo
+  # to see all processes
+  # https://github.com/lsof-org/lsof
+  sudo apt install lsof -y
+
   # install unzip
   install_unzip_os_packager
+
+  # Install lsof
+  install_net_lsof_apt
 
   # install openjdk
   install_openjdk_os_packager
@@ -2293,9 +2304,6 @@ main() {
 
   # Install commitlint
   install_nodejs_commitlint
-
-  # Install lsof
-  install_net_lsof
 
   # Install netstat
   install_netstat

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# A npm wrapper to be logged in in npm (ie release)
+
+# The repo should have a file called .npmrc and have this conf:
+# //registry.npmjs.org/:_authToken=${NPM_TOKEN}
+export NPM_TOKEN
+NPM_TOKEN=$(pass npm/release-token)
+
+yarn release-it "$@"
