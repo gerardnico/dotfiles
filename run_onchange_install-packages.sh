@@ -1574,9 +1574,9 @@ install_git_repos() {
   fi
 
   # the bash lib (ssh-x depend on it)
-  if [ ! -d "$HOME/code/bash-lib" ]; then
+  if [ ! -d "$HOME/code/gerardnico/bash-lib" ]; then
     echo "Install Bash Lib"
-    git clone git@github.com:gerardnico/bash-lib.git "$HOME/code/bash-lib"
+    git clone git@github.com:gerardnico/bash-lib.git "$HOME/code/gerardnico/bash-lib"
   else
     echo "Repo Bash Lib present"
   fi

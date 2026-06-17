@@ -2,7 +2,7 @@
 # A pass wrapper to intercept who is calling pass
 
 set -Eeuo pipefail
-export PATH=${SSH_BASHLIB_LIBRARY_PATH}:$PATH
+export PATH="$BASHLIB_PATH:$PATH"
 
 # Trying to see who call it
 source "bashlib-stack.sh"

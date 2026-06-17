@@ -9,7 +9,7 @@ unset SSH_BIN
 # Private Key in pass
 export SSH_X_KEY_STORE="pass"
 
-export SSH_BASHLIB_LIBRARY_PATH="$HOME/code/bash-lib/lib"
+export SSH_BASHLIB_LIBRARY_PATH="$HOME/code/gerardnico/bash-lib/lib"
 
 # A caller logs
 export SSH_X_CALLERS_LOG=$HOME/code/nico/tmp
