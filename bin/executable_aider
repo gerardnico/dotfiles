@@ -7,12 +7,12 @@
 PROJECT_NAME=${PROJECT_NAME:-}
 if [ "$PROJECT_NAME" == "" ]; then
   echo "Project Name env (PROJECT_NAME) is missing"
-  return 1
+  exit 1
 fi
 ORGANIZATION_NAME=${ORGANIZATION_NAME:-}
 if [ "$ORGANIZATION_NAME" == "" ]; then
   echo "Organization Name env (ORGANIZATION_NAME) is missing"
-  return 1
+  exit 1
 fi
 
 DEFAULT="$(which -a aider | sed -n '2p')"
@@ -20,7 +20,7 @@ AIDER_PATH=${AIDER_PATH:-"$DEFAULT"}
 if ! [ -f "$AIDER_PATH" ]; then
   echo "Aider not found at $AIDER_PATH."
   echo "Possible Solutions: Set the AIDER_PATH env to another path"
-  return 1
+  exit 1
 fi
 
 case "${LLM:-}" in
@@ -42,18 +42,28 @@ case "${LLM:-}" in
 *)
   echo "LLM ${LLM:-} is unknown"
   echo "Set LLM env to openai, claude or openrouter"
-  return 1
+  exit 1
   ;;
 esac
 
+get_api_key(){
+  local LLM_KEY_PATH=$1
+  local LLM_KEY
+  if ! LLM_KEY=$(pass "$LLM_KEY_PATH" 2>/dev/null); then
+      echo "${LLM:-} Api Key Not Found at $LLM_KEY_PATH" >/dev/stderr
+      return 1
+  fi
+  echo "${LLM:-} Api Key Found at $LLM_KEY_PATH" >/dev/stderr
+  echo "$LLM_KEY"
+}
+
 LLM_KEY_PATH="${PROVIDER}/${ORGANIZATION_NAME}/${PROJECT_NAME}"
-if ! LLM_KEY=$(pass "$LLM_KEY_PATH"); then
-  echo "${LLM:-} Api Key Not Found at $LLM_KEY_PATH"
+if ! LLM_KEY=$(get_api_key "$LLM_KEY_PATH"); then
   LLM_KEY_PATH="${PROVIDER}/${ORGANIZATION_NAME}/default"
-fi
-if ! LLM_KEY=$(pass "$LLM_KEY_PATH"); then
-  echo "${LLM:-} Api Key Not Found at $LLM_KEY_PATH"
-  return 1
+  if ! LLM_KEY=$(get_api_key "$LLM_KEY_PATH"); then
+    exit 1
+  fi
 fi
 
+echo "Starting Aider with ${LLM:-}"
 eval "$ENV_NAME=$LLM_KEY $AIDER_PATH $*"
