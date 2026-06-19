@@ -31,12 +31,12 @@ repos:
     rev: e46582c # v9.23.0
     hooks:
       # equivalent to:
-      # commitlint --extends '@commitlint/config-conventional' --verbose --edit  "$1"
+      # commitlint --extends '@commitlint/config-conventional' --config .config/commitlint.config.js --verbose --edit  "$1"
       - id: commitlint
         name: check commit message
         stages: [ commit-msg ]
         additional_dependencies: [ '@commitlint/config-conventional' ]
-        args: [ "--verbose", "--config", ".config/commitlint.config.js" ]
+        args: [ "--verbose", "--config", ".config/commitlint.config.mjs" ]
   - repo: https://github.com/combostrap/devfiles
     rev: "v0.1.8"
     hooks:

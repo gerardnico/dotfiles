@@ -1537,7 +1537,7 @@ install_net_lsof_apt() {
     return
   fi
   echo "Installing lsof"
-  # not as brew because root needs it brew install lsof
+  # not as brew because root needs it (brew install lsof but for the user)
   sudo apt install lsof -y
   echo "lsof installed"
 
@@ -2141,13 +2141,11 @@ main_os_packager_apt() {
   # Needs to be in the system, not brew as it must run as sudo
   # to see all processes
   # https://github.com/lsof-org/lsof
-  sudo apt install lsof -y
+  # Install lsof
+  install_net_lsof_apt
 
   # install unzip
   install_unzip_os_packager
-
-  # Install lsof
-  install_net_lsof_apt
 
   # install openjdk
   install_openjdk_os_packager
@@ -2223,6 +2221,31 @@ main_node() {
 
 }
 
+# https://litestream.io/install/linux/
+install_litestream_bash(){
+  if util_command_exists litestream; then
+      echo "litestream founds"
+      return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "litestream installation on Windows not yet done"
+    return 1
+  fi
+  echo "litestream installation"
+  local INSTALL_DIR=/tmp/litestream-install
+  mkdir -p $INSTALL_DIR
+  (
+    mkdir -p $INSTALL_DIR
+    cd $INSTALL_DIR
+    wget https://github.com/benbjohnson/litestream/releases/download/v0.5.8/litestream-0.5.8-linux-x86_64.deb
+    sudo dpkg -i litestream-0.5.8-linux-x86_64.deb
+    rm -rf $INSTALL_DIR
+  )
+  brew install node
+  echo "litestream installed"
+
+}
+
 # Install via a bash script
 main_bash() {
 
@@ -2234,6 +2257,9 @@ main_bash() {
 
   # Install Sprite
   install_sprite_bash
+
+  # Install Litestream
+  install_litestream_bash
 
 }
 
