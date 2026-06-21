@@ -2221,6 +2221,7 @@ main_node() {
 
 }
 
+# brew is supported as seen here: https://github.com/benbjohnson/litestream/releases
 # https://litestream.io/install/linux/
 install_litestream_bash(){
   if util_command_exists litestream; then
@@ -2232,16 +2233,17 @@ install_litestream_bash(){
     return 1
   fi
   echo "litestream installation"
-  local INSTALL_DIR=/tmp/litestream-install
-  mkdir -p $INSTALL_DIR
-  (
-    mkdir -p $INSTALL_DIR
-    cd $INSTALL_DIR
-    wget https://github.com/benbjohnson/litestream/releases/download/v0.5.8/litestream-0.5.8-linux-x86_64.deb
-    sudo dpkg -i litestream-0.5.8-linux-x86_64.deb
-    rm -rf $INSTALL_DIR
-  )
-  brew install node
+  brew tap benbjohnson/litestream
+  brew install litestream
+#  local INSTALL_DIR=/tmp/litestream-install
+#  mkdir -p $INSTALL_DIR
+#  (
+#    mkdir -p $INSTALL_DIR
+#    cd $INSTALL_DIR
+#    wget https://github.com/benbjohnson/litestream/releases/download/v0.5.8/litestream-0.5.8-linux-x86_64.deb
+#    sudo dpkg -i litestream-0.5.8-linux-x86_64.deb
+#    rm -rf $INSTALL_DIR
+#  )
   echo "litestream installed"
 
 }
@@ -2277,6 +2279,8 @@ main() {
   main_brew
 
   # bash installer
+  echo ""
+  echo "Manual Bash installation"
   main_bash
 
   # install pass

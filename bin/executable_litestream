@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Wrapper script to get the appropriate key
+
+export LITESTREAM_ACCESS_KEY_ID
+LITESTREAM_ACCESS_KEY_ID=$(pass idrive/sqlite-backup-access-key-id)
+export LITESTREAM_SECRET_ACCESS_KEY
+LITESTREAM_SECRET_ACCESS_KEY=$(pass idrive/sqlite-backup-secret-access-key)
+
+echo "Starting Litestream Wrapper"
+"$(which -a litestream | sed -n '2p')" "$@"

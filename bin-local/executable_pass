@@ -2,6 +2,11 @@
 # A pass wrapper to intercept who is calling pass
 
 set -Eeuo pipefail
+if [ "$BASHLIB_PATH" == "" ]; then
+  echo "Error: BASHLIB_PATH not found"
+  exit 1
+fi
+
 export PATH="$BASHLIB_PATH:$PATH"
 
 # Trying to see who call it
