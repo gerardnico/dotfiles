@@ -34,6 +34,5 @@ DROP TABLE BLOG;
 
 ```bash
 migrate up
-migrate down
-migrate up
+migrate redo
 ```
