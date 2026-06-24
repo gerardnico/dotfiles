@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Wrapper to inject the token
+
+export GH_TOKEN
+GH_TOKEN=$(pass github/gh-token)
+
+# Take the second vault
+"$(which -a gh | sed -n '2p')" "$@"

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Wrapper
+# You need to activate a context (same as kubectl) before using it
+# hcloud context create --token-from-env kubee
+
+export HCLOUD_TOKEN
+HCLOUD_TOKEN=$(pass hetzner/hcloud-cli-token)
+
+# Take the second vault
+"$(which -a hcloud | sed -n '2p')" "$@"

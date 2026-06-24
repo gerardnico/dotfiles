@@ -1274,9 +1274,10 @@ install_go_json_to_yaml() {
 
 }
 
-# gojsontoyaml app
+
 # https://github.com/hetznercloud/cli/releases/
-install_go_hcloud() {
+# brew is supported https://github.com/hetznercloud/cli/blob/main/docs/tutorials/setup-hcloud-cli.md#15-installation-using-homebrew
+install_hcloud_brew() {
 
   local BINARY="hcloud"
 
@@ -1285,7 +1286,7 @@ install_go_hcloud() {
     return
   fi
 
-  install_from_github_go_release "hetznercloud/cli" "$BINARY" "1.65.0"
+  util_install_brew BINARY
 
 }
 
@@ -2177,6 +2178,9 @@ main_brew() {
   # uv / python manager
   install_uv_brew
 
+  # Install hcloud
+  install_hcloud_brew
+
 }
 
 # Package Manager or just file
@@ -2320,8 +2324,6 @@ main_go_release(){
   # Install utility gojsontoyaml
   install_go_json_to_yaml
 
-  # Install hcloud
-  install_go_hcloud
 
 }
 
