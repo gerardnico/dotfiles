@@ -206,6 +206,36 @@ winget_package_play() {
 
 }
 
+curl_archive_from_github(){
+  local REPO="$1"
+  local BINARY="$2" # The project
+  local VERSION="$3"
+  local TEMP_DIR="$4"
+
+  ARCHIVE_NAMES=(
+    "${BINARY}_${VERSION}_$(get_os_name)_$(get_cpu_arch_name).tar.gz"
+    # some have no version and minus instead of underscore
+    "${BINARY}-$(get_os_name)-$(get_cpu_arch_name).tar.gz"
+  )
+  i=0
+  while [ $i -lt ${#ARCHIVE_NAMES[@]} ]; do
+    ARCHIVE_NAME="${ARCHIVE_NAMES[$i]}"
+    ((i++))
+    DOWNLOAD_URL="https://github.com/$REPO/releases/download/v${VERSION}/$ARCHIVE_NAME"
+    echo "Downloading $i - $ARCHIVE_NAME..." 1>&2
+    status=$(curl -s -L -o "$TEMP_DIR/$ARCHIVE_NAME" -w "%{http_code}" "$DOWNLOAD_URL")
+    if [ "$status" -eq 200 ]; then
+      echo "$ARCHIVE_NAME"
+      return
+    fi
+    echo "Error $status while downloading $ARCHIVE_NAME..." 1>&2
+    echo "   Does the URL exists? $DOWNLOAD_URL" 1>&2
+  done
+
+  echo "Error: we could not download the archive" 1>&2
+  return 1
+
+}
 # Install from a standard go release in github
 # Binary
 # Version
@@ -218,16 +248,19 @@ install_from_github_go_release() {
   local FINAL_BINARY="${4:-$BINARY}"
   echo "Installing $BINARY version $VERSION"
 
-  # Download URL
-  ARCHIVE_NAME="${BINARY}_${VERSION}_$(get_os_name)_$(get_cpu_arch_name).tar.gz"
-  DOWNLOAD_URL="https://github.com/$REPO/releases/download/v${VERSION}/$ARCHIVE_NAME"
-  echo "Downloading $ARCHIVE_NAME..."
   # Temporary directory for extraction
   TEMP_DIR=$(mktemp -d)
-  curl -L -o "$TEMP_DIR/$ARCHIVE_NAME" "$DOWNLOAD_URL"
+  # Download URL
+  if ! ARCHIVE_NAME=$(curl_archive_from_github "$REPO" "$BINARY" "$VERSION" "$TEMP_DIR"); then
+    exit 1
+  fi
 
-  echo "Extracting archive..."
-  tar -xzf "$TEMP_DIR/$ARCHIVE_NAME" -C "$TEMP_DIR"
+  echo "Extracting archive $ARCHIVE_NAME"
+  if ! tar -xzf "$TEMP_DIR/$ARCHIVE_NAME" -C "$TEMP_DIR"; then
+    echo "Error: while extracting the archive"
+    exit 1
+  fi
+
   # Find the binary in the extracted files
   BINARY_PATH=$(find "$TEMP_DIR" -name "${FINAL_BINARY}" -type f)
   # Check if binary was found
@@ -1240,6 +1273,22 @@ install_go_json_to_yaml() {
   install_from_github_go_release "brancz/gojsontoyaml" "$BINARY" "0.1.0"
 
 }
+
+# gojsontoyaml app
+# https://github.com/hetznercloud/cli/releases/
+install_go_hcloud() {
+
+  local BINARY="hcloud"
+
+  if util_command_exists "$BINARY"; then
+    echo "$BINARY is already installed"
+    return
+  fi
+
+  install_from_github_go_release "hetznercloud/cli" "$BINARY" "1.65.0"
+
+}
+
 
 # https://github.com/google/go-jsonnet
 install_jsonnet() {
@@ -2265,6 +2314,17 @@ main_bash() {
 
 }
 
+# Install from download of Go Github binary
+main_go_release(){
+
+  # Install utility gojsontoyaml
+  install_go_json_to_yaml
+
+  # Install hcloud
+  install_go_hcloud
+
+}
+
 ## Installation
 main() {
 
@@ -2297,7 +2357,11 @@ main() {
 
   main_python
 
+  # from node
   main_node
+
+  # go release from github
+  main_go_release
 
   # Install openoffice
   install_openoffice
@@ -2413,8 +2477,6 @@ main() {
   install_cert_manager_cmctl
   # Install jsonnet bundler (package manager)
   install_jsonnet_bundler_manager
-  # Install utility gojsontoyaml
-  install_go_json_to_yaml
   # Install jsonnet
   install_jsonnet
 
