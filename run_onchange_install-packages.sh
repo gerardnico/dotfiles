@@ -122,16 +122,8 @@ install_unzip_os_packager() {
 
 }
 
-# https://geminicli.com/docs/get-started/installation/
-install_nodejs_npm_gemini() {
-  if util_command_exists gemini; then
-    echo "gemini found"
-    return
-  fi
-  echo "gemini installation"
-  npm install -g @google/gemini-cli
-  echo "gemini installation done"
-}
+
+
 
 # https://dashboard.ngrok.com/get-started/setup/linux
 # ngrok brew: # https://formulae.brew.sh/cask/ngrok
@@ -2264,13 +2256,17 @@ main_node() {
   install_nodejs_npm_markdown_check
 
   # Gemini
-  install_nodejs_npm_gemini
+  # https://geminicli.com/docs/get-started/installation/
+  util_install_npm "gemini" "@google/gemini-cli"
 
   # svgo
-  util_install_npm svgo
+  util_install_npm "svgo"
 
   # posthog-cli
   util_install_npm "posthog-cli" "@posthog/cli"
+
+  # https://www.npmjs.com/package/mjml
+  util_install_npm "mjml"
 
 }
 
