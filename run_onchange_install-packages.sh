@@ -2245,6 +2245,11 @@ main_python() {
   # transcript-downloader
   util_install_pipx transcribe "$HOME/code/gerardnico/transcribe"
 
+  # html2text
+  # to get text template from html
+  # https://github.com/Alir3z4/html2text
+  util_install_pipx html2text
+
 }
 
 main_node() {
