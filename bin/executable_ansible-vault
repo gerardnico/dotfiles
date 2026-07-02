@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 # Wrapper to inject the token
-
-args=("$@")
-
-if [[ "${1}" == "decrypt" ]]; then
-  args+=("--vault-password-file" "<(pass ansible/vault-password)")
-fi
+# sudo apt install opendkim-tools
 
 # Take the second vault
-"$(which -a ansible-vault | sed -n '2p')" "${args[@]}"
+ANSIBLE_PATH="$(which -a ansible-vault | sed -n '2p')"
+
+# Add for decrypt
+if [[ "${1}" == "decrypt" ]]; then
+  # Unfortunately there's no clean way to store a process substitution in a variable and have it expand correctly later
+  $ANSIBLE_PATH "$@" --vault-password-file <(pass ansible/vault-password)
+  exit $?
+fi
+
+$ANSIBLE_PATH "$@"

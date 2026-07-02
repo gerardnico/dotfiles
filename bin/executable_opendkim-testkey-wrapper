@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Wrapper to inject the private key
+
+# the private key to be readable only by the owner (600 or stricter).
+umask 077
+
+
+TMPDIR="$HOME/tmp/dkim-test"
+mkdir -p "$TMPDIR"
+PRIVATE_KEY_PATH="$TMPDIR/dkim"
+pass tower/dkim_private_key > "$PRIVATE_KEY_PATH"
+
+opendkim-testkey -k "$PRIVATE_KEY_PATH" -vvv "$@"
+
+rm -rf "$TMPDIR"
