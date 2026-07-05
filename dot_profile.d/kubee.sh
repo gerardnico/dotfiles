@@ -5,7 +5,7 @@
 ##############################
 
 # Adding nkubee in the PATH
-NKUBEE_DIR=$HOME/code/bytle/kubee/contrib/scripts-global
+NKUBEE_DIR=$HOME/code/combostrap/kubee/contrib/scripts-global
 if [[ ":$PATH:" != *":$NKUBEE_DIR:"* ]]; then
   # for an unknown reason, this script is called twice
   # we check if the nkubee dir is already in the PATH
@@ -21,11 +21,12 @@ export HELM_BIN="kubee helm"
 export HELM_MAX_HISTORY=3
 
 # Alert Manager Connection for the API
-export KUBEE_ALERT_MANAGER_URL=https://alertmanager.eraldy.com
+KUBEE_SERVER="188-245-43-250"
+export KUBEE_ALERT_MANAGER_URL="https://alertmanager-${KUBEE_SERVER}.sslip.io/#/alerts"
 export KUBEE_ALERT_MANAGER_BASIC_AUTH_PASS_USER=alert-manager/user
 export KUBEE_ALERT_MANAGER_BASIC_AUTH_PASS_PASSWORD=alert-manager/password
 
 # Prometheus Connection for PromTool
-export KUBEE_PROM_URL=https://prometheus.eraldy.com
+export KUBEE_PROM_URL="https://prometheus-${KUBEE_SERVER}.sslip.io"
 export KUBEE_PROM_BASIC_AUTH_PASS_USER=alert-manager/user
 export KUBEE_PROM_BASIC_AUTH_PASS_PASSWORD=alert-manager/password
