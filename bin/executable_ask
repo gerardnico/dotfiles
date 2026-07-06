@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
+set -Eeuo pipefail
 
 source bashlib-echo.sh
-source bashlib-error.sh
-error::set_trap
+
 
 to_uri() {
   s="${1//'%'/%25}"

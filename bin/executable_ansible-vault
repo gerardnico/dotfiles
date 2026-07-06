@@ -2,6 +2,8 @@
 # Wrapper to inject the token
 # sudo apt install opendkim-tools
 
+set -Eeuo pipefail
+
 # Take the second vault
 ANSIBLE_PATH="$(which -a ansible-vault | sed -n '2p')"
 

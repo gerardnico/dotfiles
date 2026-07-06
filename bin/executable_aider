@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+set -Eeuo pipefail
 # Aider Wrapper script to get the appropriate key
 # by project
 

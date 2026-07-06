@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Local setup for project agent
-
-
+set -Eeuo pipefail
 
 
 create_claude_symlink() {
