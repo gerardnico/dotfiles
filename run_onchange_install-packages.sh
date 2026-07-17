@@ -2243,7 +2243,13 @@ main_python() {
   util_install_pipx yt-dlp
 
   # transcript-downloader
-  util_install_pipx transcribe "$HOME/code/gerardnico/transcribe"
+  local transcribe_home="$HOME/code/gerardnico/transcribe"
+  if [ -d "$transcribe_home" ]; then
+    util_install_pipx transcribe "$transcribe_home"
+  else
+    echo "No transcribe directory found, no installation"
+  fi
+
 
   # html2text
   # to get text template from html
