@@ -2125,6 +2125,9 @@ main_brew() {
   # can't add ? @0.14.2
   util_install_brew "typst"
 
+  # duckdb
+  util_install_brew "duckdb"
+
   # install whois
   # https://github.com/rfc1036/whois
   util_install_brew "whois"
