@@ -103,6 +103,19 @@ install_claude_code_bash() {
   echo "claude installation done"
 }
 
+# https://openrouter.ai/docs/guides/ori/harness
+install_openrouter_ori_harness_bash() {
+  # it's installed on local bin, we have our own
+  local ORI_PATH=${ORI_PATH:-"$HOME/.local/bin/ori"}
+  if [ -f "$ORI_PATH" ]; then
+    echo "ori found"
+    return
+  fi
+  echo "ori installation"
+  curl -fsSL https://openrouter.ai/labs/ori/install.sh | bash
+  echo "ori installation done"
+}
+
 install_unzip_os_packager() {
 
   if util_command_exists unzip; then
@@ -2117,7 +2130,7 @@ main_brew() {
   # install ffmpeg
   # scoop install ffmpeg on windows
   # this is: https://www.gyan.dev/ffmpeg/builds/ that is advertised on the ffmpeg install page
-  util_install_brew ffmpeg
+  util_install_brew "ffmpeg"
 
   # typst
   # https://typst.app/open-source/#download
@@ -2316,6 +2329,9 @@ main_bash() {
 
   # Install Claude
   install_claude_code_bash
+
+  # Install Ori Harness
+  install_openrouter_ori_harness_bash
 
   # Install mitm
   install_mitmproxy_bash
