@@ -5,13 +5,13 @@ description: General rules to use for code generation
 
 ## Development environment
 
-The developer is using the IntelliJ IDEA on Windows
-and the project are stored on WSL.
+* The developer is using the IntelliJ IDEA editor on Windows
+* The projects are stored on Windows WSL.
 
 ## General Coding Guidelines
 
-* Don't use global scoped variables. You should pass the variables in the function argument for instance via a context
-  object
+Don't use global scoped variables. You should pass the variables
+in the function argument for instance via a context object
 
 ## Environment Variables
 
