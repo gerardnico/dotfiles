@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# "$(which -a git | sed -n '2p')" "$@"
+ORI_PATH=${ORI_PATH:-"$HOME/.local/bin/ori"}
+if ! [ -f "$ORI_PATH" ]; then
+  echo "Ori not found at $ORI_PATH."
+  echo "Possible Solutions: ori is not installed"
+  echo "Possible Solutions: Set the ORI_PATH env to another path"
+  exit 1
+fi
+
+# Ori Wrapper script to inject the convention file
+OPENROUTER_API_KEY_PATH="gerardnico/openrouter/api-key"
+export OPENROUTER_API_KEY
+if ! OPENROUTER_API_KEY=$(pass "$OPENROUTER_API_KEY_PATH" 2>/dev/null); then
+  echo "${LLM:-} Api Key Not Found at $OPENROUTER_API_KEY_PATH" >/dev/stderr
+  exit 1
+fi
+
+# set the real bin (claude, pi, ...) path first
+# ie $HOME/.local/bin/claude
+# "$(which -a claude | sed -n '2p')" "$@"
+export PATH="$HOME/.local/bin:$PATH"
+
+# agent setup
+if command -v "agent-setup" > /dev/null 2>&1; then
+  agent-setup
+else
+  echo "Agent Setup Not Found"
+fi
+
+"$ORI_PATH" "$@"

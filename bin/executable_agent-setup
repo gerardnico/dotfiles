@@ -31,12 +31,17 @@ if [[ ! -d "./.claude" ]]; then
   mkdir -p "./.claude"
 fi
 
+if [ "${PROJECT_DIR}" == "" ]; then
+  echo "Not a project directory. Exiting"
+  exit 0
+fi
+
 # Claude
 SOURCE="$HOME/.claude/settings.local.json"
 TARGET="$PROJECT_DIR/.claude/settings.local.json"
-create_claude_symlink $SOURCE $TARGET
+create_claude_symlink "$SOURCE" "$TARGET"
 
 # Claude
 SOURCE="$PROJECT_DIR/AGENT.md"
 TARGET="$PROJECT_DIR/CLAUDE.md"
-create_claude_symlink $SOURCE $TARGET
+create_claude_symlink "$SOURCE" "$TARGET"
