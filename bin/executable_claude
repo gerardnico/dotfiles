@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -Eeuo pipefail
 
 # Claude Wrapper script to inject the convention file
 # Key is given by the api key helper claude-api-key-helper
@@ -32,7 +33,7 @@ if [ ! -f "$CLAUDE_INSTRUCTION_FILE" ]; then
   INSTRUCTION_FILE="./.agent/AGENT.md"
   if [ -f "$INSTRUCTION_FILE" ]; then
 
-    # We create a symlink otherwise we don't see it in the /context command
+
     ln -s "$INSTRUCTION_FILE" "CLAUDE.md"
     echo "Created symlink file ($INSTRUCTION_FILE)"
 
@@ -45,5 +46,14 @@ if [ ! -f "$CLAUDE_INSTRUCTION_FILE" ]; then
 else
   echo "$CLAUDE_INSTRUCTION_FILE detected"
 fi
+
+# Add these lines to the file:
+export OPENROUTER_API_KEY="<your-openrouter-api-key>"
+export ANTHROPIC_BASE_URL="https://openrouter.ai/api"
+export ANTHROPIC_AUTH_TOKEN="$OPENROUTER_API_KEY"
+# Important: Must be explicitly empty
+export ANTHROPIC_API_KEY=""
+# Optional: enables the gateway model picker
+export CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1
 
 "$CLAUDE_PATH" "$@"

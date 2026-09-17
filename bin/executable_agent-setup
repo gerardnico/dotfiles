@@ -3,18 +3,18 @@
 set -Eeuo pipefail
 
 
-create_claude_symlink() {
+create_symlink() {
   local SOURCE="$1"
   local TARGET="$2"
 
 
   if [[ ! -f "$SOURCE" ]]; then
-    echo "Claude Source file not found: $SOURCE"
+    echo "Source file not found: $SOURCE"
     return
   fi
 
   if [[ -L "$TARGET" ]]; then
-    echo "Claude symlink found: $TARGET -> $(readlink "$TARGET")"
+    echo "Symlink found: $TARGET -> $(readlink "$TARGET")"
     return
   fi
 
@@ -23,8 +23,10 @@ create_claude_symlink() {
     return
   fi
 
+  # We create a symlink otherwise we don't see it in the /context command
   ln -s "$SOURCE" "$TARGET"
   echo "Link created: $SOURCE -> $TARGET"
+
 }
 
 if [[ ! -d "./.claude" ]]; then
@@ -39,9 +41,11 @@ fi
 # Claude
 SOURCE="$HOME/.claude/settings.local.json"
 TARGET="$PROJECT_DIR/.claude/settings.local.json"
-create_claude_symlink "$SOURCE" "$TARGET"
+create_symlink "$SOURCE" "$TARGET"
 
 # Claude
+# Project Instruction file
 SOURCE="$PROJECT_DIR/AGENT.md"
 TARGET="$PROJECT_DIR/CLAUDE.md"
-create_claude_symlink "$SOURCE" "$TARGET"
+create_symlink "$SOURCE" "$TARGET"
+create_symlink "$PROJECT_DIR/.agent/AGENT.md" "$TARGET"
