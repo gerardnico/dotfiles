@@ -335,7 +335,7 @@ install_nodejs_npm_markdown_check() {
 
 }
 
-install_kubectl() {
+install_kubectl_brew() {
 
   if util_command_exists kubectl; then
     echo "Kubectl found"
@@ -351,6 +351,7 @@ install_kubectl() {
   echo "Kubectl installation done"
 
 }
+
 
 install_kubectl_oidc_login() {
 
@@ -491,6 +492,32 @@ install_php_composer() {
   # Error: Too many open files @ rb_sysopen - /home/linuxbrew/.linuxbrew/Cellar/util-linux/2.40.4/lib/libfdisk.so.1
   brew install composer
   echo "composer installation done"
+
+}
+
+# Vault Cli Installation
+# https://developer.hashicorp.com/vault/install#linux
+install_vault_apt(){
+
+  if util_command_exists vault; then
+      echo "vault founds"
+      return
+  fi
+  if [ "$CHEZMOI_OS" == "windows" ]; then
+    echo "Sorry vault installation on Windows not yet done"
+    return
+  fi
+  echo "vault installation"
+
+  wget --quiet -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+  if [ ! -x "$(command -v lsb_release)" ]; then
+    sudo apt install -y lsb-release
+  fi
+  echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+  sudo apt update && sudo apt install -y vault
+  echo "vault installed"
 
 }
 # https://sdkman.io/install
@@ -2218,6 +2245,9 @@ main_os_packager_apt() {
   # install ngrok
   install_ngrok_apt
 
+  # install vault
+  install_vault_apt
+
 }
 
 # Install python cli
@@ -2519,7 +2549,7 @@ main() {
   install_helm_plugin 'schema' 'https://github.com/dadav/helm-schema'
   install_helm_plugin 'diff' 'https://github.com/databus23/helm-diff'
   # Install kubectl and oidc-login
-  install_kubectl
+  install_kubectl_brew
   install_kubectl_oidc_login
   # Install swaks email client
   install_mail_swaks

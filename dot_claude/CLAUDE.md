@@ -2,3 +2,4 @@
 
 * You should format the text in Markdown.
 * You should use the backtick character to quote a word.
+* For separation use `:`, not `—`
