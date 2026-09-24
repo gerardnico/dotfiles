@@ -318,22 +318,6 @@ package_installed() {
   dpkg -l "$1" > /dev/null 2>&1
 }
 
-install_nodejs_npm_markdown_check() {
-
-  if util_command_exists markdown-link-check; then
-    echo "markdown-link-check found"
-    return
-  fi
-
-  if [ "$CHEZMOI_OS" == "windows" ]; then
-    echo "markdown-link-check on Windows not yet done"
-    return
-  fi
-  echo "markdown-link-check install"
-  npm install -g markdown-link-check
-  echo "markdown-link-check installation done"
-
-}
 
 install_kubectl_brew() {
 
@@ -722,6 +706,7 @@ util_install_pipx() {
 util_install_npm() {
   COMMAND=${1}
   PACKAGE=${2:-${1}}
+  OPTIONS=("${@:3}")
   if util_command_exists "${COMMAND}"; then
     echo "${COMMAND} found"
     return
@@ -731,7 +716,7 @@ util_install_npm() {
     return 1
   fi
   echo "Installing $COMMAND"
-  npm install -g "$PACKAGE"
+  npm install -g "${OPTIONS[@]}" "$PACKAGE"
   echo "$COMMAND installed"
 }
 
@@ -2305,13 +2290,13 @@ main_python() {
 
 }
 
-main_node() {
+main_node_npm() {
 
   # Install node
   install_nodejs
 
   # Markdown check
-  install_nodejs_npm_markdown_check
+  util_install_npm "markdown-link-check"
 
   # Gemini
   # https://geminicli.com/docs/get-started/installation/
@@ -2325,6 +2310,9 @@ main_node() {
 
   # https://www.npmjs.com/package/mjml
   util_install_npm "mjml"
+
+  # https://pi.dev/
+  util_install_npm "pi" "@earendil-works/pi-coding-agent" "--ignore-scripts"
 
 }
 
@@ -2417,7 +2405,7 @@ main() {
   main_python
 
   # from node
-  main_node
+  main_node_npm
 
   # go release from github
   main_go_release
