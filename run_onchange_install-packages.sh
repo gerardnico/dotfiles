@@ -509,7 +509,7 @@ install_sdkman() {
   # sdk man is a bash function and is not yet loaded
   # we check with the install directory
   # Note: $HOME/.sdkman is not enough as $HOME/.sdkman/etc may exist
-  if [ -d "$HOME/.sdkman/bin/sdkman-init.sh" ]; then
+  if [ -f "$HOME/.sdkman/bin/sdkman-init.sh" ]; then
     echo "sdkman founds"
     return
   fi
