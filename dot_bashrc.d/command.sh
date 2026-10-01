@@ -23,3 +23,11 @@ export HISTFILESIZE=500
 # number of lines or commands that are stored in memory
 # 500 = default
 export HISTSIZE=500
+
+# Reload the history
+# -a save pending line to disk
+# -n reload
+# -c clear the memory
+# -r reload the whole file
+# export PROMPT_COMMAND="history -a"
+export PROMPT_COMMAND="${PROMPT_COMMAND}history -a; history -n;"
