@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+
+# fixed value
+# and not: (which -a npm | sed -n '2p')
+# because it get started by software with the path
+DEFAULT="/home/linuxbrew/.linuxbrew/bin/npm"
+NPM_PATH=${NPM_PATH:-"$DEFAULT"}
+if ! [ -f "$NPM_PATH" ]; then
+  echo "npm not found at $NPM_PATH."
+  echo "Possible Solutions: Set the NPM_PATH env to another path"
+  exit 1
+fi
+
+# Get a token in ~/.npmrc with npm login
+# Copy and delte the ~/.npmrc after
+# The repo should have a file called .npmrc and have this conf:
+# //registry.npmjs.org/:_authToken=${NPM_TOKEN}
+export NPM_TOKEN
+NPM_TOKEN=$(pass npm/release-token)
+
+"$NPM_PATH" "$@"
