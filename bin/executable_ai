@@ -4,10 +4,10 @@ set -Eeuo pipefail
 # Aitm Wrapper script to inject env
 
 # "$(which -a git | sed -n '2p')" "$@"
-AITM_PATH=${AITM_PATH:-"$HOME/code/gerardnico/aitm/.venv/bin/aitm"}
+AITM_PATH=${AITM_PATH:-"$HOME/.virtualenvs/aitm/bin/aitm"}
 if ! [ -f "$AITM_PATH" ]; then
   echo "Aitm not found at $AITM_PATH."
-  echo "Possible Solutions: Claude is not installed"
+  echo "Possible Solutions: Aitm is not installed in the venv"
   echo "Possible Solutions: Set the AITM_PATH env to another path"
   exit 1
 fi
@@ -17,5 +17,8 @@ OPENROUTER_API_KEY=$(pass "gerardnico/openrouter/api-key")
 
 # Free
 export AITM_AGENT_DEFAULT_MODEL="stealth/space-bunny-alpha"
+
+# Runtime dir
+export AITM_RUNTIME_DIR="$HOME/code/gerardnico/aitm/.aitm"
 
 "$AITM_PATH" "$@"
