@@ -3,3 +3,6 @@ set -Eeuo pipefail
 
 
 ai nle "$@"
+
+# reload the history file
+history -r

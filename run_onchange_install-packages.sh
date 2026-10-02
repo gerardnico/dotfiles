@@ -1879,12 +1879,20 @@ install_scoop_windows_manager(){
 # https://github.com/pypa/pipx#install-pipx
 install_python_pipx() {
 
-  if util_command_exists pipx; then
-    echo "Pipx installed"
-    return
+  if [ -f "/usr/bin/pipx" ]; then
+      echo "Uninstalling pipx from apt"
+      # stay on old version
+      sudo apt remove -y pipx
   fi
 
+
+
+
   if [ "$CHEZMOI_OS" == "windows" ]; then
+    if util_command_exists pipx; then
+        echo "Pipx installed on Windows"
+        return
+    fi
     echo "Installing Pipx with scoop"
     scoop install pipx
     pipx ensurepath
@@ -1892,6 +1900,13 @@ install_python_pipx() {
     return
   fi
 
+  # check path of brew
+  # because it may be also on the path with a windows path
+  # ie /mnt/c/Users/ngera/scoop/shims/pipx
+  if [ -f "/home/linuxbrew/.linuxbrew/bin/pipx" ]; then
+    echo "Pipx installed on Linux"
+    return
+  fi
   echo "Installing Pipx"
   brew install pipx
   #  python3 -m pip install --user pipx
