@@ -29,3 +29,24 @@ When possible return optional construct instead of Null/None value
 ## Function Argumentation
 
 Use high level type instead of basic type. Example for an image, don't pass the format, pass the image object
+
+## Conditional expression
+
+In a function, try to return early.
+Don't use a serie of `if else else`
+
+```
+if condition1:
+else condition2:
+else condition3:
+else
+```
+
+but
+
+```
+if condition1:
+  return
+if condition2:
+  return
+```

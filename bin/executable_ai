@@ -15,8 +15,8 @@ fi
 export OPENROUTER_API_KEY
 OPENROUTER_API_KEY=$(pass "gerardnico/openrouter/api-key")
 
-# Free
-export AITM_AGENT_DEFAULT_MODEL="stealth/space-bunny-alpha"
+# Pretty cheap
+export AITM_AGENT_DEFAULT_MODEL="deepseek/deepseek-v4.1-flash"
 
 # Runtime dir
 export AITM_RUNTIME_DIR="$HOME/code/gerardnico/aitm/.aitm"
