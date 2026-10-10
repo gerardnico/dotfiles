@@ -17,6 +17,7 @@ OPENROUTER_API_KEY=$(pass "gerardnico/openrouter/api-key")
 
 # Pretty cheap
 export AITM_AGENT_DEFAULT_MODEL="deepseek/deepseek-v4.1-flash"
+export CLAUDE_CODE_MAX_CONTEXT_TOKENS=1000000
 
 # Runtime dir
 export AITM_RUNTIME_DIR="$HOME/code/gerardnico/aitm/.aitm"
