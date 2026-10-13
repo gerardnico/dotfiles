@@ -23,6 +23,8 @@ export CLAUDE_CODE_MAX_CONTEXT_TOKENS=1000000
 # https://code.claude.com/docs/en/agent-sdk/modifying-system-prompts#context-claude-code-adds-outside-the-system-prompt
 export CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS="1"
 
+# AITM env
+# See also aitm.sh
 # Runtime dir
 export AITM_RUNTIME_DIR="$HOME/code/gerardnico/aitm/.aitm"
 
