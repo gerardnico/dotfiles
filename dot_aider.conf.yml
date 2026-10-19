@@ -387,10 +387,8 @@ watch-files: true
 ## specify a read-only file (can be used multiple times)
 #read: xxx
 ## Specify multiple values like this:
-#read:
-#  - xxx
-#  - yyy
-#  - zzz
+read:
+  - ".agents/AGENTS.md"
 
 ## Use VI editing mode in the terminal (default: False)
 #vim: false

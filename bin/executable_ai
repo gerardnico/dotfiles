@@ -2,6 +2,7 @@
 set -Eeuo pipefail
 
 # Aitm Wrapper script to inject env
+# see also
 
 # "$(which -a git | sed -n '2p')" "$@"
 AITM_PATH=${AITM_PATH:-"$HOME/.virtualenvs/aitm/bin/aitm"}
@@ -17,17 +18,6 @@ OPENROUTER_API_KEY=$(pass "gerardnico/openrouter/api-key")
 
 # Pretty cheap
 export AITM_AGENT_DEFAULT_MODEL="deepseek/deepseek-v4.1-flash"
-
-# pi
-export PI_CODING_AGENT_SESSION_DIR="$HOME/code/gerardnico/aitm/.aitm/pi-sessions"
-
-# Claude
-# No git information by default
-# https://code.claude.com/docs/en/agent-sdk/modifying-system-prompts#context-claude-code-adds-outside-the-system-prompt
-export CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS="1"
-# to see the sessions, no env as for pi unfortunately
-export CLAUDE_CONFIG_DIR="$HOME/code/gerardnico/aitm/.aitm/.claude"
-export CLAUDE_CODE_MAX_CONTEXT_TOKENS=1000000
 
 # AITM env
 # See also aitm.sh
