@@ -2205,6 +2205,14 @@ main_brew() {
   # dnstools
   util_install_brew dnscontrol
 
+  # devcontainer
+  # https://formulae.brew.sh/formula/devcontainer
+  util_install_brew devcontainer
+
+  # Jupyter
+  # https://jupyter.org/install#homebrew
+  util_install_brew jupyter jupyterlab
+
   # install inotify
   install_inotify_tools_brew
 
