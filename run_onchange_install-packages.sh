@@ -2211,7 +2211,8 @@ main_brew() {
 
   # Jupyter
   # https://jupyter.org/install#homebrew
-  util_install_brew jupyter jupyterlab
+  # No more. Need a venv for clean installation
+  # util_install_brew jupyter jupyterlab
 
   # install inotify
   install_inotify_tools_brew

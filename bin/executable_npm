@@ -2,6 +2,15 @@
 set -Eeuo pipefail
 
 
+npm_needs_token() {
+    case "$1" in
+        publish|unpublish|deprecate|dist-tag|dist-tags|owner|author|access|team|org|token|whoami|profile|star|unstar|hook)
+            return 0 ;;
+        *)
+            return 1 ;;
+    esac
+}
+
 # fixed value
 # and not: (which -a npm | sed -n '2p')
 # because it get started by software with the path
@@ -14,10 +23,12 @@ if ! [ -f "$NPM_PATH" ]; then
 fi
 
 # Get a token in ~/.npmrc with npm login
-# Copy and delte the ~/.npmrc after
+# Copy and delete the ~/.npmrc after
 # The repo should have a file called .npmrc and have this conf:
 # //registry.npmjs.org/:_authToken=${NPM_TOKEN}
-export NPM_TOKEN
-NPM_TOKEN=$(pass npm/release-token)
+if npm_needs_token "$1"; then
+  export NPM_TOKEN
+  NPM_TOKEN=$(pass npm/release-token)
+fi
 
 "$NPM_PATH" "$@"

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Jupyter short cut
+PROJECT_NAME="notebook"
+UV_PROJECT_ENVIRONMENT="$HOME/.virtualenvs/${PROJECT_NAME}"
+
+# Activate
+# Modify the path
+if [ -d "$UV_PROJECT_ENVIRONMENT/Scripts" ]; then
+  # Windows (Git Bash / WSL boundary)
+  BIN_PATH="$UV_PROJECT_ENVIRONMENT/Scripts"
+else
+  # Linux/macOS
+  BIN_PATH="$UV_PROJECT_ENVIRONMENT/bin"
+fi
+source "${BIN_PATH}/activate"
+
+# Installation of the package
+#"${BIN_PATH}/pip" install --upgrade pip # upgrade because by default, there is bugs
+#"${BIN_PATH}/pip" install jupyterlab ipykernel
+#"${BIN_PATH}/pip" install langfun libmagic
+
+# Starting
+"${BIN_PATH}/jupyter" "$@"
