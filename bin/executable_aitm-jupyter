@@ -16,10 +16,11 @@ else
 fi
 source "${BIN_PATH}/activate"
 
-# Installation of the package
+# Once Installation of the Jupyter package
 #"${BIN_PATH}/pip" install --upgrade pip # upgrade because by default, there is bugs
 #"${BIN_PATH}/pip" install jupyterlab ipykernel
-#"${BIN_PATH}/pip" install langfun libmagic
 
-# Starting
-"${BIN_PATH}/jupyter" "$@"
+AITM_PATH=${AITM_PATH:-"$HOME/.virtualenvs/aitm/bin/aitm"}
+
+# Aitm needs the activation to detect jupyter, ipython, pip
+"$AITM_PATH" "jupyter" "$@"
