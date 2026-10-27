@@ -1043,6 +1043,8 @@ install_inotify_tools_brew() {
 }
 
 # Install from brew
+# first argument the cli name
+# second argument and more the package args (default to cli name)
 util_install_brew() {
   COMMAND=${1}
   # install may use a cask
@@ -2225,6 +2227,13 @@ main_brew() {
 
   # Install hcloud
   install_hcloud_brew
+
+  # Install try
+  # https://github.com/tobi/try#homebrew
+  if ! util_command_exists "try"; then
+      brew tap tobi/try https://github.com/tobi/try
+  fi
+  util_install_brew try
 
 }
 
