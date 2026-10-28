@@ -703,12 +703,18 @@ util_install_pipx() {
 }
 
 # Utility to install package globally
+# * <prefix>/lib/node_modules for Global packages
+
 util_install_npm() {
   COMMAND=${1}
   PACKAGE=${2:-${1}}
   OPTIONS=("${@:3}")
-  if util_command_exists "${COMMAND}"; then
-    echo "${COMMAND} found"
+
+  # Check <prefix>/bin for executables
+  # why not check on path (because on wsl, they may exit on windows path)
+  BIN_PATH="$(npm prefix -g)/bin/$COMMAND"
+  if [ -f "${BIN_PATH}" ];  then
+    echo "${COMMAND} found at ${BIN_PATH}"
     return
   fi
   if ! util_command_exists npm; then
@@ -2235,6 +2241,10 @@ main_brew() {
   fi
   util_install_brew try
 
+  # Mise
+  # https://mise.jdx.dev/installing-mise.html#homebrew
+  util_install_brew mise
+
 }
 
 # Package Manager or just file
@@ -2327,6 +2337,9 @@ main_node_npm() {
 
   # Install node
   install_nodejs
+
+  # Corepack (no more installed with node since version 25)
+  util_install_npm "corepack"
 
   # Markdown check
   util_install_npm "markdown-link-check"
