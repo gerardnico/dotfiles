@@ -2245,6 +2245,10 @@ main_brew() {
   # https://mise.jdx.dev/installing-mise.html#homebrew
   util_install_brew mise
 
+  # Some package such as tiktoken require the rust toolchain
+  # it installs rustc and cargo
+  util_install_brew cargo rust
+
 }
 
 # Package Manager or just file
