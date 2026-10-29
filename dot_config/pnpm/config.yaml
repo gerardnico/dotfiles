@@ -1,0 +1,6 @@
+# doc: https://pnpm.io/settings
+# Default is 16, and I get [23] The operation was aborted due to timeout
+networkConcurrency: 8
+fetchTimeout: 300000
+fetchRetries: 5
+fetchRetryMintimeout: 20000
