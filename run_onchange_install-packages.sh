@@ -2400,10 +2400,12 @@ main_bash() {
   install_claude_code_bash
 
   # Install Ori Harness
-  install_openrouter_ori_harness_bash
+  # Deprecated for aitm
+  # install_openrouter_ori_harness_bash
 
   # Install mitm
-  install_mitmproxy_bash
+  # Deprecated for aitm
+  # install_mitmproxy_bash
 
   # Install Sprite
   install_sprite_bash

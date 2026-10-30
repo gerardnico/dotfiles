@@ -1,14 +1,24 @@
 # Be sure to have the agent.md file
 # for all harnesses/agents
 
+RED='\033[0;31m'
+NC='\033[0m'  # no color
+
 ensure_symlink() {
 
   local TARGET_MD_PATH="$2"
-  if [ -e "$TARGET_MD_PATH" ] && [ -L "$TARGET_MD_PATH" ]; then
+  local AGENT_MD="$1"
+  # -e: true if the target path exists and is reachable
+  if [ ! -e "$TARGET_MD_PATH" ]; then
+    echo -e "${RED}The symlink target path $TARGET_MD_PATH does not exists for the source: $AGENT_MD${NC}" > /dev/stderr
     return
   fi
 
-  AGENT_MD="$1"
+  # -L: true if the path is a symbolic link
+  if [ -L "$TARGET_MD_PATH" ]; then
+    return
+  fi
+
   mkdir -p "$(dirname "$TARGET_MD_PATH")" || return 1
   echo "Creating the symlink from $AGENT_MD to $TARGET_MD_PATH" > /dev/stderr
   ln -s "$AGENT_MD" "$TARGET_MD_PATH"
