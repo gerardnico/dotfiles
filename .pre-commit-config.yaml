@@ -1,11 +1,15 @@
+# yaml-language-server: $schema=https://json.schemastore.org/pre-commit-config.json
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 # No tag as rev because they can be overwritten while sha cannot
 # Check the code
 # For update to the last commit `pre-commit autoupdate`. See https://pre-commit.com/#using-the-latest-version-for-a-repository
+default_language_version:
+  # Why? Error on node version such as prebuilt node (27.0.0-alpha.0.0.0).  ValueError: invalid literal for int() with base 10: '0-alpha'
+  node: system
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: 3e8a870 # v6.0.0
+    rev: v6.0.0 # v6.0.0
     hooks:
       - id: trailing-whitespace # trims trailing whitespace
       - id: end-of-file-fixer # makes sure files end in a newline and only a newline.
@@ -22,13 +26,13 @@ repos:
       # Checks for symlinks which do not point to anything.
       - id: check-symlinks
   - repo: https://github.com/tcort/markdown-link-check
-    rev: 3c9471f # v3.14.1
+    rev: v3.15.0 # v3.14.1
     hooks:
       - id: markdown-link-check
         name: markdown link check
         args: [ --quiet, "--config", ".config/markdown-link-check.config.json" ]
   - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
-    rev: e46582c # v9.23.0
+    rev: v9.27.0 # v9.23.0
     hooks:
       # equivalent to:
       # commitlint --extends '@commitlint/config-conventional' --config .config/commitlint.config.mjs --verbose --edit  "$1"
@@ -38,14 +42,14 @@ repos:
         additional_dependencies: [ '@commitlint/config-conventional' ]
         args: [ "--verbose", "--config", ".config/commitlint.config.mjs" ]
   - repo: https://github.com/combostrap/devfiles
-    rev: "v0.1.8"
+    rev: "v0.1.11"
     hooks:
       - id: git-prevent-out-of-sync-commit
         name: prevent out-of-sync branch commit
 #      - id: idea-format
 #        name: auto formatting with idea intellij if present
   - repo: https://github.com/editorconfig-checker/editorconfig-checker
-    rev: c9d5ed0 # v3.4.1
+    rev: v4.0.2 # v3.4.1
     hooks:
       - id: editorconfig-checker
         args: [ "--verbose", "--config", ".config/editorconfig-checker.config.json" ]

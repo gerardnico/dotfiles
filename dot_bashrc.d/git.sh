@@ -104,7 +104,7 @@ alias ngt="$GITURE_BIN_PATH/git-tag"
 
 # Gitx
 # Where all repo are
-export GITURE_REPOS_DIRS="$HOME/code/tabulify:$HOME/code/combostrap:$HOME/code"
+export GITURE_REPOS_DIRS="$HOME/code/tabulify:$HOME/code/combostrap:$HOME/code:$HOME/code/gerardnico:$HOME/src/tries"
 
 # Loss repo in the wild where the path is rigid
 # Brew Tap
