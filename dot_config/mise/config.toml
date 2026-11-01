@@ -3,3 +3,10 @@ idiomatic_version_file_enable_tools = ["node"]
 
 [settings.status]
 missing_tools = "always"
+
+[tools]
+# let mise managed node, so we get no shim
+# that conflicts with pre-commit
+# mise ERROR shim fallback recursion detected for node: ~/.cache/pre-commit/repon6twrtzy/node_env-system/bin/node keeps resolving back through mise.
+# Set a version for node, or remove mise's shim for it.
+node = "lts"
