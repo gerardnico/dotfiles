@@ -25,12 +25,14 @@ ensure_symlink() {
 
 }
 
-AITM_DIR="$HOME/code/gerardnico/aitm/.aitm"
-AITM_SKILLS_DIR="$HOME/code/gerardnico/agent-skills/skills"
-AITM_AGENT_MD="$HOME/.agents/AGENTS.md"
+# Pretty cheap
+export AITM_AGENT_DEFAULT_MODEL="deepseek/deepseek-v4.1-flash"
+export AITM_BASE_DIR="$HOME/code/gerardnico/aitm/.aitm"
+export AITM_SKILLS_DIR="$HOME/code/gerardnico/agent-skills/skills"
+export AITM_AGENT_MD="$HOME/.agents/AGENTS.md"
 # Claude
 # to see the sessions, no env as for pi unfortunately
-export CLAUDE_CONFIG_DIR="$AITM_DIR/.claude"
+export CLAUDE_CONFIG_DIR="$AITM_BASE_DIR/.claude"
 # No git information by default
 # https://code.claude.com/docs/en/agent-sdk/modifying-system-prompts#context-claude-code-adds-outside-the-system-prompt
 export CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS="1"
@@ -39,8 +41,8 @@ ensure_symlink "$AITM_AGENT_MD" "$CLAUDE_CONFIG_DIR/CLAUDE.md"
 ensure_symlink "$AITM_SKILLS_DIR" "$CLAUDE_CONFIG_DIR/skills"
 
 # Pi Agent
-# export PI_CODING_AGENT_SESSION_DIR="$AITM_DIR/pi-sessions"
-export PI_CODING_AGENT_DIR="$AITM_DIR/pi-agent"
+# export PI_CODING_AGENT_SESSION_DIR="$AITM_BASE_DIR/pi-sessions"
+export PI_CODING_AGENT_DIR="$AITM_BASE_DIR/pi-agent"
 
 # Aider
 # The AGENTS.md is in the read property of the configuration file
