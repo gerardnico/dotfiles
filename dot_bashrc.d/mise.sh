@@ -1,7 +1,7 @@
 
 
 if ! command -v "mise" > /dev/null 2>&1 ; then
-  exit
+  return
 fi
 
 # mise doesn’t override cd.
