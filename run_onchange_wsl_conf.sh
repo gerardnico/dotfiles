@@ -26,20 +26,15 @@ HOSTNAME=$(hostname)
 DOMAIN=${HOSTNAME%%.*}
 if [ "$DOMAIN" != "" ]; then
   echo "$SCRIPT_NAME - Check: Wsl hostname ($HOSTNAME) has the domain ($DOMAIN)"
-  exit
 fi
 
 # Overwriting wsl
 WSL_CONF=/etc/wsl.conf
 HOSTNAME="$HOSTNAME.local"
-echo "$SCRIPT_NAME - Setting Hostname to $HOSTNAME at $WSL_CONF"
+echo "$SCRIPT_NAME - Enabling systemd"
 # We use `tee` to be able to use sudo
 # We could use `> /dev/null` to not see the output on the terminal
 cat << EOF | sudo tee $WSL_CONF
-
-[network]
-hostname = $HOSTNAME
-
+[boot]
+systemd=true
 EOF
-
-
