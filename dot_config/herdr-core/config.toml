@@ -1,0 +1,2 @@
+# https://github.com/herdrdev/herdr-core#default-shell
+shell = ["bash", "--login", "-i"]

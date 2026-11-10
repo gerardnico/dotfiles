@@ -25,11 +25,13 @@ ensure_symlink() {
 
 }
 
-# Pretty cheap
+# Aitm
 export AITM_AGENT_DEFAULT_MODEL="deepseek/deepseek-v4.1-flash"
 export AITM_BASE_DIR="$HOME/code/gerardnico/aitm/.aitm"
 export AITM_SKILLS_DIR="$HOME/code/gerardnico/agent-skills/skills"
 export AITM_AGENT_MD="$HOME/.agents/AGENTS.md"
+export AITM_USE_SERVICE=1
+
 # Claude
 # to see the sessions, no env as for pi unfortunately
 export CLAUDE_CONFIG_DIR="$AITM_BASE_DIR/.claude"

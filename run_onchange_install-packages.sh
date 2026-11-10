@@ -2168,6 +2168,9 @@ main_brew() {
   # this is: https://www.gyan.dev/ffmpeg/builds/ that is advertised on the ffmpeg install page
   util_install_brew "ffmpeg"
 
+  # to create collage for melissa
+  util_install_brew "magick" "imagemagick"
+
   # typst
   # https://typst.app/open-source/#download
   # https://formulae.brew.sh/formula/typst
