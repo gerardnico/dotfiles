@@ -1,0 +1,8 @@
+
+# Windows config to login to WSL from windows
+Host wsl
+    HostName localhost
+    Port 22
+    User admin
+    IdentityFile ~/.ssh/wsl_id_rsa
+    IdentitiesOnly yes
