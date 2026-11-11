@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+PI_PATH="$(which -a pi | sed -n '2p')"
+if [ ! -f "$PI_PATH" ]; then
+  echo "Pi not found at $PI_PATH."
+  exit 1
+fi
+
+ai cli exec "$PI_PATH" "$@"
