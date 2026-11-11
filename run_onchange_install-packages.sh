@@ -2367,6 +2367,9 @@ main_node_npm() {
   # https://pi.dev/
   util_install_npm "pi" "@earendil-works/pi-coding-agent" "--ignore-scripts"
 
+  # https://paseo.sh/docs#server--cli
+  util_install_npm "paseo" "@getpaseo/cli"
+
 }
 
 # brew is supported as seen here: https://github.com/benbjohnson/litestream/releases
