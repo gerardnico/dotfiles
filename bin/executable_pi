@@ -1,10 +1,23 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-PI_PATH="$(which -a pi | sed -n '2p')"
-if [ ! -f "$PI_PATH" ]; then
-  echo "Pi not found at $PI_PATH."
-  exit 1
-fi
+# Get the original
+# We take the next path in the list of (which -a script_basename)
+# And not (which -a cmd | sed -n '2p') as it  may recurse if the file is now the second one
+# Note we could also do: (which -a cmd | tail -n 1)
+script_path="$(realpath "${BASH_SOURCE[0]}")"
+script_basename="$(basename "${BASH_SOURCE[0]}")"
+next_self() {
+  local found=0 p
+  while IFS= read -r p; do
+    if (( found )); then
+      printf '%s\n' "$p"
+      return 0
+    fi
+    [[ "$(realpath "$p")" == "$script_path" ]] && found=1
+  done < <(which -a "$script_basename")
+  return 1
+}
+real_path="$(next_self)" || { echo "$script_basename: no next $script_basename found in PATH" >&2; exit 1; }
 
-ai cli exec "$PI_PATH" "$@"
+ai cli exec "$real_path" "$@"

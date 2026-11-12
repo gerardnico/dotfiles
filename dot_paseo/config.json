@@ -1,0 +1,15 @@
+{
+  "agents": {
+    "providers": {
+      "pi": {
+        "label": "Aitm Pi",
+        "command": [
+          "ai",
+          "pi",
+          "--mode",
+          "rpc"
+        ]
+      }
+    }
+  }
+}
