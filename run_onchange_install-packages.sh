@@ -2103,41 +2103,8 @@ install_sprite_bash() {
 
 }
 
-util_install_local_bin() {
-  SOURCE=${1}
-  CMD_NAME=${2}
-  LOCAL_BIN="$HOME/.local/bin"
-  BIN_TARGET_FILE="$LOCAL_BIN/$CMD_NAME"
-  if [ -L "$BIN_TARGET_FILE" ]; then
-    echo "Deleting Symlink with non-existent target ($BIN_TARGET_FILE)"
-    rm "$BIN_TARGET_FILE"
-  fi
-  echo "Creating symlink of $SOURCE to ~/.local/bin"
-  ln -s "$SOURCE" "$BIN_TARGET_FILE"
-  if [ -f "$SOURCE" ]; then
-    # why to avoid: chmod: cannot operate on dangling symlink '/xxx'
-    chmod +x "$BIN_TARGET_FILE"
-  fi
-}
 
-# Install script without touching the PATH
-main_local_script() {
 
-  util_install_local_bin "$HOME/.claude/skills/pdf-compressor/scripts/pdf-compressor.py" "pdf-compressor"
-  # ntabul
-  util_install_local_bin "$HOME/code/tabulify/tabulify/contrib/script/ntabul" "ntabul"
-  # git wrapper
-  util_install_local_bin "$HOME/shims/local/git" "git"
-  # pass wrapper
-  util_install_local_bin "$HOME/shims/local/pass" "pass"
-  # chezmoi apply wrapper
-  util_install_local_bin "$HOME/scripts/chezmoi-apply-clean" "chezmoi-apply-clean"
-  # claude api key helper
-  util_install_local_bin "$HOME/scripts/claude-api-key-helper" "claude-api-key-helper"
-  # dock-x
-  util_install_local_bin "$HOME/code/gerardnico/dock-x/bin/dock-x" "ndock-x"
-
-}
 
 
 # deprecated: don't check for bad link
@@ -2432,6 +2399,7 @@ main_go_release(){
 
 }
 
+
 ## Installation
 main() {
 
@@ -2604,11 +2572,7 @@ main() {
   # Install postal helper
   install_postal
 
-  # Local Python/Bash Script installer
-  # At the end as they are may wrapper cli
-  # Otherwise you get the error: chmod: cannot operate on dangling symlink '/home/admin/.local/bin/aider'
-  main_local_script
-
 }
+
 
 main

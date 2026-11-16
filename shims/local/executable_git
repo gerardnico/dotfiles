@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -Eeuo pipefail
 # Git wrapper to be called by Idea to get the environment to have
 # * ssh key working (ssh agent)
 # * all git hook working such as `commitlint`

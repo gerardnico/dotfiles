@@ -6,7 +6,7 @@ This directory contains scripts that are not [shims](../shims/README.md).
 
 All these files are installed with:
 
-* a symlink created by [run_onchange_install-packages](../run_onchange_install-packages.sh)
+* a symlink created by [local installer](executable_chezmoi-install-local)
 * into `.local/bin`
 
 # Why?

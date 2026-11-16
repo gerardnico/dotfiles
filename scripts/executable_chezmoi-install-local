@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+# Install script after sync
+
+util_install_local_bin() {
+  SOURCE=${1}
+  CMD_NAME=${2}
+  LOCAL_BIN="$HOME/.local/bin"
+  BIN_TARGET_FILE="$LOCAL_BIN/$CMD_NAME"
+  if [ -f "$BIN_TARGET_FILE" ]; then
+    if [ ! -L "$BIN_TARGET_FILE" ]; then
+      # not a link, a file
+      echo "  * Deleting non link file ($BIN_TARGET_FILE)"
+      rm "$BIN_TARGET_FILE"
+    else
+      # a link
+      if [ ! -e "$BIN_TARGET_FILE" ]; then
+        echo "  * Deleting link file ($BIN_TARGET_FILE) because target link does not exists"
+        rm "$BIN_TARGET_FILE"
+      else
+        if [ "$(readlink "$BIN_TARGET_FILE")" != "$SOURCE" ]; then
+          echo "  * Deleting link file ($BIN_TARGET_FILE) because target link is not $SOURCE"
+          rm "$BIN_TARGET_FILE"
+        else
+          echo "  * Link file ($BIN_TARGET_FILE) already exists and is conform"
+          return
+        fi
+      fi
+    fi
+  fi
+  if [ ! -f "$SOURCE" ]; then
+    echo "  * Error: source $SOURCE doest not exist yet. Sync again"
+    return 1
+  fi
+  echo "  * Creating symlink of $SOURCE to ~/.local/bin"
+  ln -s "$SOURCE" "$BIN_TARGET_FILE"
+  if [ -f "$SOURCE" ]; then
+    # why to avoid: chmod: cannot operate on dangling symlink '/xxx'
+    chmod +x "$BIN_TARGET_FILE"
+  fi
+}
+
+# Install script without touching the PATH
+main_local_script() {
+
+  util_install_local_bin "$HOME/code/gerardnico/agent-skills/skills/pdf-compressor/scripts/pdf-compressor.py" "pdf-compressor"
+  # ntabul
+  util_install_local_bin "$HOME/code/tabulify/tabulify/contrib/script/ntabul" "ntabul"
+
+  util_install_local_bin "$HOME/shims/local/git" "git"
+  util_install_local_bin "$HOME/shims/local/paseo" "paseo"
+  util_install_local_bin "$HOME/shims/local/pass" "pass"
+  util_install_local_bin "$HOME/shims/local/pi" "pi"
+
+  # chezmoi apply wrapper
+  util_install_local_bin "$HOME/scripts/chezmoi-apply-clean" "chezmoi-apply-clean"
+  # claude api key helper
+  util_install_local_bin "$HOME/scripts/claude-api-key-helper" "claude-api-key-helper"
+  # dock-x
+  util_install_local_bin "$HOME/code/gerardnico/dock-x/bin/dock-x" "ndock-x"
+
+}
+
+echo After hook execution: local script installer
+main_local_script

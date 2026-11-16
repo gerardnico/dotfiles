@@ -15,8 +15,14 @@ edit:
     args: [ "-multiInst", "-notabbar", "-nosession", "-noPlugin"]
 {{ end }}
 
-# https://www.chezmoi.io/user-guide/advanced/install-your-password-manager-on-init/
+
 hooks:
-  read-source-state:
-    pre:
-      command: "code/dotfiles/.install-password-manager.sh"
+  # https://www.chezmoi.io/user-guide/advanced/install-your-password-manager-on-init/
+  # read-source-state:
+  #  pre:
+  #    command: "{{ .chezmoi.homeDir }}/.install-password-manager.sh"
+
+  # after apply
+  apply:
+    post:
+      command: "{{ .chezmoi.homeDir }}/scripts/chezmoi-install-local"
