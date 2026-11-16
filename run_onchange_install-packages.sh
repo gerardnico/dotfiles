@@ -2109,8 +2109,10 @@ util_install_local_bin() {
   LOCAL_BIN="$HOME/.local/bin"
   BIN_TARGET_FILE="$LOCAL_BIN/$CMD_NAME"
   if [ -L "$BIN_TARGET_FILE" ]; then
+    echo "Deleting Symlink with non-existent target ($BIN_TARGET_FILE)"
     rm "$BIN_TARGET_FILE"
   fi
+  echo "Creating symlink of $SOURCE to ~/.local/bin"
   ln -s "$SOURCE" "$BIN_TARGET_FILE"
   if [ -f "$SOURCE" ]; then
     # why to avoid: chmod: cannot operate on dangling symlink '/xxx'
@@ -2125,13 +2127,13 @@ main_local_script() {
   # ntabul
   util_install_local_bin "$HOME/code/tabulify/tabulify/contrib/script/ntabul" "ntabul"
   # git wrapper
-  util_install_local_bin "$HOME/bin-local/git" "git"
+  util_install_local_bin "$HOME/shims/local/git" "git"
   # pass wrapper
-  util_install_local_bin "$HOME/bin-local/pass" "pass"
+  util_install_local_bin "$HOME/shims/local/pass" "pass"
   # chezmoi apply wrapper
-  util_install_local_bin "$HOME/bin-local/chezmoi-apply-clean" "chezmoi-apply-clean"
+  util_install_local_bin "$HOME/scripts/chezmoi-apply-clean" "chezmoi-apply-clean"
   # claude api key helper
-  util_install_local_bin "$HOME/bin-local/claude-api-key-helper" "claude-api-key-helper"
+  util_install_local_bin "$HOME/scripts/claude-api-key-helper" "claude-api-key-helper"
   # dock-x
   util_install_local_bin "$HOME/code/gerardnico/dock-x/bin/dock-x" "ndock-x"
 

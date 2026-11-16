@@ -21,7 +21,7 @@ export ANTHROPIC_AUTH_TOKEN=xxx
 export ANTHROPIC_API_KEY=""
 ```
 
-For an example, see [Claude Api Key Helper](../bin-local/executable_claude-api-key-helper)
+For an example, see [Claude Api Key Helper](../scripts/executable_claude-api-key-helper)
 
 ```json
 {

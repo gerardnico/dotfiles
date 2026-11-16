@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# A pass wrapper to intercept who is calling pass
+
+set -Eeuo pipefail
+if [ "$BASHLIB_PATH" == "" ]; then
+  echo "Error: BASHLIB_PATH not found"
+  exit 1
+fi
+
+export PATH="$BASHLIB_PATH:$PATH"
+
+# Trying to see who call it
+source "bashlib-stack.sh"
+BASE_DIR="$HOME/code/nico/tmp/"
+DAY_LOG_DIR="$BASE_DIR/$(date +"%Y-%m-%d")"
+mkdir -p "$DAY_LOG_DIR"
+stack::print_process_tree >> "$DAY_LOG_DIR/$(date +"%Y%m%d-%H%M%S")-pass.log"
+
+# Get the original
+# We take the next path in the list of (which -a script_basename)
+# And not (which -a cmd | sed -n '2p') as it  may recurse if the file is now the second one
+# Note we could also do: (which -a cmd | tail -n 1)
+script_path="$(realpath "${BASH_SOURCE[0]}")"
+script_basename="$(basename "${BASH_SOURCE[0]}")"
+next_self() {
+  local found=0 p
+  while IFS= read -r p; do
+    if (( found )); then
+      printf '%s\n' "$p"
+      return 0
+    fi
+    [[ "$(realpath "$p")" == "$script_path" ]] && found=1
+  done < <(which -a "$script_basename")
+  return 1
+}
+real_path="$(next_self)" || { echo "$script_basename: no next $script_basename found in PATH" >&2; exit 1; }
+
+# Run
+# We select the second in path order
+# Why? we may get it from the project (ie sdk man) and also globally from brew.
+# We take the second in order of priority
+"$real_path" "$@"
