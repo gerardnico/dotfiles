@@ -47,10 +47,11 @@ main_local_script() {
   # ntabul
   util_install_local_bin "$HOME/code/tabulify/tabulify/contrib/script/ntabul" "ntabul"
 
+  util_install_local_bin "$HOME/shims/local/aitm" "aitm"
   util_install_local_bin "$HOME/shims/local/git" "git"
   util_install_local_bin "$HOME/shims/local/paseo" "paseo"
   util_install_local_bin "$HOME/shims/local/pass" "pass"
-  util_install_local_bin "$HOME/shims/local/pi" "pi"
+
 
   # chezmoi apply wrapper
   util_install_local_bin "$HOME/scripts/chezmoi-apply-clean" "chezmoi-apply-clean"

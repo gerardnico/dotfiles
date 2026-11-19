@@ -1,10 +1,10 @@
 {
   "agents": {
     "providers": {
-      "pi": {
+      "aitm-pi": {
         "label": "Aitm Pi",
         "command": [
-          "ai",
+          "aitm",
           "pi",
           "--mode",
           "rpc"

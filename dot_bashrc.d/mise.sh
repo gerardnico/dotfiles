@@ -8,7 +8,7 @@ fi
 # Deprecated globally: No global activation otherwise we get shims on path
 # such as pi: ~/.local/share/mise/shims/pi
 # Activate by repository via direnv
-# eval "$(mise activate bash)"
+# eval "$(mise activate bash --shims)"
 # config is in the .config/mise/config.toml
 
 # ie in direnv, execute

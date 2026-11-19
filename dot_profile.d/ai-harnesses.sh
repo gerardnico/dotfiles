@@ -9,7 +9,7 @@ ensure_symlink() {
   local TARGET_MD_PATH="$2"
   local AGENT_MD="$1"
   # -e: true if the target path exists and is reachable
-  if [ ! -e "$TARGET_MD_PATH" ]; then
+  if [ -f "$TARGET_MD_PATH" ] && [ ! -e "$TARGET_MD_PATH" ]; then
     echo -e "${RED}The symlink target path $TARGET_MD_PATH does not exists for the source: $AGENT_MD${NC}" > /dev/stderr
     return
   fi
@@ -45,10 +45,14 @@ ensure_symlink "$AITM_SKILLS_DIR" "$CLAUDE_CONFIG_DIR/skills"
 # Pi Agent
 # export PI_CODING_AGENT_SESSION_DIR="$AITM_BASE_DIR/pi-sessions"
 export PI_CODING_AGENT_DIR="$AITM_BASE_DIR/pi-agent"
+ensure_symlink "$AITM_SKILLS_DIR" "$PI_CODING_AGENT_DIR/skills"
 
 # Aider
 # The AGENTS.md is in the read property of the configuration file
 export AIDER_CACHE_PROMPTS=true
+export AIDER_MODEL=openrouter/deepseek/deepseek-v4.1-flash  # main model (same as --model)
+export AIDER_WEAK_MODEL=openrouter/deepseek/deepseek-v4.1-flash # commit messages, summaries
+export AIDER_EDITOR_MODEL=openrouter/deepseek/deepseek-v4.1-flash # for architect mode
 
 # Other harness
 ensure_symlink "$AITM_AGENT_MD" "$HOME/.config/opencode/AGENTS.md"

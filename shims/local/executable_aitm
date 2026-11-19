@@ -2,9 +2,7 @@
 set -Eeuo pipefail
 
 # Aitm Wrapper script to inject env
-# see also
 
-# "$(which -a git | sed -n '2p')" "$@"
 AITM_PATH=${AITM_PATH:-"$HOME/.virtualenvs/aitm/bin/aitm"}
 if ! [ -f "$AITM_PATH" ]; then
   echo "Aitm not found at $AITM_PATH."
