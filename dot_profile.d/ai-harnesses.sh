@@ -27,7 +27,7 @@ ensure_symlink() {
 
 # Aitm
 export AITM_AGENT_DEFAULT_MODEL="deepseek/deepseek-v4.1-flash"
-export AITM_BASE_DIR="$HOME/code/gerardnico/aitm/.aitm"
+export AITM_STATE_DIR="$HOME/code/gerardnico/aitm/.aitm"
 export AITM_SKILLS_DIR="$HOME/code/gerardnico/agent-skills/skills"
 export AITM_AGENT_MD="$HOME/.agents/AGENTS.md"
 export AITM_USE_SERVICE=1

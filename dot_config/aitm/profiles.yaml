@@ -1,0 +1,3 @@
+# yaml-language-server: $schema=../../../gerardnico/aitm/docs/site/profiles.schema.json
+implementer:
+  command: [ "pi", "--system-prompt", "${AITM_SOURCE}/implementer.md" ]
