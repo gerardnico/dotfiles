@@ -34,7 +34,7 @@ export AITM_USE_SERVICE=1
 
 # Claude
 # to see the sessions, no env as for pi unfortunately
-export CLAUDE_CONFIG_DIR="$AITM_BASE_DIR/.claude"
+export CLAUDE_CONFIG_DIR="$AITM_STATE_DIR/.claude"
 # No git information by default
 # https://code.claude.com/docs/en/agent-sdk/modifying-system-prompts#context-claude-code-adds-outside-the-system-prompt
 export CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS="1"
@@ -44,7 +44,7 @@ ensure_symlink "$AITM_SKILLS_DIR" "$CLAUDE_CONFIG_DIR/skills"
 
 # Pi Agent
 # export PI_CODING_AGENT_SESSION_DIR="$AITM_BASE_DIR/pi-sessions"
-export PI_CODING_AGENT_DIR="$AITM_BASE_DIR/pi-agent"
+export PI_CODING_AGENT_DIR="$AITM_STATE_DIR/pi-agent"
 ensure_symlink "$AITM_SKILLS_DIR" "$PI_CODING_AGENT_DIR/skills"
 
 # Aider
