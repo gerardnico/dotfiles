@@ -702,6 +702,32 @@ util_install_pipx() {
 
 }
 
+# Utility to install via uv
+util_install_tool_uv() {
+
+  local COMMAND="${1}"
+  local ARGS=("${@:2}")
+
+  if (( ${#ARGS[@]} == 0 )); then
+    ARGS=("$COMMAND")
+  fi
+
+  if [ -f "$HOME/.local/bin/${COMMAND}" ]; then
+    echo "${COMMAND} found"
+    return
+  fi
+  if ! util_command_exists uv; then
+    echo "uv is required to install $COMMAND"
+    return 1
+  fi
+
+  echo "$COMMAND installation with uv"
+  echo "uv tool install ${ARGS[*]}"
+  uv tool install "${ARGS[@]}"
+  echo "$COMMAND installation done"
+
+}
+
 # Utility to install package globally
 # * <prefix>/lib/node_modules for Global packages
 
@@ -1893,9 +1919,6 @@ install_python_pipx() {
       sudo apt remove -y pipx
   fi
 
-
-
-
   if [ "$CHEZMOI_OS" == "windows" ]; then
     if util_command_exists pipx; then
         echo "Pipx installed on Windows"
@@ -1922,6 +1945,8 @@ install_python_pipx() {
   echo "Pipx installed"
 
 }
+
+
 
 install_python() {
 
@@ -2200,9 +2225,6 @@ main_brew() {
   # deno
   install_deno_brew
 
-  # uv / python manager
-  install_uv_brew
-
   # Install hcloud
   install_hcloud_brew
 
@@ -2254,9 +2276,16 @@ main_os_packager_apt() {
 
 }
 
-# Install python cli
+main_python_tool_uv() {
 
-main_python() {
+  # Vibe install
+  # https://docs.mistral.ai/vibe/code/cli#manual-install
+  util_install_tool_uv vibe --python 3.14 mistral-vibe
+
+}
+
+# Install python cli
+main_python_pipx() {
   # Install Python
   install_python
   install_python_pipx
@@ -2430,13 +2459,17 @@ main() {
   # Open Ssl
   install_open_ssl
 
-  main_python
+  main_python_pipx
 
   # from node
   main_node_npm
 
   # go release from github
   main_go_release
+
+  # uv / python manager
+  install_uv_brew
+  main_python_tool_uv
 
   # Install openoffice
   install_openoffice
